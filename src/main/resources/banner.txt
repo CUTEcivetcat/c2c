@@ -1,0 +1,7 @@
+${AnsiColor.BRIGHT_CYAN}
+   ____  ____  ____
+  / ___||  _ \|  _ \     ${AnsiColor.BRIGHT_YELLOW}C2C SECOND-HAND MARKETPLACE${AnsiColor.BRIGHT_CYAN}
+ | |   | |_) | |_) |
+ | |___|  __/|  __/      ${AnsiColor.DEFAULT}v${spring.application.version:1.0.0} · Spring Boot ${spring-boot.version}${AnsiColor.BRIGHT_CYAN}
+  \____|_|   |_|         ${AnsiColor.BRIGHT_GREEN}Let idle things flow again${AnsiColor.DEFAULT}
+${AnsiColor.DEFAULT}
