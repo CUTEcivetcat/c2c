@@ -42,10 +42,11 @@ jwt:
   secret: YOUR_JWT_SECRET
 
 app:
-  # 上传文件保存的根目录（绝对路径）
+  # 上传文件保存的根目录（推荐相对路径 ./uploads，基于启动目录/项目根目录；
+  # 服务器部署可用绝对路径，如 /softservice/c2c/uploads）
   upload-root: YOUR_UPLOAD_ROOT
 
 logging:
   file:
-    # 日志文件路径（绝对路径）
+    # 日志文件路径（推荐相对路径 ./logs/app.log；服务器部署用绝对路径）
     name: YOUR_LOG_FILE
