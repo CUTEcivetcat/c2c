@@ -13,6 +13,14 @@
       </button>
     </div>
 
+    <!-- 最新公告横幅 -->
+    <div v-if="announcements.length" class="announce-banner" @click="$router.push('/announcement')">
+      <span class="ann-icon">📢</span>
+      <span class="ann-label">{{ annType(announcements[0]) }}</span>
+      <span class="ann-text">{{ announcements[0].title }}</span>
+      <span class="ann-more">查看全部 ›</span>
+    </div>
+
     <!-- Banner 横幅 -->
     <div class="hero-banner fade-in-up" v-if="!selectedCat && products.length > 0">
       <div class="hero-content">
@@ -113,6 +121,7 @@ import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { getCategories, searchProducts } from '@/api/product'
 import { addFavorite, removeFavorite } from '@/api/favorite'
+import { getAnnouncementLatest } from '@/api/announcement'
 
 const store = useUserStore()
 const categories = ref([])
@@ -122,7 +131,10 @@ const page = ref(1)
 const total = ref(0)
 const sort = ref('created_at')
 const loading = ref(false)
+const announcements = ref([])
 const conditionMap = { 1: '全新', 2: '几乎全新', 3: '轻微使用', 4: '明显使用' }
+
+const annType = (a) => ({ 1: '公告', 2: '平台公约', 3: '通知' }[a?.type] || '公告')
 
 const loadProducts = async () => {
   loading.value = true
@@ -150,6 +162,8 @@ const toggleFav = async (p) => {
 onMounted(async () => {
   categories.value = await getCategories() || []
   loadProducts()
+  // 加载最新公告（首页横幅）
+  getAnnouncementLatest(3).then(r => { announcements.value = r || [] }).catch(() => {})
 })
 </script>
 
@@ -171,6 +185,26 @@ onMounted(async () => {
 .cat-chip:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
 .cat-chip.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
 .cat-icon { font-size: 16px; }
+
+/* 最新公告横幅 */
+.announce-banner {
+  display: flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #fff8f0, #fff3e6);
+  border: 1px solid #ffe3c2; border-radius: 12px;
+  padding: 10px 16px; margin: -10px 0 20px; cursor: pointer;
+  transition: all 0.25s; overflow: hidden;
+}
+.announce-banner:hover { border-color: #ffb26b; box-shadow: 0 4px 16px rgba(255,107,53,0.12); }
+.ann-icon { font-size: 16px; flex-shrink: 0; }
+.ann-label {
+  flex-shrink: 0; font-size: 11px; color: #e55a2b; font-weight: 700;
+  background: #ffe8dc; padding: 1px 8px; border-radius: 8px;
+}
+.ann-text {
+  flex: 1; font-size: 13px; color: #2d3436; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ann-more { flex-shrink: 0; font-size: 12px; color: #b2bec3; }
 
 /* Banner */
 .hero-banner {

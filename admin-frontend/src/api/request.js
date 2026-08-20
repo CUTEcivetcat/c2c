@@ -62,5 +62,11 @@ export const adminApi = {
   handleReport: (id, data) => request.post(`/review/reports/${id}/handle`, data),
   getAppeals: (params) => request.get('/review/appeals', { params }),
   getAppealDetail: (id) => request.get(`/review/appeals/${id}`),
-  handleAppeal: (id, data) => request.post(`/review/appeals/${id}/handle`, data)
+  handleAppeal: (id, data) => request.post(`/review/appeals/${id}/handle`, data),
+  // 公告管理
+  getAnnouncements: (params) => request.get('/admin/announcement/list', { params }),
+  createAnnouncement: (data) => request.post('/admin/announcement', data),
+  updateAnnouncement: (id, data) => request.put(`/admin/announcement/${id}`, data),
+  toggleAnnouncementStatus: (id, status) => request.put(`/admin/announcement/${id}/status`, { status }),
+  deleteAnnouncement: (id) => request.delete(`/admin/announcement/${id}`)
 }

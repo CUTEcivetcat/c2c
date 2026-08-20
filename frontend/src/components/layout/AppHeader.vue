@@ -46,6 +46,8 @@
               <el-dropdown-item @click="$router.push('/my/report')"><el-icon><Warning /></el-icon> 我的举报</el-dropdown-item>
               <el-dropdown-item @click="$router.push('/my/appeal')"><el-icon><RefreshLeft /></el-icon> 我的整改申诉</el-dropdown-item>
               <el-dropdown-item v-if="store.userInfo?.role === 2" @click="$router.push('/review')"><el-icon><Checked /></el-icon> 审核工作台</el-dropdown-item>
+              <el-dropdown-item v-if="store.userInfo?.role === 1" @click="goAdmin"><el-icon><Monitor /></el-icon> 管理后台</el-dropdown-item>
+              <el-dropdown-item divided @click="$router.push('/announcement')"><el-icon><Bell /></el-icon> 平台公告</el-dropdown-item>
               <el-dropdown-item @click="$router.push('/address')"><el-icon><Location /></el-icon> 收货地址</el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout"><el-icon><SwitchButton /></el-icon> 退出登录</el-dropdown-item>
             </template>
@@ -106,6 +108,11 @@ const mobileMenuOpen = ref(false)
 
 const goSearch = () => { if (keyword.value.trim()) { router.push({ name: 'Search', query: { keyword: keyword.value.trim() } }); mobileMenuOpen.value = false } }
 const handleLogout = async () => { await store.logout(); router.push('/'); mobileMenuOpen.value = false }
+// 管理后台入口：开发环境跳本地管理端(5174)，生产跳 /admin/
+const goAdmin = () => {
+  const url = import.meta.env.DEV ? 'http://localhost:5174/' : '/admin/'
+  window.open(url, '_blank', 'noopener')
+}
 
 // 未读角标：不主动轮询/推送，仅在"登录后"和"页面切换时"刷新（按需同步）
 const fetchUnread = async () => {

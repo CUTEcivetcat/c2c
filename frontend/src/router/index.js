@@ -119,6 +119,11 @@ const routes = [
     name: 'MyAppeal',
     component: () => import('@/views/MyAppealView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/announcement',
+    name: 'AnnouncementList',
+    component: () => import('@/views/AnnouncementListView.vue')
   }
 ]
 
