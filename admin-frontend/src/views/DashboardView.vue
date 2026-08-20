@@ -25,10 +25,12 @@
     <!-- 快捷操作 -->
     <el-card style="border-radius:14px;margin-top:20px">
       <h3 style="margin-bottom:12px">快捷操作</h3>
-      <div style="display:flex;gap:12px">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
         <el-button type="primary" @click="$router.push('/users')">👥 用户管理</el-button>
         <el-button type="warning" @click="$router.push('/products')">📦 商品管理</el-button>
         <el-button type="success" @click="$router.push('/orders')">📋 订单管理</el-button>
+        <el-button type="danger" plain @click="$router.push('/review')">🛡️ 审核管理</el-button>
+        <el-button plain @click="$router.push('/announcement')">📢 公告管理</el-button>
       </div>
     </el-card>
   </div>

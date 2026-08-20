@@ -12,7 +12,11 @@
         <el-table-column prop="username" label="用户名" min-width="130" />
         <el-table-column prop="phone" label="手机号" width="140"><template #default="{row}"><span v-if="row.phone">{{ row.phone.slice(0,3) }}****{{ row.phone.slice(7) }}</span></template></el-table-column>
         <el-table-column prop="email" label="邮箱" min-width="180" />
-        <el-table-column label="角色" width="90"><template #default="{row}"><el-tag v-if="row.role===1" type="danger" size="small">管理员</el-tag><el-tag v-else type="info" size="small">普通用户</el-tag></template></el-table-column>
+        <el-table-column label="角色" width="100"><template #default="{row}">
+          <el-tag v-if="row.role===1" type="danger" size="small">管理员</el-tag>
+          <el-tag v-else-if="row.role===2" type="warning" size="small">审核员</el-tag>
+          <el-tag v-else type="info" size="small">普通用户</el-tag>
+        </template></el-table-column>
         <el-table-column prop="reputationScore" label="信誉" width="80" />
         <el-table-column label="状态" width="100"><template #default="{row}"><el-tag :type="row.status===1?'success':'danger'" size="small">{{ row.status===1?'正常':'封禁' }}</el-tag></template></el-table-column>
         <el-table-column label="注册时间" width="170"><template #default="{row}">{{ fmtTime(row.createdAt) }}</template></el-table-column>
