@@ -38,6 +38,9 @@ scripts/
 # ===== 本地 agent 技能（.dsh/skills，个人开发辅助，不进仓库）=====
 .dsh/
 
+# ===== git 备份目录 =====
+.git-backup-*/
+
 # ===== 构建产物 =====
 target/
 **/node_modules/
