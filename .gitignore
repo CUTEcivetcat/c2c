@@ -15,6 +15,7 @@ config/*
 
 # ===== 数据库导出（含真实业务数据，绝不上传）=====
 sql/c2c.sql
+sql/c2cnew.sql
 sql/c2c-monolith.sql
 sql/rebuild-full.sql
 sql/*.sql.bak
