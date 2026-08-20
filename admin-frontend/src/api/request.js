@@ -68,5 +68,8 @@ export const adminApi = {
   createAnnouncement: (data) => request.post('/admin/announcement', data),
   updateAnnouncement: (id, data) => request.put(`/admin/announcement/${id}`, data),
   toggleAnnouncementStatus: (id, status) => request.put(`/admin/announcement/${id}/status`, { status }),
-  deleteAnnouncement: (id) => request.delete(`/admin/announcement/${id}`)
+  deleteAnnouncement: (id) => request.delete(`/admin/announcement/${id}`),
+  // 昵称审核
+  getNicknameAudits: (params) => request.get('/review/nickname/list', { params }),
+  handleNicknameAudit: (id, data) => request.post(`/review/nickname/${id}/handle`, data)
 }

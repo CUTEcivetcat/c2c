@@ -116,6 +116,8 @@ public interface ApiPath {
     String REVIEW_APPEALS = "/review/appeals";
     String REVIEW_APPEAL_DETAIL = "/review/appeals/{id}";
     String REVIEW_APPEAL_HANDLE = "/review/appeals/{id}/handle";
+    String REVIEW_NICKNAME_LIST = "/review/nickname/list";
+    String REVIEW_NICKNAME_HANDLE = "/review/nickname/{id}/handle";
 
     // ==================== 管理端 /admin ====================
     String ADMIN = "/admin";

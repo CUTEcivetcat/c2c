@@ -6,12 +6,15 @@ import com.c2c.common.result.R;
 import com.c2c.review.dto.ReviewHandleDTO;
 import com.c2c.review.service.ReviewService;
 import com.c2c.review.vo.AppealVO;
+import com.c2c.review.vo.NicknameAuditVO;
 import com.c2c.review.vo.ReportVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * 审核工作台（审核员 role=2 或管理员）：处理商品举报与整改申诉。
@@ -70,6 +73,26 @@ public class ReviewController {
                                 @Parameter(hidden = true) @RequestHeader(value = "X-User-Role", required = false) String userRole,
                                 @RequestBody ReviewHandleDTO dto) {
         reviewService.handleAppeal(id, handlerId, resolveRole(userRole), dto);
+        return R.ok();
+    }
+
+    @Operation(summary = "昵称修改审核列表", description = "可按状态筛选：0待审 1已通过 2已拒绝；待审排前")
+    @GetMapping(ApiPath.REVIEW_NICKNAME_LIST)
+    public R<Page<NicknameAuditVO>> nicknameAudits(@Parameter(description = "状态筛选，不传查全部") @RequestParam(required = false) Integer status,
+                                                   @Parameter(description = "页码，从 1 开始") @RequestParam(defaultValue = "1") int page,
+                                                   @Parameter(description = "每页条数") @RequestParam(defaultValue = "10") int size) {
+        return R.ok(reviewService.listNicknameAudits(status, page, size));
+    }
+
+    @Operation(summary = "处理昵称审核", description = "body：{approve: true通过/false拒绝, reason: 拒绝原因（拒绝时建议填写）}")
+    @PostMapping(ApiPath.REVIEW_NICKNAME_HANDLE)
+    public R<Void> handleNicknameAudit(@Parameter(description = "审核记录 ID") @PathVariable Long id,
+                                       @Parameter(hidden = true) @RequestHeader("X-User-Id") Long handlerId,
+                                       @Parameter(hidden = true) @RequestHeader(value = "X-User-Role", required = false) String userRole,
+                                       @RequestBody Map<String, Object> body) {
+        boolean approve = Boolean.TRUE.equals(body.get("approve"));
+        String reason = body.get("reason") == null ? null : String.valueOf(body.get("reason"));
+        reviewService.handleNicknameAudit(id, handlerId, resolveRole(userRole), approve, reason);
         return R.ok();
     }
 

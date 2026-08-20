@@ -71,6 +71,43 @@
           </div>
         </el-card>
       </el-tab-pane>
+
+      <!-- ==================== 昵称审核 ==================== -->
+      <el-tab-pane label="昵称审核" name="nickname">
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <el-select v-model="nicknameStatus" placeholder="状态筛选" clearable style="width:150px" @change="loadNicknames">
+            <el-option :value="0" label="待审核" /><el-option :value="1" label="已通过" /><el-option :value="2" label="已拒绝" />
+          </el-select>
+          <el-button type="primary" @click="loadNicknames" :loading="nicknameLoading">刷新</el-button>
+        </div>
+        <el-card style="border-radius:14px">
+          <el-table :data="nicknames" stripe>
+            <el-table-column prop="id" label="ID" width="70" />
+            <el-table-column prop="userName" label="申请人" width="130" />
+            <el-table-column prop="oldNickname" label="原昵称" width="130"><template #default="{row}">
+              <span style="color:#b2bec3;text-decoration:line-through">{{ row.oldNickname || '-' }}</span>
+            </template></el-table-column>
+            <el-table-column prop="newNickname" label="新昵称" min-width="140"><template #default="{row}">
+              <span style="font-weight:600;color:#e55a2b">{{ row.newNickname }}</span>
+            </template></el-table-column>
+            <el-table-column label="状态" width="90"><template #default="{row}">
+              <el-tag :type="nicknameStatusType(row.status)" size="small">{{ nicknameStatusText(row.status) }}</el-tag>
+            </template></el-table-column>
+            <el-table-column prop="reason" label="拒绝原因" min-width="140" show-overflow-tooltip />
+            <el-table-column label="申请时间" width="160"><template #default="{row}">{{ fmtTime(row.createdAt) }}</template></el-table-column>
+            <el-table-column label="操作" width="150" fixed="right"><template #default="{row}">
+              <template v-if="row.status === 0">
+                <el-button type="success" size="small" plain @click="approveNickname(row)">通过</el-button>
+                <el-button type="danger" size="small" plain @click="rejectNickname(row)">拒绝</el-button>
+              </template>
+              <span v-else style="color:#b2bec3;font-size:12px">已处理</span>
+            </template></el-table-column>
+          </el-table>
+          <div style="margin-top:16px;text-align:center">
+            <el-pagination layout="prev,pager,next" :total="nicknameTotal" :page-size="10" v-model:current-page="nicknamePage" @change="loadNicknames" />
+          </div>
+        </el-card>
+      </el-tab-pane>
     </el-tabs>
 
     <!-- ==================== 举报详情 ==================== -->
@@ -207,6 +244,50 @@ const loadAppeals = async () => {
   } catch (e) { /* 拦截器已提示 */ } finally { appealLoading.value = false }
 }
 
+// ==================== 昵称审核 ====================
+const nicknames = ref([])
+const nicknameTotal = ref(0)
+const nicknamePage = ref(1)
+const nicknameStatus = ref(0)
+const nicknameLoading = ref(false)
+const nicknameStatusMap = { 0: '待审核', 1: '已通过', 2: '已拒绝' }
+const nicknameStatusText = (s) => nicknameStatusMap[s] || '未知'
+const nicknameStatusType = (s) => ({ 0: 'warning', 1: 'success', 2: 'danger' }[s] || '')
+
+const loadNicknames = async () => {
+  nicknameLoading.value = true
+  try {
+    const res = await adminApi.getNicknameAudits({ status: nicknameStatus.value, page: nicknamePage.value, size: 10 })
+    nicknames.value = res.records; nicknameTotal.value = res.total
+  } catch (e) { /* 拦截器已提示 */ } finally { nicknameLoading.value = false }
+}
+
+const approveNickname = async (row) => {
+  try {
+    await ElMessageBox.confirm(`通过「${row.newNickname}」的昵称申请？通过后立即生效。`, '昵称审核', { type: 'info' })
+  } catch { return }
+  try {
+    await adminApi.handleNicknameAudit(row.id, { approve: true })
+    ElMessage.success('已通过，昵称已生效')
+    loadNicknames()
+  } catch (e) { /* */ }
+}
+
+const rejectNickname = async (row) => {
+  let reason = ''
+  try {
+    const { value } = await ElMessageBox.prompt(`拒绝「${row.newNickname}」的昵称申请，请填写原因（用户可见）。`, '昵称审核',
+      { inputType: 'textarea', inputPlaceholder: '例如：昵称含广告信息', confirmButtonText: '确认拒绝', cancelButtonText: '取消' })
+    reason = (value || '').trim()
+  } catch { return }
+  if (!reason) { ElMessage.warning('请填写拒绝原因'); return }
+  try {
+    await adminApi.handleNicknameAudit(row.id, { approve: false, reason })
+    ElMessage.success('已拒绝')
+    loadNicknames()
+  } catch (e) { /* */ }
+}
+
 const openReport = async (id) => {
   try {
     reportDetail.value = await adminApi.getReportDetail(id)
@@ -277,5 +358,5 @@ const handleAppeal = async (action) => {
   } catch (e) { /* 拦截器已提示 */ } finally { handling.value = false }
 }
 
-onMounted(() => { loadReports(); loadAppeals() })
+onMounted(() => { loadReports(); loadAppeals(); loadNicknames() })
 </script>

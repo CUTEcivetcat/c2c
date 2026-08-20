@@ -21,3 +21,6 @@ export const handleReport = (id, data) => request.post(`/review/reports/${id}/ha
 export const getAppeals = (params) => request.get('/review/appeals', { params })
 export const getAppealDetail = (id) => request.get(`/review/appeals/${id}`)
 export const handleAppeal = (id, data) => request.post(`/review/appeals/${id}/handle`, data)
+// 昵称修改审核
+export const getNicknameAudits = (params) => request.get('/review/nickname/list', { params })
+export const handleNicknameAudit = (id, data) => request.post(`/review/nickname/${id}/handle`, data)

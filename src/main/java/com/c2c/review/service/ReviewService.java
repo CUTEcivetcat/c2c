@@ -5,6 +5,7 @@ import com.c2c.review.dto.AppealCreateDTO;
 import com.c2c.review.dto.ReportCreateDTO;
 import com.c2c.review.dto.ReviewHandleDTO;
 import com.c2c.review.vo.AppealVO;
+import com.c2c.review.vo.NicknameAuditVO;
 import com.c2c.review.vo.ReportVO;
 
 /**
@@ -43,4 +44,10 @@ public interface ReviewService {
 
     /** 处理整改申诉（approve 恢复上架 / reject 驳回），写日志并通知卖家 */
     void handleAppeal(Long id, Long handlerId, Integer handlerRole, ReviewHandleDTO dto);
+
+    /** 昵称修改审核列表（可按状态筛选：0待审 1通过 2拒绝） */
+    Page<NicknameAuditVO> listNicknameAudits(Integer status, int page, int size);
+
+    /** 处理昵称审核（approve 通过生效 / reject 拒绝保留旧昵称），写日志并通知用户 */
+    void handleNicknameAudit(Long id, Long handlerId, Integer handlerRole, boolean approve, String reason);
 }
