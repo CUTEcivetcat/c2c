@@ -30,6 +30,23 @@ bash start/start-frontend.sh all        # 全部
 
 > 端口见各项目 `vite.config.js`（默认 5173，多项目启动时 Vite 自动 +1 递增）。
 
+## 前端打包（build-frontend）
+
+打包产物输出到各项目 `dist/` 目录，可配合 `deploy/upload-frontend.sh` 上传服务器。
+
+**Windows（双击 .bat）**：
+- 双击 `build-frontend.bat` → 打包用户端
+- 或命令行：`build-frontend.bat admin` / `blog` / `all`
+
+**Linux / macOS / Git Bash**：
+```bash
+bash start/build-frontend.sh            # 用户端
+bash start/build-frontend.sh admin      # 管理端
+bash start/build-frontend.sh all        # 全部
+```
+
+首次运行自动 `npm install`，之后直接 `npm run build`。
+
 ## 后端启动
 
 后端是 Spring Boot，先打包再运行（详见 `deploy/docs/` 或根目录 README）：
