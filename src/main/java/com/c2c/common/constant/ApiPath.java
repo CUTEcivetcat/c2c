@@ -86,6 +86,7 @@ public interface ApiPath {
     String IM_MESSAGE = "/im/message";
     String IM_MESSAGE_READ = "/im/message/{conversationId}/read";
     String IM_UNREAD_COUNT = "/im/unread/count";
+    String IM_UNREAD_LATEST = "/im/unread/latest";
 
     // ==================== 收藏 /favorite ====================
     String FAVORITE = "/favorite";

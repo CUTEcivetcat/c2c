@@ -88,27 +88,82 @@
         </template>
       </div>
     </transition>
+
+    <!-- 右上角新消息通知（类似微信/QQ/短信弹窗） -->
+    <transition-group name="notice" tag="div" class="msg-notices">
+      <div v-for="n in notices" :key="n.uid" class="msg-notice" @click="openNotice(n)">
+        <div class="notice-head">
+          <el-avatar :size="36" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);flex-shrink:0;font-size:14px">{{ (n.senderName || '?').charAt(0) }}</el-avatar>
+          <div class="notice-info">
+            <strong class="notice-name">{{ n.senderName }}</strong>
+            <span class="notice-time">{{ noticeTime(n.time) }}</span>
+          </div>
+          <button class="notice-close" @click.stop="dismissNotice(n.uid)"><el-icon :size="14"><Close /></el-icon></button>
+        </div>
+        <div class="notice-content">{{ n.content }}</div>
+      </div>
+    </transition-group>
   </header>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { getUnreadCount } from '@/api/im'
+import { getUnreadLatest } from '@/api/im'
 
 const router = useRouter()
+const route = useRoute()
 const store = useUserStore()
 const keyword = ref('')
 const unread = ref(0)
 const mobileMenuOpen = ref(false)
+const notices = ref([])          // 右上角通知队列（最多 3 条）
 let timer = null
+let noticeSeq = 0
+let lastNotifiedId = 0           // 已通知过的最新未读消息 ID（去重）
 
 const goSearch = () => { if (keyword.value.trim()) { router.push({ name: 'Search', query: { keyword: keyword.value.trim() } }); mobileMenuOpen.value = false } }
 const handleLogout = async () => { await store.logout(); router.push('/'); mobileMenuOpen.value = false }
 
-const fetchUnread = async () => { if (!store.isLoggedIn()) return; try { const r = await getUnreadCount(); unread.value = r.unreadTotal } catch (e) { /* */ } }
-onMounted(() => { fetchUnread(); timer = setInterval(fetchUnread, 30000) })
+// ---- 右上角新消息通知（类似微信/QQ/短信）----
+const noticeTime = (t) => {
+  if (!t) return ''
+  const d = new Date(t)
+  const now = new Date()
+  const diff = (now - d) / 1000
+  if (diff < 60) return '刚刚'
+  if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前'
+  if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前'
+  return d.toLocaleDateString('zh-CN')
+}
+const pushNotice = (n) => {
+  const item = { ...n, uid: ++noticeSeq }
+  notices.value.push(item)
+  if (notices.value.length > 3) notices.value.shift()
+  setTimeout(() => dismissNotice(item.uid), 6000)   // 6 秒自动消失
+}
+const dismissNotice = (uid) => { notices.value = notices.value.filter(x => x.uid !== uid) }
+const openNotice = (item) => { dismissNotice(item.uid); router.push('/chat/' + item.conversationId) }
+
+// ---- 轮询未读 + 新消息提醒（5 秒一次，兼顾实时性与服务器压力）----
+const fetchLatest = async () => {
+  if (!store.isLoggedIn()) return
+  try {
+    const r = await getUnreadLatest()
+    unread.value = r.unreadTotal || 0
+    if (!r.messageId) { lastNotifiedId = 0; return }
+    const curConv = String(route.params?.id || '')
+    const msgId = Number(r.messageId)
+    // 正在查看当前会话：不弹窗，只同步角标
+    if (String(r.conversationId) === curConv) { lastNotifiedId = msgId; return }
+    if (msgId !== lastNotifiedId) {
+      lastNotifiedId = msgId
+      pushNotice({ senderName: r.senderName, content: r.content, conversationId: r.conversationId, time: r.time })
+    }
+  } catch (e) { /* 网络抖动忽略，下一轮再试 */ }
+}
+onMounted(() => { fetchLatest(); timer = setInterval(fetchLatest, 5000) })
 onUnmounted(() => clearInterval(timer))
 </script>
 
@@ -175,4 +230,29 @@ onUnmounted(() => clearInterval(timer))
 @media (min-width: 769px) {
   .mobile-menu { display: none !important; }
 }
+
+/* 右上角新消息通知（类似微信/QQ/短信） */
+.msg-notices {
+  position: fixed; top: 64px; right: 16px; z-index: 2000;
+  display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.msg-notice {
+  pointer-events: auto; width: 300px; max-width: calc(100vw - 32px);
+  background: #fff; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+  padding: 12px 14px; cursor: pointer; border: 1px solid #f0f2f5;
+  transition: box-shadow 0.2s;
+}
+.msg-notice:hover { box-shadow: 0 12px 36px rgba(0,0,0,0.22); }
+.notice-head { display: flex; align-items: center; gap: 10px; }
+.notice-info { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 8px; }
+.notice-name { font-size: 14px; font-weight: 700; color: #2d3436; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notice-time { font-size: 11px; color: #b2bec3; white-space: nowrap; flex-shrink: 0; }
+.notice-close { border: none; background: none; color: #b2bec3; cursor: pointer; padding: 3px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.notice-close:hover { background: #f0f2f5; color: #2d3436; }
+.notice-content {
+  margin-top: 8px; font-size: 13px; color: #636e72; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all;
+}
+.notice-enter-active, .notice-leave-active { transition: all 0.3s ease; }
+.notice-enter-from, .notice-leave-to { opacity: 0; transform: translateX(60px); }
 </style>

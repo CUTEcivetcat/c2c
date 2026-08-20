@@ -6,6 +6,9 @@
       <el-input v-model="password" type="password" placeholder="密码" show-password size="large" style="margin-bottom:20px" @keyup.enter="login" />
       <el-button type="primary" size="large" style="width:100%;height:48px;border-radius:12px" @click="login" :loading="loading">登 录</el-button>
       <div style="margin-top:14px;font-size:12px;color:#909399;text-align:center">演示账号：admin / Abc123456</div>
+      <div style="margin-top:10px;text-align:center">
+        <a href="javascript:void(0)" style="font-size:12px;color:#909399;text-decoration:none" @click="goUser">← 返回用户端</a>
+      </div>
     </div>
   </div>
 </template>
@@ -33,5 +36,11 @@ const login = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 返回用户端：开发环境跳本地用户端(5173)，生产跳根路径
+const goUser = () => {
+  const url = import.meta.env.DEV ? 'http://localhost:5173/' : '/'
+  window.location.href = url
 }
 </script>
