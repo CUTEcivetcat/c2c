@@ -11,6 +11,7 @@ sql/
 ├── tables/                 # ★ 新增表目录：每张新表一个独立文件
 │   ├── announcement.sql    #   例：平台公告表（含演示数据）
 │   └── nickname_audit.sql  #   例：昵称修改审核表（含演示数据）
+├── CHANGELOG.md            # ★ 数据库变更记录：每次表结构变更 + 可执行 SQL
 └── README.md               # 本规范
 ```
 
