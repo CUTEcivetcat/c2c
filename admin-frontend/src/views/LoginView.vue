@@ -29,6 +29,7 @@ const login = async () => {
   try {
     const res = await adminApi.adminLogin({ account: username.value.trim(), password: password.value })
     localStorage.setItem('admin_token', res.token)
+    localStorage.setItem('admin_user', JSON.stringify(res.userInfo || {}))
     ElMessage.success('登录成功')
     router.push('/dashboard')
   } catch (e) {
