@@ -6,3 +6,4 @@ export const getMessages = (conversationId, params) => request.get(`/im/message/
 export const sendMessage = (conversationId, content) => request.post('/im/message', { conversationId, content })
 export const markRead = (conversationId) => request.put(`/im/message/${conversationId}/read`)
 export const getUnreadCount = () => request.get('/im/unread/count')
+export const getUnreadLatest = () => request.get('/im/unread/latest')

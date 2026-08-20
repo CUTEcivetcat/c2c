@@ -8,12 +8,16 @@ import com.c2c.im.entity.Conversation;
 import com.c2c.im.entity.Message;
 import com.c2c.im.mapper.ConversationMapper;
 import com.c2c.im.mapper.MessageMapper;
+import com.c2c.user.entity.User;
+import com.c2c.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 即时通讯服务
@@ -26,6 +30,7 @@ public class ImService {
 
     private final ConversationMapper conversationMapper;
     private final MessageMapper messageMapper;
+    private final UserMapper userMapper;
 
     /** 获取或创建两个用户之间的会话（可关联商品） */
     @Transactional
@@ -157,6 +162,34 @@ public class ImService {
         return messageMapper.selectCount(new LambdaQueryWrapper<Message>()
                 .eq(Message::getReceiverId, userId)
                 .eq(Message::getIsRead, 0)).intValue();
+    }
+
+    /**
+     * 最新一条未读消息（供前端右上角弹窗提醒）
+     * <p>无未读时仅返回 unreadTotal=0；有未读时附带发送人昵称、内容预览、会话 ID 等，
+     * 前端据此展示"类似微信/QQ"的新消息通知。</p>
+     */
+    public Map<String, Object> getLatestUnread(Long userId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("unreadTotal", getUnreadCount(userId));
+        Message m = messageMapper.selectOne(new LambdaQueryWrapper<Message>()
+                .eq(Message::getReceiverId, userId)
+                .eq(Message::getIsRead, 0)
+                .orderByDesc(Message::getId)
+                .last("LIMIT 1"));
+        if (m == null) {
+            return result;
+        }
+        User sender = userMapper.selectById(m.getSenderId());
+        String senderName = (sender != null && sender.getNickname() != null)
+                ? sender.getNickname() : "用户" + m.getSenderId();
+        result.put("messageId", m.getId());
+        result.put("conversationId", m.getConversationId());
+        result.put("senderId", m.getSenderId());
+        result.put("senderName", senderName);
+        result.put("content", m.getContent());
+        result.put("time", m.getCreatedAt());
+        return result;
     }
 }
 

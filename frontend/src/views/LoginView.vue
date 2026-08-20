@@ -76,6 +76,12 @@
           <span v-else>&nbsp;</span>
           <a href="javascript:void(0)" @click="$router.push('/register')">去注册（可选更多信息）</a>
         </div>
+
+        <!-- 管理员入口：快速到达管理后台 -->
+        <div class="admin-entry" @click="goAdmin">
+          <el-icon :size="14"><Lock /></el-icon> 管理员登录
+          <el-icon :size="12"><Right /></el-icon>
+        </div>
       </div>
     </div>
   </div>
@@ -145,6 +151,12 @@ const handleSubmit = async () => {
     router.push(route.query.redirect || '/')
   } catch (e) { /* handled */ }
   loading.value = false
+}
+
+// 管理员入口：开发环境跳本地管理端(5174)，生产跳 /admin/
+const goAdmin = () => {
+  const url = import.meta.env.DEV ? 'http://localhost:5174/' : '/admin/'
+  window.open(url, '_blank', 'noopener')
 }
 </script>
 
@@ -236,4 +248,12 @@ const handleSubmit = async () => {
 
 .form-footer { display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; }
 .form-footer a { color: #ff6b35; font-weight: 500; }
+
+/* 管理员入口 */
+.admin-entry {
+  margin-top: 20px; padding-top: 14px; border-top: 1px dashed #eee;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 13px; color: #b2bec3; cursor: pointer; transition: all 0.2s;
+}
+.admin-entry:hover { color: #ff6b35; }
 </style>

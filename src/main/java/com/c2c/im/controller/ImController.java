@@ -74,4 +74,10 @@ public class ImController {
     public R<Map<String, Integer>> unreadCount(@Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
         return R.ok(com.c2c.common.utils.MapUtils.of("unreadTotal", imService.getUnreadCount(userId)));
     }
+
+    @Operation(summary = "最新未读消息（右上角提醒）", description = "返回最新一条未读消息的发送人昵称、内容预览、会话 ID 等，无未读时仅返回 unreadTotal=0")
+    @GetMapping(ApiPath.IM_UNREAD_LATEST)
+    public R<Map<String, Object>> unreadLatest(@Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
+        return R.ok(imService.getLatestUnread(userId));
+    }
 }
