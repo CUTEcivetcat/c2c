@@ -32,3 +32,22 @@ sql/
 - 编码 UTF-8，支持中文注释
 - 字段注释必须中文，写清业务含义
 - 表名/字段名统一 `snake_case`
+
+## 全新部署：导入顺序（服务器 / 宝塔）
+
+按顺序执行即可（新增表文件含幂等演示数据，重复执行安全）：
+
+```bash
+# 方式一：命令行（服务器上，先建库）
+mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS c2c DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -uroot -p c2c < schema.sql            # ① 基础表 15 张
+mysql -uroot -p c2c < tables/announcement.sql     # ② 新增表 + 演示数据
+mysql -uroot -p c2c < tables/nickname_audit.sql   # ③ 新增表 + 演示数据
+mysql -uroot -p c2c < demo-data.sql         # ④ 基础表演示数据（可选）
+
+# 方式二：宝塔面板
+# 数据库 → c2c → 管理 → SQL 标签，依次粘贴上面各文件内容执行
+# （文件内容可从仓库直接复制，全部 UTF-8）
+```
+
+> 已在运行的环境升级：只执行新增的 `tables/xxx.sql` 即可（幂等），无需动 schema.sql。
