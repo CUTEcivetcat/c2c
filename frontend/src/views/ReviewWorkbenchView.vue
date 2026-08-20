@@ -16,7 +16,7 @@
         <div v-loading="reportLoading" class="card-list">
           <div v-for="r in reports" :key="r.id" class="review-card">
             <div class="card-head">
-              <el-image v-if="r.productCover" :src="r.productCover" class="card-cover" fit="cover" />
+              <product-cover v-if="r.productCover" :src="r.productCover" class="card-cover" />
               <div class="card-title-box">
                 <div class="card-title">{{ r.productTitle }}</div>
                 <div class="card-sub">
@@ -54,7 +54,7 @@
         <div v-loading="appealLoading" class="card-list">
           <div v-for="a in appeals" :key="a.id" class="review-card">
             <div class="card-head">
-              <el-image v-if="a.productCover" :src="a.productCover" class="card-cover" fit="cover" />
+              <product-cover v-if="a.productCover" :src="a.productCover" class="card-cover" />
               <div class="card-title-box">
                 <div class="card-title">{{ a.productTitle }}</div>
                 <div class="card-sub">
@@ -119,7 +119,7 @@
     <el-dialog v-model="reportDialog" title="举报详情" width="92%" style="max-width:560px">
       <template v-if="reportDetail">
         <div class="detail-product">
-          <el-image v-if="reportDetail.productCover" :src="reportDetail.productCover" class="dp-cover" fit="cover" />
+          <product-cover v-if="reportDetail.productCover" :src="reportDetail.productCover" class="dp-cover" />
           <div class="dp-info">
             <div class="dp-title">{{ reportDetail.productTitle }}</div>
             <div class="dp-price">¥{{ reportDetail.productPrice }}</div>
@@ -152,7 +152,7 @@
     <el-dialog v-model="appealDialog" title="整改申诉详情" width="92%" style="max-width:560px">
       <template v-if="appealDetail">
         <div class="detail-product">
-          <el-image v-if="appealDetail.productCover" :src="appealDetail.productCover" class="dp-cover" fit="cover" />
+          <product-cover v-if="appealDetail.productCover" :src="appealDetail.productCover" class="dp-cover" />
           <div class="dp-info">
             <div class="dp-title">{{ appealDetail.productTitle }}</div>
             <div class="dp-price">¥{{ appealDetail.productPrice }}</div>

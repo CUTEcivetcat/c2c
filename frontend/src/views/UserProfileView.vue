@@ -30,7 +30,7 @@
     <h3 class="section-title">在售商品（{{ total }}）</h3>
     <div v-if="products.length" class="product-grid">
       <div v-for="p in products" :key="p.id" class="product-card" @click="$router.push(`/product/${p.id}`)">
-        <div class="thumb"><img :src="p.images?.[0]?.url" alt="" /></div>
+        <div class="thumb"><product-cover :src="p.images?.[0]?.url" /></div>
         <div class="card-body">
           <div class="card-title">{{ p.title }}</div>
           <div class="card-footer">

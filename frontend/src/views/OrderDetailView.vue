@@ -6,7 +6,7 @@
 
       <div class="info-card">
         <div style="display:flex;gap:16px;align-items:flex-start">
-          <img :src="checkoutProduct.images?.[0]?.url" class="checkout-img" alt="" />
+          <product-cover :src="checkoutProduct.images?.[0]?.url" class="checkout-img" />
           <div style="flex:1">
             <div class="checkout-title">{{ checkoutProduct.title }}</div>
             <div class="price-highlight" style="margin:8px 0">¥{{ checkoutProduct.price }}</div>

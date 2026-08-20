@@ -3,7 +3,7 @@
     <page-back-bar title="我的收藏" />
     <div class="product-grid" style="margin-top:8px">
       <el-card v-for="it in items" :key="it.id" class="product-card" shadow="hover" @click="$router.push(`/product/${it.productId}`)">
-        <img :src="it.product?.images?.[0]?.url || '/default.png'" class="product-img" alt="" />
+        <product-cover :src="it.product?.images?.[0]?.url" class="product-img" />
         <div class="product-info">
           <h3>{{ it.product?.title || ('商品 #' + it.productId) }}</h3>
           <div class="price">{{ it.product?.price ?? '--' }}</div>

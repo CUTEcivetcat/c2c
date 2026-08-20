@@ -53,12 +53,7 @@
         @click="$router.push(`/product/${p.id}`)"
       >
         <div class="card-img-wrap">
-          <img
-            :src="p.images?.[0]?.url || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22200%22><rect fill=%22%23f0f2f5%22 width=%22260%22 height=%22200%22/><text x=%22130%22 y=%22105%22 text-anchor=%22middle%22 fill=%22%23b2bec3%22 font-size=%2216%22>暂无图片</text></svg>'"
-            :alt="p.title"
-            class="card-img"
-            loading="lazy"
-          />
+          <product-cover :src="p.images?.[0]?.url" class="card-img" />
           <span class="condition-badge">{{ conditionMap[p.condition] || '' }}</span>
           <button class="favorite-btn-mini" @click.stop="toggleFav(p)" v-if="store.isLoggedIn()">
             <el-icon :size="16" :style="{ color: p._fav ? '#ff6b35' : '#b2bec3' }">
