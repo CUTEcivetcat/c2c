@@ -1,0 +1,91 @@
+# =====================================================================
+# C2C 后端主配置（可开源上传版）
+#
+# ⚠️ 所有敏感信息（数据库密码、邮箱账号/授权码、JWT 密钥、服务器 IP 等）
+#    一律通过环境变量或 config/ 外部配置文件注入，本文件不含任何真实值。
+#    真实配置请复制 config/application.example.yml 为 config/application-prod.yml，
+#    并填入你的真实值（该文件已被 .gitignore 排除，不会上传到仓库）。
+#
+# 环境说明：默认激活 prod profile（见下方 spring.profiles.default）。
+#   - prod 差异项（监听地址、上传/日志路径）见 application-prod.yml
+#   - 部署时把 config/application-prod.yml 放到 jar 同目录 config/ 下即可自动加载
+# =====================================================================
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: c2c-monolith
+  profiles:
+    default: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:c2c}?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:your-db-password}
+    hikari:
+      # 通过公网连接数据库时，连接可能被网络层/服务器空闲策略断开，
+      # 设置较短 max-lifetime 定期重建，避免使用已失效连接导致连接池耗尽
+      minimum-idle: 1
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      max-lifetime: 120000
+      idle-timeout: 60000
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+  redis:
+    host: ${REDIS_HOST:127.0.0.1}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:your-redis-password}
+    database: ${REDIS_DATABASE:0}
+    timeout: 5000ms
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+  mail:
+    host: ${MAIL_HOST:smtp.qq.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:your-mail@example.com}
+    password: ${MAIL_PASSWORD:your-mail-auth-code}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+
+jwt:
+  # HS256 要求密钥 ≥ 32 字节(256 bit)，请务必设置你自己的随机密钥
+  secret: ${JWT_SECRET:change-me-to-a-random-secret-at-least-32-bytes}
+  expiration: ${JWT_EXPIRATION:604800}
+
+app:
+  upload-root: ${APP_UPLOAD_ROOT:./uploads}
+  upload-url-prefix: /files
+
+management:
+  health:
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  file:
+    name: ${APP_LOG_FILE:./logs/app.log}
+  level:
+    com.c2c: info
