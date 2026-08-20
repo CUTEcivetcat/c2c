@@ -16,3 +16,18 @@ CREATE TABLE IF NOT EXISTS `announcement` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   KEY `idx_status_type` (`status`, `type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='平台公告';
+
+-- =============================================================
+-- 演示数据（可选执行）：表为空时插入 2 条示例公告，幂等安全
+-- =============================================================
+INSERT INTO `announcement` (`title`, `content`, `type`, `status`, `pinned`, `created_by`)
+SELECT tmp.title, tmp.content, tmp.type, tmp.status, tmp.pinned, tmp.created_by FROM (
+  SELECT '欢迎使用闲小鱼' AS title,
+         '闲小鱼是一个 C2C 二手交易平台，让闲置流转起来。\n\n请先阅读《平台公约》，遵守交易规则，共同维护良好的交易环境。' AS content,
+         1 AS type, 1 AS status, 1 AS pinned, 4 AS created_by
+  UNION ALL
+  SELECT '平台公约',
+         '1. 如实描述商品，禁止虚假信息与违规商品。\n2. 交易自愿，请勿线下脱离平台交易。\n3. 文明沟通，禁止辱骂、骚扰等不良行为。\n4. 违规商品将被下架，情节严重者封禁账号。',
+         2, 1, 0, 4
+) tmp
+WHERE NOT EXISTS (SELECT 1 FROM `announcement`);

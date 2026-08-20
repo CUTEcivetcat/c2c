@@ -21,8 +21,10 @@ sql/
    - 文件头注释：表名 + 用途说明 + 执行方式
    - `CREATE TABLE IF NOT EXISTS ...`（幂等，重复执行安全）
    - 涉及已有表加字段时，用 `ADD COLUMN IF NOT EXISTS`
-2. **不要改 `schema.sql`**（它是基础表，保持稳定；只有基础表结构变更才动它并同步更新头部注释的表清单）
-3. 如需增量升级已部署环境，再复制一份到 `sql/migration-YYYYMMDD-xxx.sql`（可选）
+2. **演示数据**：如需模拟数据，在文件末尾加"演示数据（可选执行）"段，
+   用 `INSERT ... SELECT ... WHERE NOT EXISTS(...)` 保证幂等（表有数据就不重复插）
+3. **不要改 `schema.sql`**（它是基础表，保持稳定；只有基础表结构变更才动它并同步更新头部注释的表清单）
+4. 如需增量升级已部署环境，再复制一份到 `sql/migration-YYYYMMDD-xxx.sql`（可选）
 
 ## 约定
 
