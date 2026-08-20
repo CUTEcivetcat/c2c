@@ -13,12 +13,12 @@
       </button>
     </div>
 
-    <!-- 最新公告横幅 -->
-    <div v-if="announcements.length" class="announce-banner" @click="$router.push('/announcement')">
+    <!-- 最新公告横幅（滚动轮播显示 scroll=1 的公告） -->
+    <div v-if="scrollList.length" class="announce-banner" @click="$router.push('/announcement')">
       <span class="ann-icon">📢</span>
-      <span class="ann-label">{{ annType(announcements[0]) }}</span>
-      <span class="ann-text">{{ announcements[0].title }}</span>
-      <span class="ann-more">查看全部 ›</span>
+      <span class="ann-label">{{ annType(scrollList[annIndex]) }}</span>
+      <span class="ann-text">{{ scrollList[annIndex].title }}</span>
+      <span class="ann-more">{{ scrollList.length > 1 ? `${annIndex + 1}/${scrollList.length}` : '查看全部 ›' }}</span>
     </div>
 
     <!-- Banner 横幅 -->
@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { getCategories, searchProducts } from '@/api/product'
 import { addFavorite, removeFavorite } from '@/api/favorite'
@@ -127,9 +127,23 @@ const total = ref(0)
 const sort = ref('created_at')
 const loading = ref(false)
 const announcements = ref([])
+const annIndex = ref(0)
+let annTimer = null
 const conditionMap = { 1: '全新', 2: '几乎全新', 3: '轻微使用', 4: '明显使用' }
 
 const annType = (a) => ({ 1: '公告', 2: '平台公约', 3: '通知' }[a?.type] || '公告')
+// 参与滚动的公告（scroll=1 或未设置），默认滚动显示
+const scrollList = computed(() => (announcements.value || []).filter(a => a.scroll !== 0))
+// 轮播：每 4 秒切换下一条
+const startAnnRoll = () => {
+  stopAnnRoll()
+  if (scrollList.value.length > 1) {
+    annTimer = setInterval(() => {
+      annIndex.value = (annIndex.value + 1) % scrollList.value.length
+    }, 4000)
+  }
+}
+const stopAnnRoll = () => { if (annTimer) { clearInterval(annTimer); annTimer = null } }
 
 const loadProducts = async () => {
   loading.value = true
@@ -157,9 +171,14 @@ const toggleFav = async (p) => {
 onMounted(async () => {
   categories.value = await getCategories() || []
   loadProducts()
-  // 加载最新公告（首页横幅）
-  getAnnouncementLatest(3).then(r => { announcements.value = r || [] }).catch(() => {})
+  // 加载最新公告（首页横幅，滚动轮播）
+  getAnnouncementLatest(6).then(r => {
+    announcements.value = r || []
+    annIndex.value = 0
+    startAnnRoll()
+  }).catch(() => {})
 })
+onUnmounted(stopAnnRoll)
 </script>
 
 <style scoped>

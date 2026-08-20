@@ -50,6 +50,18 @@
         <el-form-item label="置顶">
           <el-switch v-model="form.pinned" :active-value="1" :inactive-value="0" />
         </el-form-item>
+        <el-form-item label="强制弹窗">
+          <el-switch v-model="form.isForce" :active-value="1" :inactive-value="0" />
+          <span class="form-tip">开启后用户登录时强制弹出阅读</span>
+        </el-form-item>
+        <el-form-item label="停留秒数" v-if="form.isForce === 1">
+          <el-input-number v-model="form.minSeconds" :min="1" :max="60" />
+          <span class="form-tip">最低停留秒数，期间不可关闭</span>
+        </el-form-item>
+        <el-form-item label="滚动显示">
+          <el-switch v-model="form.scroll" :active-value="1" :inactive-value="0" />
+          <span class="form-tip">首页横幅参与轮播（默认滚动）</span>
+        </el-form-item>
         <el-form-item label="内容" required>
           <el-input v-model="form.content" type="textarea" :rows="8" maxlength="5000" show-word-limit placeholder="公告内容（可换行）" />
         </el-form-item>
@@ -73,7 +85,7 @@ const page = ref(1)
 const size = ref(10)
 const dialogVisible = ref(false)
 const saving = ref(false)
-const form = ref({ id: null, title: '', content: '', type: 1, pinned: 0 })
+const form = ref({ id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1 })
 
 const typeText = (t) => ({ 1: '公告', 2: '平台公约', 3: '通知' }[t] || '公告')
 const typeTag = (t) => ({ 1: '', 2: 'warning', 3: 'info' }[t] || '')
@@ -87,7 +99,7 @@ const load = async () => {
 }
 
 const openDialog = (row) => {
-  form.value = row ? { id: row.id, title: row.title, content: row.content, type: row.type, pinned: row.pinned } : { id: null, title: '', content: '', type: 1, pinned: 0 }
+  form.value = row ? { id: row.id, title: row.title, content: row.content, type: row.type, pinned: row.pinned, isForce: row.isForce, minSeconds: row.minSeconds || 5, scroll: row.scroll ?? 1 } : { id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1 }
   dialogVisible.value = true
 }
 
@@ -128,3 +140,7 @@ const remove = async (row) => {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.form-tip { margin-left: 10px; font-size: 12px; color: #b2bec3; }
+</style>

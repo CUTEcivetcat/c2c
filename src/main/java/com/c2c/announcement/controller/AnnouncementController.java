@@ -38,4 +38,10 @@ public class AnnouncementController {
     public R<List<Announcement>> latest(@Parameter(description = "条数") @RequestParam(defaultValue = "3") int limit) {
         return R.ok(announcementService.listLatest(limit));
     }
+
+    @Operation(summary = "强制弹窗公告（登录时展示）", description = "返回 force=1 且已发布的公告，含最低停留秒数，置顶优先")
+    @GetMapping(ApiPath.ANNOUNCEMENT_FORCE)
+    public R<List<Announcement>> force() {
+        return R.ok(announcementService.listForce());
+    }
 }
