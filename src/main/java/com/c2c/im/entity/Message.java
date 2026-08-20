@@ -37,4 +37,8 @@ public class Message {
 
     /** 发送时间 */
     private LocalDateTime createdAt;
+
+    /** 发送人昵称（查询时填充，非数据库列，供前端头像/显示用） */
+    @TableField(exist = false)
+    private String senderName;
 }
