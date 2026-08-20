@@ -3,12 +3,13 @@
 #
 # ⚠️ 所有敏感信息（数据库密码、邮箱账号/授权码、JWT 密钥、服务器 IP 等）
 #    一律通过环境变量或 config/ 外部配置文件注入，本文件不含任何真实值。
-#    真实配置请复制 config/application.example.yml 为 config/application-prod.yml，
-#    并填入你的真实值（该文件已被 .gitignore 排除，不会上传到仓库）。
+#    真实配置请复制 config/application.example.yml 为 config/application-pro.yml
+#    或 config/application-prod.yml，并填入你的真实值（已被 .gitignore 排除）。
 #
-# 环境说明：默认激活 prod profile（见下方 spring.profiles.default）。
-#   - prod 差异项（监听地址、上传/日志路径）见 application-prod.yml
-#   - 部署时把 config/application-prod.yml 放到 jar 同目录 config/ 下即可自动加载
+# 环境说明：默认激活 pro profile（见下方 spring.profiles.default）。
+#   - pro  = 本地开发，连服务器公网数据库/缓存（config/application-pro.yml）
+#   - prod = 生产服务器（SPRING_PROFILES_ACTIVE=prod + config/application-prod.yml）
+#   - 部署时把对应外部配置放到 jar 同目录 config/ 下即可自动加载
 # =====================================================================
 
 server:
@@ -20,7 +21,7 @@ spring:
   application:
     name: c2c-monolith
   profiles:
-    default: prod
+    default: pro
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:c2c}?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
