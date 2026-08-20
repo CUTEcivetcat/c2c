@@ -5,7 +5,7 @@
       <el-tab-pane :label="`我想要的（${myTotal}）`" name="buyer">
         <div v-if="myList.length" class="intent-list">
           <div v-for="it in myList" :key="it.id" class="intent-card" @click="goProduct(it)">
-            <img :src="it.productCover || '/default.png'" class="intent-img" alt="" />
+            <product-cover :src="it.productCover" class="intent-img" />
             <div class="intent-main">
               <div class="intent-title">{{ it.productTitle || ('商品 #' + it.productId) }}</div>
               <div class="intent-meta">
@@ -28,7 +28,7 @@
       <el-tab-pane :label="`收到的意向（${sellerTotal}）`" name="seller">
         <div v-if="sellerList.length" class="intent-list">
           <div v-for="it in sellerList" :key="it.id" class="intent-card" @click="goProduct(it)">
-            <img :src="it.productCover || '/default.png'" class="intent-img" alt="" />
+            <product-cover :src="it.productCover" class="intent-img" />
             <div class="intent-main">
               <div class="intent-title">{{ it.productTitle || ('商品 #' + it.productId) }}</div>
               <div class="intent-meta">

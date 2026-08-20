@@ -35,9 +35,7 @@
       <div v-loading="loading" class="goods-list">
         <div v-for="p in list" :key="p.id" class="goods-card">
           <router-link :to="`/product/${p.id}`" class="goods-cover-wrap">
-            <el-image :src="coverOf(p)" class="goods-cover" fit="cover">
-              <template #error><div class="cover-err">无图</div></template>
-            </el-image>
+            <product-cover :src="coverOf(p)" class="goods-cover" />
           </router-link>
           <div class="goods-main">
             <div class="goods-title">

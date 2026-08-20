@@ -8,7 +8,7 @@
     </el-row>
     <div class="product-grid">
       <el-card v-for="p in products" :key="p.id" class="product-card" shadow="hover" @click="$router.push(`/product/${p.id}`)">
-        <img :src="p.images?.[0]?.url || '/default.png'" class="product-img" alt="" />
+        <product-cover :src="p.images?.[0]?.url" class="product-img" />
         <div class="product-info">
           <h3>{{ p.title }}</h3>
           <div class="price">{{ p.price }}</div>

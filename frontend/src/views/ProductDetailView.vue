@@ -5,14 +5,14 @@
       <!-- 左侧图片 -->
       <div class="detail-gallery">
         <div class="main-image-wrap">
-          <img :src="activeImage" :alt="product.title" class="main-image" />
+          <product-cover :src="activeImage" class="main-image" fit="contain" />
           <span class="img-badge" v-if="product.conditionText">{{ product.conditionText }}</span>
         </div>
         <div class="thumb-list" v-if="product.images?.length > 1">
           <div v-for="(img, i) in product.images" :key="i"
             :class="['thumb', { active: activeImage === img.url }]"
             @click="activeImage = img.url">
-            <img :src="img.url" alt="" />
+            <product-cover :src="img.url" />
           </div>
         </div>
       </div>

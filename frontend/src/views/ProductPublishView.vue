@@ -28,7 +28,7 @@
         <el-form-item label="商品图片（第一张为封面）">
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
             <div v-for="(img, i) in existingImages" :key="'old-'+i" class="img-preview-item">
-              <img :src="img.url" /><el-icon class="img-del" @click="removeExisting(i)"><CircleClose /></el-icon>
+              <product-cover :src="img.url" /><el-icon class="img-del" @click="removeExisting(i)"><CircleClose /></el-icon>
               <span v-if="i===0" class="img-cover-tag">封面</span>
             </div>
           </div>

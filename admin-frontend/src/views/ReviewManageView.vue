@@ -16,7 +16,7 @@
             <el-table-column prop="id" label="ID" width="70" />
             <el-table-column prop="productTitle" label="商品" min-width="180"><template #default="{row}">
               <div style="display:flex;align-items:center;gap:8px">
-                <el-image v-if="row.productCover" :src="row.productCover" style="width:40px;height:40px;border-radius:8px;flex-shrink:0" fit="cover" />
+                <product-cover v-if="row.productCover" :src="row.productCover" style="width:40px;height:40px;border-radius:8px;flex-shrink:0" />
                 <span style="font-weight:600">{{ row.productTitle }}</span>
               </div>
             </template></el-table-column>
@@ -51,7 +51,7 @@
             <el-table-column prop="id" label="ID" width="70" />
             <el-table-column prop="productTitle" label="商品" min-width="180"><template #default="{row}">
               <div style="display:flex;align-items:center;gap:8px">
-                <el-image v-if="row.productCover" :src="row.productCover" style="width:40px;height:40px;border-radius:8px;flex-shrink:0" fit="cover" />
+                <product-cover v-if="row.productCover" :src="row.productCover" style="width:40px;height:40px;border-radius:8px;flex-shrink:0" />
                 <span style="font-weight:600">{{ row.productTitle }}</span>
               </div>
             </template></el-table-column>
@@ -115,7 +115,7 @@
       <template v-if="reportDetail">
         <el-descriptions title="被举报商品" :column="2" border style="margin-bottom:16px">
           <el-descriptions-item label="封面" :span="2">
-            <el-image v-if="reportDetail.productCover" :src="reportDetail.productCover" style="width:100px;height:100px;border-radius:10px" fit="cover" />
+            <product-cover v-if="reportDetail.productCover" :src="reportDetail.productCover" style="width:100px;height:100px;border-radius:10px" />
             <span v-else>-</span>
           </el-descriptions-item>
           <el-descriptions-item label="标题">{{ reportDetail.productTitle }}</el-descriptions-item>
@@ -134,7 +134,7 @@
           <el-descriptions-item label="举报理由" :span="2">{{ reportDetail.reason }}</el-descriptions-item>
           <el-descriptions-item label="附图" :span="2">
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <el-image v-for="(u, i) in splitImages(reportDetail.images)" :key="i" :src="u" :preview-src-list="splitImages(reportDetail.images)" style="width:80px;height:80px;border-radius:8px" fit="cover" />
+              <product-cover v-for="(u, i) in splitImages(reportDetail.images)" :key="i" :src="u" preview style="width:80px;height:80px;border-radius:8px" />
               <span v-if="!reportDetail.images">-</span>
             </div>
           </el-descriptions-item>
@@ -154,7 +154,7 @@
       <template v-if="appealDetail">
         <el-descriptions title="商品信息" :column="2" border style="margin-bottom:16px">
           <el-descriptions-item label="封面" :span="2">
-            <el-image v-if="appealDetail.productCover" :src="appealDetail.productCover" style="width:100px;height:100px;border-radius:10px" fit="cover" />
+            <product-cover v-if="appealDetail.productCover" :src="appealDetail.productCover" style="width:100px;height:100px;border-radius:10px" />
             <span v-else>-</span>
           </el-descriptions-item>
           <el-descriptions-item label="标题">{{ appealDetail.productTitle }}</el-descriptions-item>
@@ -171,7 +171,7 @@
           <el-descriptions-item label="整改说明" :span="2">{{ appealDetail.appealReason }}</el-descriptions-item>
           <el-descriptions-item label="附图" :span="2">
             <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <el-image v-for="(u, i) in splitImages(appealDetail.images)" :key="i" :src="u" :preview-src-list="splitImages(appealDetail.images)" style="width:80px;height:80px;border-radius:8px" fit="cover" />
+              <product-cover v-for="(u, i) in splitImages(appealDetail.images)" :key="i" :src="u" preview style="width:80px;height:80px;border-radius:8px" />
               <span v-if="!appealDetail.images">-</span>
             </div>
           </el-descriptions-item>
