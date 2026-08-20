@@ -8,8 +8,8 @@
 #   外部写了哪个 key 就覆盖哪个，没写的沿用 classpath 内默认值。
 #
 # 使用方式：
-#   1. 复制一份本文件，重命名为 application-prod.yml，放进 config/ 目录
-#      （项目只保留 prod 一个环境，默认 profile 即 prod）
+#   1. 复制一份本文件，重命名为 application-pro.yml（本地开发，连服务器库）
+#      或 application-prod.yml（生产服务器），放进 config/ 目录
 #   2. 把下面所有 YOUR_XXX 占位符替换成你自己的真实值
 #   3. 部署时把 config/ 目录放到 jar 同目录，Spring Boot 自动加载，
 #      覆盖 jar 内 src/main/resources 的脱敏占位符，无需改代码重新打包
