@@ -47,7 +47,7 @@ c2c/
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
 ├── blog/                         # 博客前端（Vite 5175）
-├── sql/                          # schema.sql 基础表 / tables/ 新增表 / demo-data.sql 演示数据 / migration-*.sql 增量
+├── sql/                          # schema.sql 基础表 / tables/ 新增表(含演示数据) / demo-data.sql 演示数据
 │   └── tables/                   # ★ 新增表统一放这里，每张表一个独立文件（见 sql/README.md 规范）
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
