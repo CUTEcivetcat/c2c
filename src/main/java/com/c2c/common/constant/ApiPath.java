@@ -129,4 +129,12 @@ public interface ApiPath {
     String ADMIN_PRODUCTS = "/admin/products";
     String ADMIN_PRODUCT_STATUS = "/admin/products/{id}/status";
     String ADMIN_ORDERS = "/admin/orders";
+
+    // ==================== 平台公告 /announcement ====================
+    String ANNOUNCEMENT_LIST = "/announcement/list";
+    String ANNOUNCEMENT_LATEST = "/announcement/latest";
+    String ANNOUNCEMENT_ADMIN_LIST = "/admin/announcement/list";
+    String ANNOUNCEMENT_ADMIN = "/admin/announcement";
+    String ANNOUNCEMENT_ADMIN_ID = "/admin/announcement/{id}";
+    String ANNOUNCEMENT_ADMIN_STATUS = "/admin/announcement/{id}/status";
 }

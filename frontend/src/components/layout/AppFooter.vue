@@ -9,8 +9,10 @@
         <span>Vue 3</span><span class="dot">·</span>
         <span>Spring Boot</span><span class="dot">·</span>
         <span>MySQL</span><span class="dot">·</span>
-        <span>Redis</span><span class="dot">·</span>
-        <span>RabbitMQ</span>
+        <span>Redis</span>
+      </div>
+      <div class="footer-nav">
+        <router-link to="/announcement" class="footer-nav-link">📢 平台公告</router-link>
       </div>
       <p class="footer-copy">© 2026 C2C Platform. All rights reserved.</p>
     </div>
@@ -33,5 +35,8 @@
 .footer-desc { font-size: 12px; color: #ff6b35; background: #fff5f0; padding: 2px 10px; border-radius: 8px; }
 .footer-links { font-size: 12px; color: #b2bec3; display: flex; gap: 6px; align-items: center; }
 .footer-links .dot { font-size: 16px; }
+.footer-nav { display: flex; gap: 16px; }
+.footer-nav-link { font-size: 12px; color: #b2bec3; text-decoration: none; transition: color 0.2s; }
+.footer-nav-link:hover { color: #ff6b35; }
 .footer-copy { font-size: 11px; color: #b2bec3; }
 </style>

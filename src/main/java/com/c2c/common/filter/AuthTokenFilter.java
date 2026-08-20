@@ -58,7 +58,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/product/category",    // 商品分类
             "/product/user",        // 查看某用户发布的在售商品（用户主页）
             "/product/comment",     // 商品评论（游客可看，发表需登录）
-            "/user/profile/"        // 查看他人公开信息
+            "/user/profile/",       // 查看他人公开信息
+            "/announcement/list",   // 平台公告列表（游客可看）
+            "/announcement/latest"  // 首页最新公告横幅（游客可看）
     );
 
     @Override
