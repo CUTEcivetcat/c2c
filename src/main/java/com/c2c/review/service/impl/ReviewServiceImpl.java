@@ -16,16 +16,19 @@ import com.c2c.review.dto.AppealCreateDTO;
 import com.c2c.review.dto.ReportCreateDTO;
 import com.c2c.review.dto.ReviewHandleDTO;
 import com.c2c.review.entity.AdminLog;
+import com.c2c.review.entity.NicknameAudit;
 import com.c2c.review.entity.ProductAppeal;
 import com.c2c.review.entity.Report;
 import com.c2c.review.enums.AppealStatus;
 import com.c2c.review.enums.ReportStatus;
 import com.c2c.review.enums.ReportType;
 import com.c2c.review.mapper.AdminLogMapper;
+import com.c2c.review.mapper.NicknameAuditMapper;
 import com.c2c.review.mapper.ProductAppealMapper;
 import com.c2c.review.mapper.ReportMapper;
 import com.c2c.review.service.ReviewService;
 import com.c2c.review.vo.AppealVO;
+import com.c2c.review.vo.NicknameAuditVO;
 import com.c2c.review.vo.ReportVO;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
@@ -58,6 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ProductMapper productMapper;
     private final ProductImageMapper productImageMapper;
     private final UserMapper userMapper;
+    private final NicknameAuditMapper nicknameAuditMapper;
     private final ProductService productService;
     private final ImService imService;
 
@@ -300,6 +304,79 @@ public class ReviewServiceImpl implements ReviewService {
         appeal.setHandledAt(LocalDateTime.now());
         appealMapper.updateById(appeal);
         log.info("整改申诉处理完成：appealId={}, action={}, handlerId={}", id, action, handlerId);
+    }
+
+    // ==================== 昵称审核 ====================
+
+    @Override
+    public Page<NicknameAuditVO> listNicknameAudits(Integer status, int page, int size) {
+        LambdaQueryWrapper<NicknameAudit> w = new LambdaQueryWrapper<NicknameAudit>()
+                .orderByAsc(NicknameAudit::getStatus)
+                .orderByDesc(NicknameAudit::getId);
+        if (status != null) {
+            w.eq(NicknameAudit::getStatus, status);
+        }
+        Page<NicknameAudit> p = nicknameAuditMapper.selectPage(new Page<>(page, size), w);
+        Page<NicknameAuditVO> vo = new Page<>(p.getCurrent(), p.getSize(), p.getTotal());
+        vo.setRecords(buildNicknameAuditVOs(p.getRecords()));
+        return vo;
+    }
+
+    @Override
+    @Transactional
+    public void handleNicknameAudit(Long id, Long handlerId, Integer handlerRole, boolean approve, String reason) {
+        NicknameAudit audit = nicknameAuditMapper.selectById(id);
+        if (audit == null) {
+            throw new BusinessException("审核记录不存在");
+        }
+        if (audit.getStatus() != 0) {
+            throw new BusinessException("该申请已处理");
+        }
+        User user = userMapper.selectById(audit.getUserId());
+        if (user == null) {
+            throw new BusinessException("申请人不存在");
+        }
+        String result = approve ? "通过" : "拒绝";
+        String remark = StrUtil.blankToDefault(reason, approve ? "" : "昵称不符合平台规范");
+        writeLog(handlerId, handlerRole, "nickname_handle", "user", user.getId(),
+                "昵称审核" + result + "：「" + audit.getNewNickname() + "」" + (StrUtil.isNotBlank(remark) ? "，原因：" + remark : ""));
+        if (approve) {
+            user.setNickname(audit.getNewNickname());
+            notifyUser(handlerId, user.getId(), null,
+                    "您申请的昵称「" + audit.getNewNickname() + "」已审核通过，现已生效。");
+        } else {
+            notifyUser(handlerId, user.getId(), null,
+                    "您申请的昵称「" + audit.getNewNickname() + "」未通过审核，原因：" + remark + "。已保留原昵称。");
+        }
+        user.setNicknameStatus(0);
+        user.setNicknamePending(null);
+        userMapper.updateById(user);
+
+        audit.setStatus(approve ? 1 : 2);
+        audit.setReason(StrUtil.isNotBlank(reason) ? reason : remark);
+        audit.setHandledBy(handlerId);
+        audit.setHandledAt(LocalDateTime.now());
+        nicknameAuditMapper.updateById(audit);
+        log.info("昵称审核处理完成：auditId={}, approve={}, handlerId={}", id, approve, handlerId);
+    }
+
+    private List<NicknameAuditVO> buildNicknameAuditVOs(List<NicknameAudit> list) {
+        if (list == null || list.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Set<Long> userIds = list.stream().map(NicknameAudit::getUserId).collect(Collectors.toSet());
+        Map<Long, String> nickMap = selectNicknames(userIds);
+        return list.stream().map(a -> NicknameAuditVO.builder()
+                .id(a.getId())
+                .userId(a.getUserId())
+                .userName(nickMap.getOrDefault(a.getUserId(), "用户" + a.getUserId()))
+                .oldNickname(a.getOldNickname())
+                .newNickname(a.getNewNickname())
+                .status(a.getStatus())
+                .reason(a.getReason())
+                .createdAt(a.getCreatedAt())
+                .handledAt(a.getHandledAt())
+                .build()).collect(Collectors.toList());
     }
 
     // ==================== 私有辅助 ====================

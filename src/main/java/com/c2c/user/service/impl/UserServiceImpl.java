@@ -4,6 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.common.utils.JwtUtils;
+import com.c2c.common.utils.SensitiveWordUtils;
+import com.c2c.review.entity.NicknameAudit;
+import com.c2c.review.mapper.NicknameAuditMapper;
 import com.c2c.user.dto.LoginVO;
 import com.c2c.user.dto.RegisterDTO;
 import com.c2c.user.dto.ResetPasswordDTO;
@@ -40,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final EmailService emailService;
     private final StringRedisTemplate redisTemplate;
+    private final NicknameAuditMapper nicknameAuditMapper;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Value("${jwt.secret}")
@@ -222,13 +226,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateProfile(Long userId, String nickname, String avatarUrl, Integer gender, String bio) {
         User user = userMapper.selectById(userId);
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
+        // 昵称变更需审核：自动敏感词拦截 + 人工审核（审核通过后生效）
         if (StrUtil.isNotBlank(nickname)) {
-            user.setNickname(nickname);
+            String newNick = nickname.trim();
+            if (!newNick.equals(user.getNickname())) {
+                if (newNick.length() > 20) {
+                    throw new BusinessException("昵称最长 20 个字符");
+                }
+                String hit = SensitiveWordUtils.hit(newNick);
+                if (hit != null) {
+                    throw new BusinessException("昵称包含敏感词，请更换后再试");
+                }
+                if (user.getNicknameStatus() != null && user.getNicknameStatus() == 1) {
+                    throw new BusinessException("已有昵称申请正在审核中，请耐心等待");
+                }
+                // 写入审核记录（状态 0 待审核）
+                NicknameAudit audit = new NicknameAudit();
+                audit.setUserId(userId);
+                audit.setOldNickname(user.getNickname());
+                audit.setNewNickname(newNick);
+                audit.setStatus(0);
+                nicknameAuditMapper.insert(audit);
+                // 用户进入"昵称审核中"状态
+                user.setNicknamePending(newNick);
+                user.setNicknameStatus(1);
+                log.info("nickname apply submitted: userId={}, new={}", userId, newNick);
+            }
         }
         if (StrUtil.isNotBlank(avatarUrl)) {
             user.setAvatarUrl(avatarUrl);
@@ -310,6 +339,8 @@ public class UserServiceImpl implements UserService {
                 .phone(desensitizePhone(user.getPhone()))
                 .email(desensitizeEmail(user.getEmail()))
                 .nickname(user.getNickname())
+                .nicknamePending(user.getNicknamePending())
+                .nicknameStatus(user.getNicknameStatus())
                 .bio(user.getBio())
                 .avatarUrl(user.getAvatarUrl())
                 .gender(user.getGender())

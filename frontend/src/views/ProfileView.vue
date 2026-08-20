@@ -86,7 +86,11 @@
     <div class="profile-form-card">
       <el-form :model="form" label-position="top" size="large">
         <el-form-item label="昵称">
-          <el-input v-model="form.nickname" placeholder="设置你的昵称" />
+          <el-input v-model="form.nickname" placeholder="设置你的昵称" maxlength="20" />
+          <div v-if="store.userInfo?.nicknameStatus === 1" class="nickname-pending">
+            <el-icon><Loading /></el-icon> 昵称「{{ store.userInfo.nicknamePending }}」审核中，通过后生效
+          </div>
+          <div v-else class="nickname-tip">修改昵称需审核：自动拦截敏感词，通过后由审核员人工审核</div>
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="form.gender">
@@ -192,9 +196,11 @@ onMounted(async () => {
 })
 
 const save = async () => {
+  const oldNick = store.userInfo?.nickname || ''
+  const nickChanged = form.value.nickname.trim() !== oldNick
   await updateProfile({ nickname: form.value.nickname, gender: form.value.gender })
   await store.fetchProfile()
-  ElMessage.success('保存成功')
+  ElMessage.success(nickChanged ? '昵称已提交审核，通过后生效；其他资料已保存' : '保存成功')
 }
 </script>
 
@@ -207,6 +213,12 @@ const save = async () => {
 .rep-badge { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .rep-badge span { font-size: 14px; font-weight: 600; color: #ff6b35; }
 .profile-form-card { background: #fff; border-radius: 20px; padding: 28px; border: 1px solid #f0f2f5; }
+.nickname-pending {
+  margin-top: 6px; font-size: 12px; color: #e55a2b;
+  display: flex; align-items: center; gap: 4px;
+  background: #fff5f0; border-radius: 8px; padding: 6px 10px;
+}
+.nickname-tip { margin-top: 6px; font-size: 12px; color: #b2bec3; }
 .profile-menu {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
   margin-bottom: 20px;

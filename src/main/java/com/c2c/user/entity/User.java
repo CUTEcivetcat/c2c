@@ -41,6 +41,12 @@ public class User {
     /** 昵称 */
     private String nickname;
 
+    /** 待审核昵称（修改昵称提交审核后暂存，通过后生效） */
+    private String nicknamePending;
+
+    /** 昵称状态：0 正常 / 1 审核中 */
+    private Integer nicknameStatus;
+
     /** 个人简介 */
     private String bio;
 

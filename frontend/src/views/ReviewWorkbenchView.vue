@@ -79,6 +79,40 @@
           <el-pagination layout="prev,pager,next" :total="appealTotal" :page-size="10" v-model:current-page="appealPage" @change="loadAppeals" />
         </div>
       </el-tab-pane>
+
+      <!-- ==================== 昵称修改审核 ==================== -->
+      <el-tab-pane label="昵称审核" name="nickname">
+        <div class="filter-row">
+          <el-select v-model="nicknameStatus" size="small" style="width:130px" @change="loadNicknames">
+            <el-option :value="0" label="待审核" /><el-option :value="1" label="已通过" /><el-option :value="2" label="已拒绝" />
+          </el-select>
+          <el-button size="small" type="primary" plain @click="loadNicknames" :loading="nicknameLoading">刷新</el-button>
+        </div>
+
+        <div v-loading="nicknameLoading" class="card-list">
+          <div v-for="n in nicknames" :key="n.id" class="review-card">
+            <div class="card-body">
+              <div class="line">申请人：<b>{{ n.userName }}</b>（ID {{ n.userId }}）</div>
+              <div class="line">原昵称：<span class="old-nick">{{ n.oldNickname || '-' }}</span> → 新昵称：<b class="new-nick">{{ n.newNickname }}</b></div>
+              <div v-if="n.status === 2 && n.reason" class="line remark">拒绝原因：{{ n.reason }}</div>
+            </div>
+            <div class="card-foot">
+              <span class="time">{{ fmtTime(n.createdAt) }}</span>
+              <template v-if="n.status === 0">
+                <el-button size="small" type="success" plain @click="approveNickname(n)">通过</el-button>
+                <el-button size="small" type="danger" plain @click="rejectNickname(n)">拒绝</el-button>
+              </template>
+              <el-tag v-else size="small" :type="n.status === 1 ? 'success' : 'danger'">
+                {{ n.status === 1 ? '已通过' : '已拒绝' }}
+              </el-tag>
+            </div>
+          </div>
+          <el-empty v-if="!nicknameLoading && !nicknames.length" description="暂无昵称审核记录" />
+        </div>
+        <div v-if="nicknameTotal > 10" class="pager">
+          <el-pagination layout="prev,pager,next" :total="nicknameTotal" :page-size="10" v-model:current-page="nicknamePage" @change="loadNicknames" />
+        </div>
+      </el-tab-pane>
     </el-tabs>
 
     <!-- ==================== 举报详情 ==================== -->
@@ -152,7 +186,8 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   getReports, getReportDetail, handleReport,
-  getAppeals, getAppealDetail, handleAppeal
+  getAppeals, getAppealDetail, handleAppeal,
+  getNicknameAudits, handleNicknameAudit
 } from '@/api/review'
 import { getOrCreateConversation } from '@/api/im'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -175,6 +210,13 @@ const appealStatus = ref(1)
 const appealLoading = ref(false)
 const appealDialog = ref(false)
 const appealDetail = ref(null)
+
+// 昵称审核
+const nicknames = ref([])
+const nicknameTotal = ref(0)
+const nicknamePage = ref(1)
+const nicknameStatus = ref(0)
+const nicknameLoading = ref(false)
 
 const handling = ref(false)
 
@@ -204,6 +246,42 @@ const loadAppeals = async () => {
     appeals.value = res.records || []
     appealTotal.value = res.total || 0
   } catch (e) { /* 拦截器已提示 */ } finally { appealLoading.value = false }
+}
+
+// ==================== 昵称审核 ====================
+const loadNicknames = async () => {
+  nicknameLoading.value = true
+  try {
+    const res = await getNicknameAudits({ status: nicknameStatus.value, page: nicknamePage.value, size: 10 })
+    nicknames.value = res.records || []
+    nicknameTotal.value = res.total || 0
+  } catch (e) { /* 拦截器已提示 */ } finally { nicknameLoading.value = false }
+}
+
+const approveNickname = async (n) => {
+  try {
+    await ElMessageBox.confirm(`通过「${n.newNickname}」的昵称申请？通过后立即生效。`, '昵称审核', { type: 'info' })
+  } catch { return }
+  try {
+    await handleNicknameAudit(n.id, { approve: true })
+    ElMessage.success('已通过，昵称已生效')
+    loadNicknames()
+  } catch (e) { /* */ }
+}
+
+const rejectNickname = async (n) => {
+  let reason = ''
+  try {
+    const { value } = await ElMessageBox.prompt(`拒绝「${n.newNickname}」的昵称申请，请填写原因（用户可见）。`, '昵称审核',
+      { inputType: 'textarea', inputPlaceholder: '例如：昵称含广告信息', confirmButtonText: '确认拒绝', cancelButtonText: '取消' })
+    reason = (value || '').trim()
+  } catch { return }
+  if (!reason) { ElMessage.warning('请填写拒绝原因'); return }
+  try {
+    await handleNicknameAudit(n.id, { approve: false, reason })
+    ElMessage.success('已拒绝')
+    loadNicknames()
+  } catch (e) { /* */ }
 }
 
 const openReport = async (id) => {
@@ -284,7 +362,7 @@ const contactSeller = async (userId) => {
   } catch (e) { /* 拦截器已提示 */ }
 }
 
-onMounted(() => { loadReports(); loadAppeals() })
+onMounted(() => { loadReports(); loadAppeals(); loadNicknames() })
 </script>
 
 <style scoped>
@@ -292,6 +370,8 @@ onMounted(() => { loadReports(); loadAppeals() })
 .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
 .card-list { display: flex; flex-direction: column; gap: 12px; min-height: 120px; }
 .review-card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid #f0f2f5; }
+.old-nick { color: #b2bec3; text-decoration: line-through; }
+.new-nick { color: #e55a2b; }
 .card-head { display: flex; gap: 12px; align-items: center; }
 .card-cover { width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0; }
 .card-title-box { flex: 1; min-width: 0; }
