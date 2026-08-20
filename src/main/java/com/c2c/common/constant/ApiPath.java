@@ -135,6 +135,7 @@ public interface ApiPath {
     // ==================== 平台公告 /announcement ====================
     String ANNOUNCEMENT_LIST = "/announcement/list";
     String ANNOUNCEMENT_LATEST = "/announcement/latest";
+    String ANNOUNCEMENT_FORCE = "/announcement/force";
     String ANNOUNCEMENT_ADMIN_LIST = "/admin/announcement/list";
     String ANNOUNCEMENT_ADMIN = "/admin/announcement";
     String ANNOUNCEMENT_ADMIN_ID = "/admin/announcement/{id}";

@@ -40,6 +40,15 @@ public class AnnouncementService {
                 .last("LIMIT " + Math.min(Math.max(limit, 1), 20)));
     }
 
+    /** 强制弹窗公告列表（用户登录时展示，is_force=1 且已发布，置顶优先、时间倒序） */
+    public List<Announcement> listForce() {
+        return announcementMapper.selectList(new LambdaQueryWrapper<Announcement>()
+                .eq(Announcement::getStatus, 1)
+                .eq(Announcement::getIsForce, 1)
+                .orderByDesc(Announcement::getPinned)
+                .orderByDesc(Announcement::getId));
+    }
+
     /** 管理端全部公告（含已下架） */
     public Page<Announcement> listAll(int page, int size, String keyword) {
         LambdaQueryWrapper<Announcement> w = new LambdaQueryWrapper<Announcement>()

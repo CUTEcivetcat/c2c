@@ -33,6 +33,15 @@ public class Announcement {
     /** 是否置顶：1 置顶 / 0 普通 */
     private Integer pinned;
 
+    /** 是否强制弹窗提示（登录时弹出，需停留最低时长）：1 是 / 0 否（is_force，避免 force 保留字） */
+    private Integer isForce;
+
+    /** 强制弹窗最低停留秒数（is_force=1 时生效，期间不可关闭） */
+    private Integer minSeconds;
+
+    /** 首页横幅是否参与滚动显示：1 滚动 / 0 不滚动 */
+    private Integer scroll;
+
     /** 发布人用户 ID */
     private Long createdBy;
 
