@@ -16,6 +16,8 @@ config/*
 # ===== 数据库导出（含真实业务数据，绝不上传）=====
 sql/c2c.sql
 sql/c2c-monolith.sql
+sql/rebuild-full.sql
+sql/*.sql.bak
 
 # ===== 部署/运维文档（含真实 IP/密码，仅本地维护）=====
 deploy/docs/
