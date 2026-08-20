@@ -32,6 +32,9 @@ deploy/nginx-c2c.conf
 Git上传与同步规则.md
 scripts/
 
+# ===== 本地 agent 技能（.dsh/skills，个人开发辅助，不进仓库）=====
+.dsh/
+
 # ===== 构建产物 =====
 target/
 **/node_modules/
