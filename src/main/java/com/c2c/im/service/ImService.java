@@ -110,7 +110,24 @@ public class ImService {
         Page<Message> page = messageMapper.selectPage(new Page<>(1, size), w);
         // 反转顺序（前端上拉加载旧消息 / 轮询增量时用）
         java.util.Collections.reverse(page.getRecords());
+        fillSenderName(page.getRecords());
         return page;
+    }
+
+    /** 批量填充消息发送人昵称（避免前端逐条查用户） */
+    private void fillSenderName(List<Message> messages) {
+        if (messages == null || messages.isEmpty()) return;
+        java.util.Set<Long> ids = new java.util.HashSet<>();
+        for (Message m : messages) {
+            if (m.getSenderId() != null) ids.add(m.getSenderId());
+        }
+        if (ids.isEmpty()) return;
+        java.util.Map<Long, User> users = userMapper.selectBatchIds(ids).stream()
+                .collect(java.util.stream.Collectors.toMap(User::getId, u -> u));
+        for (Message m : messages) {
+            User u = users.get(m.getSenderId());
+            m.setSenderName(u != null && u.getNickname() != null ? u.getNickname() : "用户" + m.getSenderId());
+        }
     }
 
     /**
