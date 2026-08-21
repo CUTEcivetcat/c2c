@@ -37,6 +37,7 @@
       <span class="result-count">共 <strong>{{ total }}</strong> 件商品</span>
       <div class="sort-tabs">
         <button :class="{ active: sort === 'created_at' }" @click="sort='created_at';loadProducts()">最新</button>
+        <button :class="{ active: sort === 'hot' }" @click="sort='hot';loadProducts()">🔥 人气</button>
         <button :class="{ active: sort === 'view_count' }" @click="sort='view_count';loadProducts()">最热</button>
         <button :class="{ active: sort === 'price_asc' }" @click="sort='price_asc';loadProducts()">价格↑</button>
         <button :class="{ active: sort === 'price_desc' }" @click="sort='price_desc';loadProducts()">价格↓</button>

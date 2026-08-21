@@ -214,6 +214,7 @@ public class ProductServiceImpl implements ProductService {
         if ("price_asc".equals(sort)) wrapper.orderByAsc(Product::getPrice);
         else if ("price_desc".equals(sort)) wrapper.orderByDesc(Product::getPrice);
         else if ("view_count".equals(sort)) wrapper.orderByDesc(Product::getViewCount);
+        else if ("hot".equals(sort)) wrapper.orderByDesc(Product::getViewCount).orderByDesc(Product::getFavoriteCount);
         else wrapper.orderByDesc(Product::getCreatedAt);
 
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);

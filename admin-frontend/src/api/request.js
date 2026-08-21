@@ -53,6 +53,7 @@ export const adminApi = {
   banProduct: (id, reason) => request.put(`/product/admin/${id}/ban`, { reason }),
   restoreProduct: (id) => request.put(`/product/admin/${id}/restore`),
   getOrders: (params) => request.get('/admin/orders', { params }),
+  getOrderWallet: (orderId) => request.get(`/admin/orders/${orderId}/wallet`),
   // 权限管理
   getUserRoles: (params) => request.get('/admin/users/roles', { params }),
   setUserRole: (id, role) => request.put(`/admin/users/${id}/role`, { role }),

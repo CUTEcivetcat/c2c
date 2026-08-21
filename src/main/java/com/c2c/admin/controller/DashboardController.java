@@ -7,6 +7,9 @@ import com.c2c.admin.mapper.DashboardMapper;
 import com.c2c.announcement.mapper.AnnouncementMapper;
 import com.c2c.common.constant.ApiPath;
 import com.c2c.common.result.R;
+import com.c2c.wallet.entity.WalletLog;
+import com.c2c.wallet.mapper.WalletLogMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +38,7 @@ public class DashboardController {
     private final OrderFeignClient orderFeignClient;
     private final DashboardMapper dashboardMapper;
     private final AnnouncementMapper announcementMapper;
+    private final WalletLogMapper walletLogMapper;
 
     @Operation(summary = "首页统计汇总", description = "用户总数 / 商品总数 / 在售数 / 今日订单数")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_SUMMARY)
@@ -47,13 +51,16 @@ public class DashboardController {
         Map<String, Object> productData = getData(productCount);
         Map<String, Object> orderData = getData(orderCount);
 
-        return R.ok(com.c2c.common.utils.MapUtils.of(
-            "totalUsers", safeLong(userData, "total"),
-            "totalProducts", safeLong(productData, "total"),
-            "onSaleProducts", safeLong(productData, "onSale"),
-            "todayOrders", safeLong(orderData, "todayOrders"),
-            "totalAnnouncements", announcementMapper.selectCount(null)
-        ));
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalUsers", safeLong(userData, "total"));
+        result.put("totalProducts", safeLong(productData, "total"));
+        result.put("onSaleProducts", safeLong(productData, "onSale"));
+        result.put("todayOrders", safeLong(orderData, "todayOrders"));
+        result.put("totalAnnouncements", announcementMapper.selectCount(null));
+        result.put("pendingReports", dashboardMapper.pendingReports());
+        result.put("pendingAppeals", dashboardMapper.pendingAppeals());
+        result.put("pendingNicknames", dashboardMapper.pendingNicknames());
+        return R.ok(result);
     }
 
     @Operation(summary = "用户列表（管理端）", description = "关键字搜索 + 分页")
@@ -98,6 +105,14 @@ public class DashboardController {
                                          @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
         Map<String, Object> resp = orderFeignClient.getOrderList(status, page, size);
         return R.ok(getData(resp));
+    }
+
+    @Operation(summary = "订单资金流水", description = "按订单 ID 查询关联的资金流水（支付/退款/收款）")
+    @GetMapping("/admin/orders/{orderId}/wallet")
+    public R<List<WalletLog>> orderWallet(@Parameter(description = "订单 ID") @PathVariable Long orderId) {
+        return R.ok(walletLogMapper.selectList(new LambdaQueryWrapper<WalletLog>()
+                .eq(WalletLog::getOrderId, orderId)
+                .orderByDesc(WalletLog::getId)));
     }
 
     @SuppressWarnings("unchecked")
