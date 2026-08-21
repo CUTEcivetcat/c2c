@@ -11,6 +11,7 @@ import com.c2c.order.mapper.OrderMapper;
 import com.c2c.order.mq.OrderEventPublisher;
 import com.c2c.order.service.OrderService;
 import com.c2c.product.dto.ProductVO;
+import com.c2c.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductFeignClient productFeignClient;
     private final UserFeignClient userFeignClient;
     private final OrderEventPublisher eventPublisher;
+    private final WalletService walletService;
 
     @Override
     @Transactional
@@ -151,14 +153,19 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("当前订单状态不允许支付");
             }
 
+            // 余额扣款 + 平台托管
+            BigDecimal amount = order.getTotalAmount();
+            walletService.deductBalance(buyerId, amount, orderId, "订单支付 #" + order.getOrderNo());
+
             order.setStatus(1);
-            order.setPaymentMethod("mock");
+            order.setPaymentMethod("balance");
+            order.setEscrow(amount);
             order.setPaymentTime(LocalDateTime.now());
             orderMapper.updateById(order);
 
             productFeignClient.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
             eventPublisher.publishOrderPaid(orderId);
-            log.info("order paid: orderId={}", orderId);
+            log.info("order paid (wallet): orderId={}, amount={}", orderId, amount);
         }
     }
 
@@ -181,6 +188,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void receive(Long orderId, Long buyerId) {
         Order order = orderMapper.selectById(orderId);
         if (order == null || !order.getBuyerId().equals(buyerId)) {
@@ -190,14 +198,22 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException("当前订单状态不允许收货");
         }
 
+        // 平台托管金额打给卖家
+        if (order.getEscrow() != null && order.getEscrow().compareTo(BigDecimal.ZERO) > 0) {
+            walletService.receive(order.getSellerId(), order.getEscrow(), orderId,
+                    "订单收款 #" + order.getOrderNo());
+        }
+
         order.setStatus(4);
         order.setReceiveTime(LocalDateTime.now());
         order.setCompleteTime(LocalDateTime.now());
+        order.setEscrow(null);
         orderMapper.updateById(order);
         log.info("order received and completed: orderId={}", orderId);
     }
 
     @Override
+    @Transactional
     public void cancel(Long orderId, Long userId, String reason) {
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
@@ -206,16 +222,25 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getBuyerId().equals(userId) && !order.getSellerId().equals(userId)) {
             throw new BusinessException("无权操作该订单");
         }
-        if (order.getStatus() != 0) {
+        if (order.getStatus() != 0 && order.getStatus() != 1) {
             throw new BusinessException("当前订单状态不允许取消");
+        }
+
+        // 已支付（有托管金）则退款
+        if (order.getEscrow() != null && order.getEscrow().compareTo(BigDecimal.ZERO) > 0) {
+            walletService.refund(order.getBuyerId(), order.getEscrow(), orderId,
+                    "订单退款 #" + order.getOrderNo());
         }
 
         order.setStatus(5);
         order.setCancelTime(LocalDateTime.now());
         order.setCancelReason(reason);
+        order.setEscrow(null);
         orderMapper.updateById(order);
 
-        productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+        if (order.getStatus() == 5 || order.getStatus() == 1) {
+            productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+        }
         log.info("order cancelled: orderId={}", orderId);
     }
 

@@ -57,6 +57,9 @@ public class Order {
     /** 支付方式 */
     private String paymentMethod;
 
+    /** 平台托管金额（支付时暂扣，收货后打给卖家） */
+    private BigDecimal escrow;
+
     /** 支付时间 */
     private LocalDateTime paymentTime;
 
