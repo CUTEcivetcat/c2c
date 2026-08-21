@@ -129,20 +129,42 @@ public class DashboardController {
     }
 
     /**
-     * 7 日趋势数据（真实数据库查询：近 7 天新增用户 / 订单 / 交易额）
+     * 趋势数据（真实数据库查询：新增用户 / 订单 / 交易额，支持时间段选择）
      */
-    @Operation(summary = "7 日趋势数据", description = "近 7 日新增用户 / 订单 / 交易额（真实数据）")
+    @Operation(summary = "趋势数据", description = "新增用户 / 订单 / 交易额，支持周/月/自定义")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_TRENDS)
-    public R<Map<String, Object>> trends() {
+    public R<Map<String, Object>> trends(
+            @Parameter(description = "时间范围：7d/30d/custom") @RequestParam(defaultValue = "7d") String range,
+            @Parameter(description = "自定义开始日期(yyyy-MM-dd)，range=custom时必填") @RequestParam(required = false) String start,
+            @Parameter(description = "自定义结束日期(yyyy-MM-dd)，range=custom时必填") @RequestParam(required = false) String end) {
         LocalDate today = LocalDate.now();
-        LocalDate sevenDaysAgo = today.minusDays(6);
-        LocalDateTime since = LocalDateTime.of(sevenDaysAgo, LocalTime.MIN);
+        LocalDate beginDate;
+        int days;
+        if ("custom".equals(range) && start != null) {
+            beginDate = LocalDate.parse(start);
+            LocalDate endDate = end != null ? LocalDate.parse(end) : today;
+            days = (int) java.time.temporal.ChronoUnit.DAYS.between(beginDate, endDate);
+            if (days < 0) { beginDate = endDate; days = -days; }
+            if (days > 365) { beginDate = today.minusDays(365); days = 365; }
+        } else if ("30d".equals(range)) {
+            beginDate = today.minusDays(29);
+            days = 29;
+        } else {
+            beginDate = today.minusDays(6);
+            days = 6;
+        }
+        LocalDateTime since = LocalDateTime.of(beginDate, LocalTime.MIN);
+        int totalDays = days + 1;
 
-        // 按日期建立 Map 方便填充
+        // 按日期建立 Map
         Map<String, int[]> dayMap = new java.util.LinkedHashMap<>();
-        for (int i = 6; i >= 0; i--) {
+        for (int i = totalDays - 1; i >= 0; i--) {
             String key = today.minusDays(i).toString();
-            dayMap.put(key, new int[]{0, 0, 0}); // {有数据标记, 订单数, 交易额}
+            // 如果自定义且不是今天，从 beginDate 开始算
+            if ("custom".equals(range)) {
+                key = beginDate.plusDays(i).toString();
+            }
+            dayMap.put(key, new int[]{0, 0, 0});
         }
         // 查用户新增
         List<Map<String, Object>> userData = dashboardMapper.userTrend(since);

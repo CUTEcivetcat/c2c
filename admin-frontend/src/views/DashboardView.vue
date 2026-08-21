@@ -40,13 +40,27 @@
     </el-row>
 
     <!-- 折线图 -->
+    <div class="chart-toolbar">
+      <div class="chart-range">
+        <el-select v-model="range" @change="loadTrends" style="width:110px">
+          <el-option label="近 7 天" value="7d" />
+          <el-option label="近 30 天" value="30d" />
+          <el-option label="自定义" value="custom" />
+        </el-select>
+        <template v-if="range === 'custom'">
+          <el-date-picker v-model="customStart" type="date" placeholder="开始日期" value-format="YYYY-MM-DD" @change="loadTrends" style="width:140px" />
+          <span style="color:#b2bec3;font-size:13px">至</span>
+          <el-date-picker v-model="customEnd" type="date" placeholder="结束日期" value-format="YYYY-MM-DD" @change="loadTrends" style="width:140px" />
+        </template>
+      </div>
+    </div>
     <div class="chart-row">
       <div class="chart-card">
-        <h3>7日用户新增趋势</h3>
+        <h3>{{ rangeLabel }}用户新增趋势</h3>
         <div ref="userChartRef" class="chart-box"></div>
       </div>
       <div class="chart-card">
-        <h3>7日订单与交易额</h3>
+        <h3>{{ rangeLabel }}订单与交易额</h3>
         <div ref="orderChartRef" class="chart-box"></div>
       </div>
     </div>
@@ -66,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { adminApi } from '@/api/request'
 import * as echarts from 'echarts'
 
@@ -75,12 +89,37 @@ const userChartRef = ref(null)
 const orderChartRef = ref(null)
 let userChart = null
 let orderChart = null
+const range = ref('7d')
+const customStart = ref('')
+const customEnd = ref('')
+let ro = null
+
+const rangeLabel = computed(() => {
+  if (range.value === '30d') return '近 30 日'
+  if (range.value === 'custom') return '自定义'
+  return '近 7 日'
+})
+
+const loadTrends = async () => {
+  const params = { range: range.value }
+  if (range.value === 'custom') {
+    if (!customStart.value || !customEnd.value) return
+    params.start = customStart.value
+    params.end = customEnd.value
+  }
+  try {
+    const trends = await adminApi.getTrends(params)
+    if (trends) {
+      nextTick(() => initCharts(trends))
+    }
+  } catch (e) { /* */ }
+}
 
 onMounted(async () => {
   try {
     const [summary, trends] = await Promise.all([
       adminApi.getSummary(),
-      adminApi.getTrends()
+      adminApi.getTrends({ range: '7d' })
     ])
     stats.value = {
       totalUsers: summary.totalUsers || 0,
@@ -98,10 +137,15 @@ onMounted(async () => {
   } catch (e) { /* */ }
 
   window.addEventListener('resize', resizeCharts)
+  // 用 ResizeObserver 监听图表容器自适应（侧边栏展开收起时自动跟随）
+  ro = new ResizeObserver(() => resizeCharts())
+  if (userChartRef.value) ro.observe(userChartRef.value)
+  if (orderChartRef.value) ro.observe(orderChartRef.value)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', resizeCharts)
+  ro?.disconnect()
   userChart?.dispose()
   orderChart?.dispose()
 })
@@ -190,6 +234,8 @@ const initCharts = (trends) => {
 .pending-text strong { font-size: 26px; font-weight: 800; color: #2d3436; }
 .pending-text span { font-size: 13px; color: #909399; }
 
+.chart-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.chart-range { display: flex; align-items: center; gap: 8px; }
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px }
 @media (max-width: 900px) { .chart-row { grid-template-columns: 1fr } }
 .chart-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04) }
