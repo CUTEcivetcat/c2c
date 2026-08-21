@@ -45,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryMapper categoryMapper;
     private final UserFeignClient userFeignClient;
     private final StringRedisTemplate redisTemplate;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -100,6 +101,7 @@ public class ProductServiceImpl implements ProductService {
         }
         // 清除缓存
         redisTemplate.delete("product:info:" + productId);
+        clearHomeCache();
     }
 
     @Override
@@ -111,6 +113,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStatus(ProductStatus.OFF_SHELF.getCode());
         productMapper.updateById(product);
         redisTemplate.delete("product:info:" + productId);
+        clearHomeCache();
     }
 
     @Override
@@ -125,6 +128,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStatus(status);
         productMapper.updateById(product);
         redisTemplate.delete("product:info:" + productId);
+        clearHomeCache();
     }
 
     @Override
@@ -138,6 +142,7 @@ public class ProductServiceImpl implements ProductService {
                 .set(Product::getStatus, ProductStatus.BANNED.getCode())
                 .set(Product::getReviewReason, reason == null ? "" : reason));
         redisTemplate.delete("product:info:" + productId);
+        clearHomeCache();
     }
 
     @Override
@@ -151,6 +156,7 @@ public class ProductServiceImpl implements ProductService {
                 .set(Product::getStatus, ProductStatus.ON_SALE.getCode())
                 .set(Product::getReviewReason, null));
         redisTemplate.delete("product:info:" + productId);
+        clearHomeCache();
     }
 
     @Override
@@ -188,6 +194,26 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductVO> search(String keyword, Long categoryId, Integer condition,
                                    Double minPrice, Double maxPrice, String sort,
                                    int page, int size) {
+        // 首页默认列表（无筛选、第一页、按最新）缓存 60 秒，降低 DB 压力
+        boolean homeList = StrUtil.isBlank(keyword) && categoryId == null && condition == null
+                && minPrice == null && maxPrice == null && page == 1
+                && "created_at".equals(sort);
+        String cacheKey = null;
+        if (homeList) {
+            cacheKey = "product:home:" + size;
+            String cached = redisTemplate.opsForValue().get(cacheKey);
+            if (cached != null) {
+                try {
+                    Page<ProductVO> p = new Page<>(1, size, 0);
+                    p.setRecords(objectMapper.readValue(cached,
+                            new com.fasterxml.jackson.core.type.TypeReference<List<ProductVO>>() {}));
+                    return p;
+                } catch (Exception ignored) {
+                    // 缓存解析失败则回退到数据库查询
+                }
+            }
+        }
+
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Product::getStatus, ProductStatus.ON_SALE.getCode());
 
@@ -223,6 +249,16 @@ public class ProductServiceImpl implements ProductService {
         voPage.setRecords(result.getRecords().stream()
                 .map(p -> buildVO(p, null))
                 .collect(Collectors.toList()));
+
+        // 写入首页缓存
+        if (cacheKey != null) {
+            try {
+                redisTemplate.opsForValue().set(cacheKey,
+                        objectMapper.writeValueAsString(voPage.getRecords()), 60, TimeUnit.SECONDS);
+            } catch (Exception ignored) {
+                // 缓存失败不影响查询结果
+            }
+        }
         return voPage;
     }
 
@@ -284,6 +320,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // ========== 私有方法 ==========
+
+    private void clearHomeCache() {
+        try {
+            Set<String> keys = redisTemplate.keys("product:home:*");
+            if (keys != null && !keys.isEmpty()) {
+                redisTemplate.delete(keys);
+            }
+        } catch (Exception ignored) {
+            // 缓存清理失败不影响业务
+        }
+    }
 
     private ProductVO buildVO(Product product, Long currentUserId) {
         // 获取图片
