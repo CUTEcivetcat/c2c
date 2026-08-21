@@ -30,6 +30,7 @@
           <router-link to="/chat" class="nav-icon-btn">
             <el-badge :value="unread" :hidden="!unread" :max="99"><el-icon :size="22"><ChatDotRound /></el-icon></el-badge>
           </router-link>
+          <router-link to="/announcement" class="nav-icon-btn"><el-icon :size="22"><Bell /></el-icon></router-link>
           <router-link to="/favorite" class="nav-icon-btn"><el-icon :size="22"><Star /></el-icon></router-link>
           <el-dropdown trigger="click" popper-class="user-dropdown">
             <div class="user-avatar-btn">

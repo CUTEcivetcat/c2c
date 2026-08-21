@@ -4,6 +4,7 @@ import com.c2c.admin.feign.OrderFeignClient;
 import com.c2c.admin.feign.ProductFeignClient;
 import com.c2c.admin.feign.UserFeignClient;
 import com.c2c.admin.mapper.DashboardMapper;
+import com.c2c.announcement.mapper.AnnouncementMapper;
 import com.c2c.common.constant.ApiPath;
 import com.c2c.common.result.R;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ public class DashboardController {
     private final ProductFeignClient productFeignClient;
     private final OrderFeignClient orderFeignClient;
     private final DashboardMapper dashboardMapper;
+    private final AnnouncementMapper announcementMapper;
 
     @Operation(summary = "首页统计汇总", description = "用户总数 / 商品总数 / 在售数 / 今日订单数")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_SUMMARY)
@@ -49,7 +51,8 @@ public class DashboardController {
             "totalUsers", safeLong(userData, "total"),
             "totalProducts", safeLong(productData, "total"),
             "onSaleProducts", safeLong(productData, "onSale"),
-            "todayOrders", safeLong(orderData, "todayOrders")
+            "todayOrders", safeLong(orderData, "todayOrders"),
+            "totalAnnouncements", announcementMapper.selectCount(null)
         ));
     }
 
