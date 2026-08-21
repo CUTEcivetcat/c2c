@@ -1,31 +1,17 @@
 -- =============================================================
--- C2C 二手校园交易平台 · 全量建表脚本（schema.sql）
+-- C2C 全量建表脚本（init.sql）
+-- 包含 17 张表：15 基础表 + announcement + nickname_audit + wallet_log 及 ALTER
+-- 用法：mysql -uroot -p c2c < init.sql
+--       再执行 data.sql 导入演示数据
+-- 注意：会清空重建 c2c 库！
 -- =============================================================
--- 说明：
---   1. 本脚本会 DROP 并重建 c2c 库，导入前请确认不需要保留旧数据。
---   2. 共 15 张表（含后续新增）：
---      user / user_address / category / product / product_image /
---      order / favorite / rating / conversation / message /
---      product_comment / product_intent / report / product_appeal / admin_log
---   3. 演示数据见 demo-data.sql（建表完成后执行）。
---   4. 数据库编码 utf8mb4，支持中文和 emoji。
---
--- 导入方式（服务器上）：
---   mysql -uroot -p c2c < schema.sql
--- 或进入 MySQL 后：USE c2c; SOURCE schema.sql;
--- =============================================================
-
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 DROP DATABASE IF EXISTS c2c;
 CREATE DATABASE c2c DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE c2c;
 
--- =============================================================
--- 1. user 用户表
---    平台所有账号的载体。role 区分身份：0=普通用户，1=管理员，2=审核员。
---    管理员通过 /admin/login 登录，签发带 ADMIN 角色的 JWT。
---    普通用户通过 /user/login 登录。
---    密码使用 BCrypt 加密存储（字段 password）。
--- =============================================================
+-- ==================== 基础表（15 张，来自 schema.sql） ====================
 CREATE TABLE `user` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `username` VARCHAR(100) NOT NULL COMMENT '用户名（登录账号，唯一业务约束）',
@@ -339,6 +325,46 @@ CREATE TABLE `admin_log` (
 -- 18. wallet_log 资金流水表
 --     记录每笔余额变动：充值/支付/退款/到账，进出双向留痕。
 -- =============================================================
+-- ==================== 新增表（来自 tables/） ====================
+
+-- announcement 平台公告表
+CREATE TABLE IF NOT EXISTS `announcement` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(200) NOT NULL COMMENT '公告标题',
+  `content` TEXT NOT NULL COMMENT '公告内容',
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT '类型：1公告 2平台公约 3通知',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1已发布 0已下架',
+  `pinned` TINYINT NOT NULL DEFAULT 0 COMMENT '是否置顶：1置顶 0普通',
+  `is_force` TINYINT NOT NULL DEFAULT 0 COMMENT '是否强制弹窗（登录时弹出）：1是 0否',
+  `min_seconds` INT NOT NULL DEFAULT 0 COMMENT '强制弹窗最低停留秒数（is_force=1时生效）',
+  `scroll` TINYINT NOT NULL DEFAULT 1 COMMENT '首页横幅是否滚动显示：1滚动 0不滚动',
+  `show_on_publish` TINYINT NOT NULL DEFAULT 0 COMMENT '是否在发布商品页右侧展示：1展示 0不展示',
+  `created_by` BIGINT DEFAULT NULL COMMENT '发布人用户ID',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  KEY `idx_status_type` (`status`, `type`),
+  KEY `idx_force` (`status`, `is_force`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='平台公告';
+
+-- nickname_audit 昵称审核表
+CREATE TABLE IF NOT EXISTS `nickname_audit` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL COMMENT '申请人用户ID',
+  `old_nickname` VARCHAR(50) DEFAULT NULL COMMENT '原昵称',
+  `new_nickname` VARCHAR(50) NOT NULL COMMENT '申请的新昵称',
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '状态：0待审核 1已通过 2已拒绝',
+  `reason` VARCHAR(500) DEFAULT NULL COMMENT '处理说明/拒绝原因',
+  `handled_by` BIGINT DEFAULT NULL COMMENT '处理人用户ID（审核员/管理员）',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+  `handled_at` DATETIME DEFAULT NULL COMMENT '处理时间',
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='昵称修改审核记录';
+
+ALTER TABLE `user` ADD COLUMN `nickname_pending` VARCHAR(50) DEFAULT NULL COMMENT '待审核昵称' AFTER `nickname`;
+ALTER TABLE `user` ADD COLUMN `nickname_status` TINYINT NOT NULL DEFAULT 0 COMMENT '昵称状态：0正常 1审核中' AFTER `nickname_pending`;
+
+-- wallet_log 资金流水表
 CREATE TABLE IF NOT EXISTS `wallet_log` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -353,8 +379,10 @@ CREATE TABLE IF NOT EXISTS `wallet_log` (
   KEY `idx_order` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资金流水';
 
--- 用户表增加余额字段
 ALTER TABLE `user` ADD COLUMN IF NOT EXISTS `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '账户余额' AFTER `reputation_score`;
-
--- 订单表增加平台托管金额字段
 ALTER TABLE `order` ADD COLUMN IF NOT EXISTS `escrow` DECIMAL(10,2) DEFAULT NULL COMMENT '平台托管金额（支付时暂扣，收货后打给卖家）' AFTER `payment_method`;
+
+SET FOREIGN_KEY_CHECKS = 1;
+-- =============================================================
+-- 建表完成：17 张表
+-- =============================================================

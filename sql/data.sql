@@ -1,4 +1,14 @@
 -- =============================================================
+-- C2C 全量演示数据（data.sql）
+-- 在 init.sql 建表完成后执行
+-- 用法：mysql -uroot -p c2c < data.sql
+-- =============================================================
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+USE c2c;
+
+-- ==================== 基础表演示数据（来自 demo-data.sql） ====================
+-- =============================================================
 -- C2C 二手校园交易平台 · 演示数据（demo-data.sql）
 -- =============================================================
 -- 说明：
@@ -112,3 +122,35 @@ INSERT INTO `message`
 VALUES
 (1, 1, 2, 1, '你好，iPhone 15 Pro 还有货吗？', 1, NULL, 1, NOW()),
 (2, 1, 1, 2, '有的，可以在主校区当面看。', 1, NULL, 0, NOW());
+
+-- ==================== 新增表演示数据 ====================
+
+INSERT INTO `announcement` (`title`, `content`, `type`, `status`, `pinned`, `is_force`, `min_seconds`, `scroll`, `show_on_publish`, `created_by`)
+SELECT tmp.title, tmp.content, tmp.type, tmp.status, tmp.pinned, tmp.is_force, tmp.min_seconds, tmp.scroll, tmp.show_on_publish, tmp.created_by FROM (
+  SELECT '欢迎使用闲小鱼' AS title,
+         '闲小鱼是一个 C2C 二手交易平台，让闲置流转起来。\n\n请先阅读《平台公约》，遵守交易规则，共同维护良好的交易环境。' AS content,
+         1 AS type, 1 AS status, 1 AS pinned, 1 AS is_force, 5 AS min_seconds, 1 AS scroll, 1 AS show_on_publish, 4 AS created_by
+  UNION ALL
+  SELECT '平台公约',
+         '1. 如实描述商品，禁止虚假信息与违规商品。\n2. 交易自愿，请勿线下脱离平台交易。\n3. 文明沟通，禁止辱骂、骚扰等不良行为。\n4. 违规商品将被下架，情节严重者封禁账号。',
+         2, 1, 0, 0 AS is_force, 0 AS min_seconds, 1 AS scroll, 0 AS show_on_publish, 4 AS created_by
+  UNION ALL
+  SELECT '交易提示',
+         '支付与收货请务必在平台内完成，谨防线下交易诈骗。',
+         3, 1, 0, 0 AS is_force, 0 AS min_seconds, 1 AS scroll, 0 AS show_on_publish, 4 AS created_by
+) tmp
+WHERE NOT EXISTS (SELECT 1 FROM `announcement`);
+
+
+INSERT INTO `nickname_audit` (`user_id`, `old_nickname`, `new_nickname`, `status`)
+SELECT 1, '小王', '小闲鱼', 0
+WHERE NOT EXISTS (SELECT 1 FROM `nickname_audit` WHERE `user_id` = 1 AND `status` = 0);
+
+
+-- 演示用户各充值 100 元
+UPDATE `user` SET balance = 100.00 WHERE id <= 8 AND balance = 0;
+
+SET FOREIGN_KEY_CHECKS = 1;
+-- =============================================================
+-- 数据导入完成
+-- =============================================================
