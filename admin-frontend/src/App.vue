@@ -244,4 +244,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .admin-main .el-dialog__footer {
   padding: 0 24px 20px !important;
 }
+
+/* 日期选择器统一样式 */
+.admin-main .el-date-editor .el-input__wrapper {
+  border-radius: 12px !important;
+}
+.admin-main .el-picker-panel {
+  border-radius: 14px !important;
+}
 </style>
