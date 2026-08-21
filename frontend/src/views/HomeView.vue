@@ -256,21 +256,29 @@ onUnmounted(stopAnnRoll)
 .product-card-new {
   background: #fff; border-radius: 16px; overflow: hidden;
   border: 1px solid #f0f2f5; cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 .product-card-new:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  border-color: transparent;
 }
 .card-img-wrap {
   position: relative; overflow: hidden;
   height: 200px; background: #f8f9fa;
 }
+.card-img-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  opacity: 0; transition: opacity 0.35s ease;
+  background: linear-gradient(180deg, transparent 40%, rgba(255,107,53,0.08) 100%);
+}
+.product-card-new:hover .card-img-wrap::after { opacity: 1; }
 .card-img {
   width: 100%; height: 100%; object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s ease;
 }
-.product-card-new:hover .card-img { transform: scale(1.05); }
+.product-card-new:hover .card-img { transform: scale(1.08); }
 .condition-badge {
   position: absolute; top: 10px; left: 10px;
   background: rgba(0,0,0,0.55); color: #fff;

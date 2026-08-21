@@ -163,15 +163,38 @@ const goAdmin = () => {
 <style scoped>
 .login-page {
   min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center;
-  padding: 40px 20px; background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%);
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%);
+  background-size: 200% 200%;
+  animation: loginGradient 8s ease infinite;
+}
+@keyframes loginGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .login-container {
   display: flex; max-width: 880px; width: 100%;
-  background: #fff; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); overflow: hidden;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+  border-radius: 24px; box-shadow: 0 25px 80px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.04);
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.8);
 }
 .login-art {
-  flex: 0 0 360px; background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 50%, #e55a2b 100%);
+  flex: 0 0 360px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 50%, #e55a2b 100%);
+  background-size: 200% 200%;
+  animation: loginArtGrad 6s ease infinite;
   display: flex; align-items: center; justify-content: center; padding: 48px;
+  position: relative; overflow: hidden;
+}
+@keyframes loginArtGrad {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.login-art::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.15) 0%, transparent 60%);
 }
 @media (max-width: 768px) {
   .login-container { flex-direction: column; max-width: 420px; margin: 0 12px; }

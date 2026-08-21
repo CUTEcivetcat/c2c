@@ -135,12 +135,23 @@ watch(() => route.fullPath, () => { fetchUnread() })
 
 /* 搜索栏 */
 .search-bar { flex: 1; max-width: 420px; }
-.search-input-wrap { display: flex; align-items: center; gap: 8px; background: #f0f2f5; border-radius: 20px; padding: 0 14px; height: 36px; transition: all 0.25s; border: 2px solid transparent; }
-.search-input-wrap:focus-within { background: #fff; border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255,107,53,0.1); }
-.search-icon { font-size: 16px; color: #b2bec3; flex-shrink: 0; }
+.search-input-wrap {
+  display: flex; align-items: center; gap: 8px;
+  background: #f0f2f5; border-radius: 24px; padding: 0 16px; height: 38px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent; box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+}
+.search-input-wrap:focus-within {
+  background: #fff; border-color: #ff6b35;
+  box-shadow: 0 0 0 4px rgba(255,107,53,0.12), 0 4px 16px rgba(255,107,53,0.08);
+  transform: scale(1.02);
+}
+.search-icon { font-size: 16px; color: #b2bec3; flex-shrink: 0; transition: color 0.3s; }
+.search-input-wrap:focus-within .search-icon { color: #ff6b35; }
 .search-input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; color: #2d3436; }
 .search-input::placeholder { color: #b2bec3; }
-.search-clear { border: none; background: #dfe6e9; cursor: pointer; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.search-clear { border: none; background: #dfe6e9; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.2s; }
+.search-clear:hover { background: #b2bec3; color: #fff; }
 
 /* 桌面操作 */
 .nav-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
