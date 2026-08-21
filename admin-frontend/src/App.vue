@@ -15,7 +15,7 @@
         <router-link to="/review" class="nav-item"><el-icon><Checked /></el-icon><span>审核管理</span></router-link>
         <router-link to="/products" class="nav-item"><el-icon><Goods /></el-icon><span>商品管理</span></router-link>
         <router-link to="/orders" class="nav-item"><el-icon><Document /></el-icon><span>订单管理</span></router-link>
-        <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span>公告管理</span></router-link>
+        <router-link to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span>轮播图管理</span></router-link>        <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span>公告管理</span></router-link>
       </nav>
       <div class="sidebar-footer">
         <div class="admin-user">

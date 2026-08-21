@@ -13,6 +13,18 @@
       </button>
     </div>
 
+    <!-- 首页轮播图（运营位） -->
+    <div class="home-banner" v-if="banners.length">
+      <el-carousel height="200px" :interval="4000" arrow="hover">
+        <el-carousel-item v-for="b in banners" :key="b.id">
+          <div class="banner-slide" @click="goBanner(b)">
+            <img :src="b.imageUrl" alt="" class="banner-img" />
+            <span v-if="b.title" class="banner-title">{{ b.title }}</span>
+          </div>
+        </el-carousel-item>
+      </el-carousel>
+    </div>
+
     <!-- 最新公告横幅（滚动轮播显示 scroll=1 的公告） -->
     <div v-if="scrollList.length" class="announce-banner" @click="$router.push('/announcement')">
       <span class="ann-icon">📢</span>
@@ -111,6 +123,7 @@ import { useUserStore } from '@/stores/userStore'
 import { getCategories, searchProducts } from '@/api/product'
 import { addFavorite, removeFavorite } from '@/api/favorite'
 import { getAnnouncementLatest } from '@/api/announcement'
+import { getBanners } from '@/api/banner'
 
 const store = useUserStore()
 const categories = ref([])
@@ -122,6 +135,7 @@ const sort = ref('created_at')
 const loading = ref(false)
 const announcements = ref([])
 const annIndex = ref(0)
+const banners = ref([])
 let annTimer = null
 const conditionMap = { 1: '全新', 2: '几乎全新', 3: '轻微使用', 4: '明显使用' }
 
@@ -171,8 +185,12 @@ onMounted(async () => {
     annIndex.value = 0
     startAnnRoll()
   }).catch(() => {})
+  // 加载轮播图
+  getBanners().then(r => { banners.value = r || [] }).catch(() => {})
 })
 onUnmounted(stopAnnRoll)
+
+const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 </script>
 
 <style scoped>
@@ -194,9 +212,19 @@ onUnmounted(stopAnnRoll)
 .cat-chip.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
 .cat-icon { font-size: 16px; }
 
+/* 首页轮播图 */
+.home-banner { margin-bottom: 16px; border-radius: 14px; overflow: hidden; }
+.banner-slide { position: relative; height: 100%; cursor: pointer; }
+.banner-img { width: 100%; height: 100%; object-fit: cover; }
+.banner-title {
+  position: absolute; bottom: 10px; left: 14px;
+  color: #fff; font-size: 14px; font-weight: 600;
+  background: rgba(0,0,0,0.45); padding: 3px 12px; border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
 /* 最新公告横幅 */
-.announce-banner {
-  display: flex; align-items: center; gap: 8px;
+.announce-banner {  display: flex; align-items: center; gap: 8px;
   background: linear-gradient(135deg, #fff8f0, #fff3e6);
   border: 1px solid #ffe3c2; border-radius: 12px;
   padding: 10px 16px; margin: -10px 0 20px; cursor: pointer;

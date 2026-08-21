@@ -72,5 +72,10 @@ export const adminApi = {
   deleteAnnouncement: (id) => request.delete(`/admin/announcement/${id}`),
   // 昵称审核
   getNicknameAudits: (params) => request.get('/review/nickname/list', { params }),
-  handleNicknameAudit: (id, data) => request.post(`/review/nickname/${id}/handle`, data)
+  handleNicknameAudit: (id, data) => request.post(`/review/nickname/${id}/handle`, data),
+  // 轮播图管理
+  getBanners: () => request.get('/admin/banner/list'),
+  createBanner: (data) => request.post('/admin/banner', data),
+  updateBanner: (id, data) => request.put(`/admin/banner/${id}`, data),
+  deleteBanner: (id) => request.delete(`/admin/banner/${id}`)
 }
