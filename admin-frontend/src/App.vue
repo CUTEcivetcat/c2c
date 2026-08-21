@@ -18,6 +18,12 @@
         <router-link to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
         <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
       </nav>
+      <!-- 收起按钮（导航与退出之间，居中） -->
+      <div class="sidebar-collapse">
+        <button class="collapse-btn" @click="collapsed = !collapsed">
+          <el-icon><ArrowLeft v-if="!collapsed" /><ArrowRight v-else /></el-icon>
+        </button>
+      </div>
       <div class="sidebar-footer">
         <div class="admin-user">
           <el-avatar :size="32" class="admin-avatar">{{ adminName.charAt(0) || 'A' }}</el-avatar>
@@ -26,14 +32,9 @@
             <small>在线</small>
           </div>
         </div>
-        <div class="footer-actions">
-          <button class="logout-btn" @click="logout">
-            <el-icon><SwitchButton /></el-icon><span v-show="!collapsed">退出后台</span>
-          </button>
-          <button class="collapse-btn" @click="collapsed = !collapsed">
-            <el-icon><ArrowLeft v-if="!collapsed" /><ArrowRight v-else /></el-icon>
-          </button>
-        </div>
+        <button class="logout-btn" @click="logout">
+          <el-icon><SwitchButton /></el-icon><span v-show="!collapsed">退出后台</span>
+        </button>
       </div>
     </aside>
     <main class="admin-main" :class="{ collapsed }">
@@ -88,17 +89,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .admin-sidebar.collapsed .logout-btn span{display:none}
 .logout-btn:hover{background:rgba(231,76,60,0.25);border-color:#e74c3c;color:#fff}
 
-/* 底部操作栏：退出按钮 + 收起按钮同行 */
-.footer-actions{display:flex;align-items:center;gap:8px}
-.admin-sidebar.collapsed .footer-actions{justify-content:center}
+/* 收起按钮容器（居中） */
+.sidebar-collapse {
+  display: flex; justify-content: center; padding: 8px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
 
-/* 收起按钮（侧边栏底部，与退出按钮同行，融合风格） */
+/* 收起按钮 */
 .collapse-btn {
   width: 36px; height: 36px; border: none; border-radius: 10px;
   background: rgba(255,255,255,0.08);
   color: rgba(255,255,255,0.5); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; transition: all 0.25s ease; flex-shrink: 0;
+  font-size: 16px; transition: all 0.25s ease;
 }
 .collapse-btn:hover {
   background: rgba(255,255,255,0.18); color: #ff6b35;
