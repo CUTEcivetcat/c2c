@@ -65,6 +65,43 @@ UPDATE `announcement` SET show_on_publish = 1 WHERE title = '欢迎使用闲小�
 
 ---
 
+## 2026-08-21 · 余额钱包 + 担保交易
+
+**变更内容**：新增余额钱包体系，支付从模拟改为真实余额扣款。
+- 新建 `wallet_log` 表（资金流水，充值/支付/退款/收款）
+- `user` 表加 `balance` 列（余额）
+- `order` 表加 `escrow` 列（平台托管金额）
+
+**执行 SQL**（幂等，列已存在报错忽略）：
+
+```sql
+-- 1. 资金流水表
+CREATE TABLE IF NOT EXISTS `wallet_log` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL COMMENT '用户ID',
+  `type` VARCHAR(20) NOT NULL COMMENT '类型：recharge/pay/refund/receive',
+  `amount` DECIMAL(10,2) NOT NULL COMMENT '金额（正数=收入，负数=支出）',
+  `balance_before` DECIMAL(10,2) NOT NULL COMMENT '变动前余额',
+  `balance_after` DECIMAL(10,2) NOT NULL COMMENT '变动后余额',
+  `order_id` BIGINT DEFAULT NULL COMMENT '关联订单ID',
+  `remark` VARCHAR(200) DEFAULT NULL COMMENT '备注',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `idx_user` (`user_id`),
+  KEY `idx_order` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资金流水';
+
+-- 2. user 表加余额
+ALTER TABLE `user` ADD COLUMN `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '账户余额' AFTER `reputation_score`;
+
+-- 3. order 表加托管金
+ALTER TABLE `order` ADD COLUMN `escrow` DECIMAL(10,2) DEFAULT NULL COMMENT '平台托管金额（支付时暂扣，收货后打给卖家）' AFTER `payment_method`;
+
+-- 4. 演示用户各充值 100 元
+UPDATE `user` SET balance = 100.00 WHERE id <= 8 AND balance = 0;
+```
+
+---
+
 ## 更早变更（已并入基础表/新增表文件）
 
 | 日期 | 变更 | 位置 |
