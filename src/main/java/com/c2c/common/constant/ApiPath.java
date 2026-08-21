@@ -146,4 +146,10 @@ public interface ApiPath {
     // ==================== 钱包 /user/wallet ====================
     String WALLET_PROFILE = "/user/wallet/profile";
     String WALLET_RECHARGE = "/user/wallet/recharge";
+
+    // ==================== 轮播图 /banner ====================
+    String BANNER_LIST = "/banner/list";
+    String BANNER_ADMIN_LIST = "/admin/banner/list";
+    String BANNER_ADMIN = "/admin/banner";
+    String BANNER_ADMIN_ID = "/admin/banner/{id}";
 }

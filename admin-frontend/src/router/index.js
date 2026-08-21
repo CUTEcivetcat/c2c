@@ -9,7 +9,8 @@ const routes = [
   { path: '/orders', name: 'Orders', component: () => import('@/views/OrderManageView.vue'), meta: { requiresAuth: true } },
   { path: '/permissions', name: 'Permissions', component: () => import('@/views/UserRoleManageView.vue'), meta: { requiresAuth: true } },
   { path: '/review', name: 'Review', component: () => import('@/views/ReviewManageView.vue'), meta: { requiresAuth: true } },
-  { path: '/announcement', name: 'Announcement', component: () => import('@/views/AnnouncementManageView.vue'), meta: { requiresAuth: true } }
+  { path: '/announcement', name: 'Announcement', component: () => import('@/views/AnnouncementManageView.vue'), meta: { requiresAuth: true } },
+  { path: '/banner', name: 'Banner', component: () => import('@/views/BannerManageView.vue'), meta: { requiresAuth: true } }
 ]
 
 const router = createRouter({ history: createWebHashHistory(), routes })
