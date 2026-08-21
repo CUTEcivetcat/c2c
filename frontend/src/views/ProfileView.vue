@@ -24,6 +24,9 @@
       <router-link to="/my/appeal" class="menu-item">
         <span class="menu-ico">🔁</span><span>我的整改申诉</span>
       </router-link>
+      <router-link to="/browse-history" class="menu-item">
+        <span class="menu-ico">🕐</span><span>最近浏览</span>
+      </router-link>
       <router-link v-if="store.userInfo?.role === 2" to="/review" class="menu-item">
         <span class="menu-ico">🛡️</span><span>审核工作台</span>
       </router-link>

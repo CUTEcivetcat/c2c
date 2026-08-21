@@ -41,6 +41,9 @@ public interface ProductService {
 
     /** 查看某个用户发布的在售商品（公开，用于用户主页） */
     Page<ProductVO> getUserOnSaleList(Long userId, int page, int size);
+
+    /** 批量查询商品（按 ID 列表，逗号分隔，最多 50 个），供最近浏览等场景 */
+    java.util.List<ProductVO> batchByIds(String ids);
 }
 
 

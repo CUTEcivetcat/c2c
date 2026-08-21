@@ -38,6 +38,7 @@ public interface ApiPath {
     String PRODUCT_STATUS = "/product/{id}/status";
     String PRODUCT_MY_PUBLISHED = "/product/my/published";
     String PRODUCT_USER_ID = "/product/user/{userId}";
+    String PRODUCT_IDS = "/product/ids";
     String PRODUCT_ADMIN_LIST = "/product/admin/list";
     String PRODUCT_ADMIN_COUNT = "/product/admin/count";
     String PRODUCT_ADMIN_BAN = "/product/admin/{id}/ban";

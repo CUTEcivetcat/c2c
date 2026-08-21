@@ -10,6 +10,7 @@ export const offShelfProduct = (id) => request.delete(`/product/${id}`)
 export const updateStatus = (id, status) => request.put(`/product/${id}/status`, null, { headers: { 'X-Status': status } })
 export const getMyPublished = (params) => request.get('/product/my/published', { params })
 export const getUserProducts = (userId, params) => request.get(`/product/user/${userId}`, { params })
+export const getProductsByIds = (ids) => request.get('/product/ids', { params: { ids } })
 export const uploadImage = (file) => {
   const formData = new FormData()
   formData.append('file', file)

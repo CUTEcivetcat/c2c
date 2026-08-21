@@ -255,6 +255,34 @@ public class ProductServiceImpl implements ProductService {
         return voPage;
     }
 
+    @Override
+    public java.util.List<ProductVO> batchByIds(String ids) {
+        if (ids == null || ids.trim().isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        java.util.List<Long> idList = new java.util.ArrayList<>();
+        for (String s : ids.split(",")) {
+            try {
+                idList.add(Long.valueOf(s.trim()));
+            } catch (NumberFormatException ignored) {
+                // 忽略非法 ID
+            }
+        }
+        if (idList.size() > 50) {
+            idList = idList.subList(0, 50);
+        }
+        if (idList.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        java.util.Map<Long, Product> map = productMapper.selectBatchIds(idList).stream()
+                .collect(java.util.stream.Collectors.toMap(Product::getId, p -> p));
+        return idList.stream()
+                .filter(map::containsKey)
+                .map(map::get)
+                .map(p -> buildVO(p, null))
+                .collect(Collectors.toList());
+    }
+
     // ========== 私有方法 ==========
 
     private ProductVO buildVO(Product product, Long currentUserId) {
