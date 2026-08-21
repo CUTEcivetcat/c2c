@@ -47,8 +47,7 @@ c2c/
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
 ├── blog/                         # 博客前端（Vite 5175）
-├── sql/                          # schema.sql 基础表 / tables/ 新增表(含演示数据) / demo-data.sql 演示数据
-│   └── tables/                   # ★ 新增表统一放这里，每张表一个独立文件（见 sql/README.md 规范）
+├── sql/                          # init.sql 全量建表(18张) / data.sql 全量演示数据 / README.md 说明
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
 └── deploy/                       # 部署脚本与示例配置（脱敏）
@@ -64,8 +63,8 @@ c2c/
 ### 1. 数据库
 ```sql
 -- 建库 + 建表 + 演示数据（任选其一）
-source sql/schema.sql;      -- 纯表结构
-source sql/demo-data.sql;   -- 演示数据（用户/分类/商品/订单等）
+source sql/init.sql;      -- 全量建表（18 张表，会清空库）
+source sql/data.sql;   -- 全量演示数据（用户/分类/商品/订单/公告/钱包等）
 ```
 
 ### 2. 后端
