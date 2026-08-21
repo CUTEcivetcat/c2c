@@ -132,6 +132,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/browse-history',
+    name: 'BrowseHistory',
+    component: () => import('@/views/BrowseHistoryView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundView.vue')

@@ -161,6 +161,20 @@
       </div>
     </div>
 
+    <!-- 猜你喜欢（同分类在售商品） -->
+    <div class="detail-section" v-if="similar.length">
+      <h2 class="section-title">猜你喜欢</h2>
+      <div class="similar-grid">
+        <div v-for="p in similar" :key="p.id" class="similar-card" @click="$router.push(`/product/${p.id}`)">
+          <product-cover :src="p.images?.[0]?.url" class="similar-img" />
+          <div class="similar-info">
+            <div class="similar-title">{{ p.title }}</div>
+            <div class="similar-price">¥{{ p.price }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 我想要弹窗 -->
     <el-dialog v-model="showIntentDialog" title="我想买" width="420px">
       <p style="font-size:14px;color:#636e72;margin:0 0 16px">对「<strong>{{ product.title }}</strong>」表达购买意向，卖家会收到并回复你。</p>
@@ -222,7 +236,8 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { getProductDetail, getComments, addComment, deleteComment, createIntent } from '@/api/product'
+import { getProductDetail, getComments, addComment, deleteComment, createIntent, searchProducts } from '@/api/product'
+import { recordBrowse } from '@/utils/browseHistory'
 import { addFavorite, removeFavorite, checkFavorite } from '@/api/favorite'
 import { getOrCreateConversation } from '@/api/im'
 import { createReport, createAppeal } from '@/api/review'
@@ -260,13 +275,26 @@ const appealSubmitting = ref(false)
 const appealForm = ref({ appealReason: '' })
 
 onMounted(async () => {
+  // 记录浏览历史
+  recordBrowse(route.params.id)
   product.value = await getProductDetail(route.params.id)
   activeImage.value = product.value.images?.[0]?.url || ''
   if (store.isLoggedIn()) {
     try { const r = await checkFavorite(route.params.id); isFav.value = r.isFavorited } catch (e) { /* */ }
   }
   loadComments()
+  loadSimilar()
 })
+
+// 猜你喜欢：同分类在售商品，排除当前
+const similar = ref([])
+const loadSimilar = async () => {
+  if (!product.value?.categoryId) return
+  try {
+    const res = await searchProducts({ categoryId: product.value.categoryId, sort: 'hot', page: 1, size: 8 })
+    similar.value = (res.records || []).filter(p => Number(p.id) !== Number(route.params.id)).slice(0, 8)
+  } catch (e) { /* */ }
+}
 
 const loadComments = async () => {
   loadingComments.value = true
@@ -542,6 +570,16 @@ const contactSeller = async () => {
 .comment-reply { margin-top: 10px; padding-top: 12px; border-top: 1px dashed #f0f2f5; }
 .comment-reply-actions { text-align: right; margin-top: 8px; }
 .comment-empty { text-align: center; color: #b2bec3; padding: 32px; font-size: 14px; }
+
+/* 猜你喜欢 */
+.similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+@media (max-width: 768px) { .similar-grid { grid-template-columns: repeat(2, 1fr); } }
+.similar-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #f0f2f5; cursor: pointer; transition: all 0.25s; }
+.similar-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.similar-img { width: 100%; height: 130px; }
+.similar-info { padding: 8px 10px; }
+.similar-title { font-size: 13px; font-weight: 600; color: #2d3436; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.similar-price { font-size: 15px; font-weight: 700; color: #ff6b35; margin-top: 2px; }
 @media (max-width: 480px) {
   .comment-box { padding: 16px; }
 }

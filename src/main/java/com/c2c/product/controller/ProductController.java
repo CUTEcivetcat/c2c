@@ -13,6 +13,8 @@ import cn.hutool.core.util.StrUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -100,6 +102,12 @@ public class ProductController {
                                                 @Parameter(description = "页码，从 1 开始") @RequestParam(defaultValue = "1") int page,
                                                 @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
         return R.ok(productService.getUserOnSaleList(userId, page, size));
+    }
+
+    @Operation(summary = "批量查询商品（按ID列表）", description = "供最近浏览等场景，ids 逗号分隔，最多 50 个")
+    @GetMapping(ApiPath.PRODUCT_IDS)
+    public R<List<ProductVO>> batchByIds(@Parameter(description = "商品 ID 列表，逗号分隔") @RequestParam String ids) {
+        return R.ok(productService.batchByIds(ids));
     }
 
     // ==================== Admin 接口 ====================
