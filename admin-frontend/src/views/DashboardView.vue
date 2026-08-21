@@ -8,6 +8,7 @@
       <div class="stat-card"><div class="stat-num green">{{ stats.totalProducts }}</div><div class="stat-label">总商品数</div></div>
       <div class="stat-card"><div class="stat-num orange">{{ stats.onSaleProducts }}</div><div class="stat-label">在售商品</div></div>
       <div class="stat-card"><div class="stat-num red">{{ stats.todayOrders }}</div><div class="stat-label">今日订单</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#8e44ad">{{ stats.totalAnnouncements }}</div><div class="stat-label">公告总数</div></div>
     </div>
 
     <!-- 折线图 -->
@@ -57,7 +58,8 @@ onMounted(async () => {
       totalUsers: summary.totalUsers || 0,
       totalProducts: summary.totalProducts || 0,
       onSaleProducts: summary.onSaleProducts || 0,
-      todayOrders: summary.todayOrders || 0
+      todayOrders: summary.todayOrders || 0,
+      totalAnnouncements: summary.totalAnnouncements || 0
     }
     nextTick(() => {
       if (trends) initCharts(trends)
