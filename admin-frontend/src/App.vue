@@ -112,7 +112,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
   background: rgba(255,255,255,0.06);
 }
 
-.admin-main{flex:1;margin-left:220px;padding:24px;transition:margin-left 0.25s cubic-bezier(0.4,0,0.2,1)}
+.admin-main{flex:1;margin-left:220px;padding:24px;overflow-x:hidden;transition:margin-left 0.25s cubic-bezier(0.4,0,0.2,1)}
 .admin-main.collapsed{margin-left:60px}
 
 /* ===== 全局 uiverse 风格覆盖 ===== */
