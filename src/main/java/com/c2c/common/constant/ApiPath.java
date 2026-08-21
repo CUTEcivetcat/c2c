@@ -141,4 +141,8 @@ public interface ApiPath {
     String ANNOUNCEMENT_ADMIN = "/admin/announcement";
     String ANNOUNCEMENT_ADMIN_ID = "/admin/announcement/{id}";
     String ANNOUNCEMENT_ADMIN_STATUS = "/admin/announcement/{id}/status";
+
+    // ==================== 钱包 /user/wallet ====================
+    String WALLET_PROFILE = "/user/wallet/profile";
+    String WALLET_RECHARGE = "/user/wallet/recharge";
 }

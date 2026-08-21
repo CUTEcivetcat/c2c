@@ -15,6 +15,9 @@
 
     <!-- 功能入口 -->
     <div class="profile-menu">
+      <router-link to="/wallet" class="menu-item">
+        <span class="menu-ico">💰</span><span>我的钱包</span>
+      </router-link>
       <router-link to="/my/report" class="menu-item">
         <span class="menu-ico">⚑</span><span>我的举报</span>
       </router-link>

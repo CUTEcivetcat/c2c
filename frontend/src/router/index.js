@@ -124,6 +124,12 @@ const routes = [
     path: '/announcement',
     name: 'AnnouncementList',
     component: () => import('@/views/AnnouncementListView.vue')
+  },
+  {
+    path: '/wallet',
+    name: 'Wallet',
+    component: () => import('@/views/WalletView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

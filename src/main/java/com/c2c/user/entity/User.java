@@ -62,6 +62,9 @@ public class User {
     /** 信誉分（0~5） */
     private BigDecimal reputationScore;
 
+    /** 账户余额 */
+    private BigDecimal balance;
+
     /** 最近登录时间 */
     private LocalDateTime lastLoginAt;
 

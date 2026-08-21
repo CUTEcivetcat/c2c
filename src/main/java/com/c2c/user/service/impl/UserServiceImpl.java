@@ -346,6 +346,7 @@ public class UserServiceImpl implements UserService {
                 .gender(user.getGender())
                 .role(user.getRole())
                 .reputationScore(user.getReputationScore())
+                .balance(user.getBalance())
                 .lastLoginAt(user.getLastLoginAt())
                 .createdAt(user.getCreatedAt())
                 .build();

@@ -45,6 +45,9 @@ public class UserVO {
     /** 信誉评分 */
     private BigDecimal reputationScore;
 
+    /** 账户余额 */
+    private BigDecimal balance;
+
     /** 最后登录时间 */
     private LocalDateTime lastLoginAt;
 
