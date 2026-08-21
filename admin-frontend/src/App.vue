@@ -9,14 +9,14 @@
         </div>
       </div>
       <nav class="sidebar-nav">
-        <router-link to="/dashboard" class="nav-item" data-tip="数据大屏"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
-        <router-link to="/users" class="nav-item" data-tip="用户管理"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
-        <router-link to="/permissions" class="nav-item" data-tip="权限管理"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
-        <router-link to="/review" class="nav-item" data-tip="审核管理"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
-        <router-link to="/products" class="nav-item" data-tip="商品管理"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
-        <router-link to="/orders" class="nav-item" data-tip="订单管理"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
-        <router-link to="/banner" class="nav-item" data-tip="轮播图管理"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
-        <router-link to="/announcement" class="nav-item" data-tip="公告管理"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
+        <router-link to="/dashboard" class="nav-item"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
+        <router-link to="/users" class="nav-item"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
+        <router-link to="/permissions" class="nav-item"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
+        <router-link to="/review" class="nav-item"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
+        <router-link to="/products" class="nav-item"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
+        <router-link to="/orders" class="nav-item"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
+        <router-link to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
+        <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
       </nav>
       <div class="sidebar-footer">
         <div class="admin-user">
@@ -70,38 +70,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .brand-text{display:flex;flex-direction:column;line-height:1.2;overflow:hidden}
 .brand-text strong{font-size:17px;letter-spacing:1px;white-space:nowrap}
 .brand-text small{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;white-space:nowrap}
-.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.sidebar-nav{flex:1;padding:12px 0;overflow:hidden}
 .nav-item{display:flex;align-items:center;gap:10px;padding:12px 20px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:14px;transition:all 0.2s;border-left:3px solid transparent;white-space:nowrap}
 .admin-sidebar.collapsed .nav-item{padding:14px 0;justify-content:center;border-left:none}
 .nav-item:hover{color:#fff;background:rgba(255,255,255,0.06)}
 .nav-item.router-link-active{color:#fff;background:rgba(255,255,255,0.1);border-left-color:#ff6b35}
-
-/* 收起时悬停 tooltip */
-.admin-sidebar.collapsed .nav-item {
-  position: relative;
-}
-.admin-sidebar.collapsed .nav-item::after {
-  content: attr(data-tip);
-  position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
-  background: #1a1a2e; color: #fff;
-  padding: 6px 14px; border-radius: 8px; font-size: 13px; white-space: nowrap;
-  z-index: 999; opacity: 0; pointer-events: none;
-  transition: opacity 0.2s ease 0.1s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-.admin-sidebar.collapsed .nav-item::before {
-  content: '';
-  position: absolute; left: 54px; top: 50%; transform: translateY(-50%);
-  border: 6px solid transparent; border-right-color: #1a1a2e;
-  z-index: 999; opacity: 0; pointer-events: none;
-  transition: opacity 0.2s ease 0.1s;
-}
-.admin-sidebar.collapsed .nav-item:hover::after,
-.admin-sidebar.collapsed .nav-item:hover::before {
-  opacity: 1;
-}
-
 .sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08)}
 .admin-sidebar.collapsed .sidebar-footer{padding:14px 8px}
 .admin-user{display:flex;align-items:center;gap:10px;padding:6px 4px 12px}
