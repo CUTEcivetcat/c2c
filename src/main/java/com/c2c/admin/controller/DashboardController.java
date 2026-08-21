@@ -3,6 +3,7 @@ package com.c2c.admin.controller;
 import com.c2c.admin.feign.OrderFeignClient;
 import com.c2c.admin.feign.ProductFeignClient;
 import com.c2c.admin.feign.UserFeignClient;
+import com.c2c.admin.mapper.DashboardMapper;
 import com.c2c.common.constant.ApiPath;
 import com.c2c.common.result.R;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +12,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 管理端首页看板：汇总用户 / 商品 / 订单概况，以及模拟的 7 日趋势数据。
@@ -25,6 +32,7 @@ public class DashboardController {
     private final UserFeignClient userFeignClient;
     private final ProductFeignClient productFeignClient;
     private final OrderFeignClient orderFeignClient;
+    private final DashboardMapper dashboardMapper;
 
     @Operation(summary = "首页统计汇总", description = "用户总数 / 商品总数 / 在售数 / 今日订单数")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_SUMMARY)
@@ -103,24 +111,57 @@ public class DashboardController {
     }
 
     /**
-     * 模拟 7 日趋势数据（生产环境应查 DB）
+     * 7 日趋势数据（真实数据库查询：近 7 天新增用户 / 订单 / 交易额）
      */
-    @Operation(summary = "7 日趋势数据", description = "近 7 日新增用户 / 订单 / 营收（当前为模拟数据）")
+    @Operation(summary = "7 日趋势数据", description = "近 7 日新增用户 / 订单 / 交易额（真实数据）")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_TRENDS)
     public R<Map<String, Object>> trends() {
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysAgo = today.minusDays(6);
+        LocalDateTime since = LocalDateTime.of(sevenDaysAgo, LocalTime.MIN);
+
+        // 按日期建立 Map 方便填充
+        Map<String, int[]> dayMap = new java.util.LinkedHashMap<>();
+        for (int i = 6; i >= 0; i--) {
+            String key = today.minusDays(i).toString();
+            dayMap.put(key, new int[]{0, 0, 0}); // {有数据标记, 订单数, 交易额}
+        }
+        // 查用户新增
+        List<Map<String, Object>> userData = dashboardMapper.userTrend(since);
+        for (Map<String, Object> row : userData) {
+            String d = String.valueOf(row.get("d"));
+            if (dayMap.containsKey(d)) {
+                dayMap.get(d)[0] = toInt(row.get("cnt"));
+            }
+        }
+        // 查订单趋势
+        List<Map<String, Object>> orderData = dashboardMapper.orderTrend(since);
+        for (Map<String, Object> row : orderData) {
+            String d = String.valueOf(row.get("d"));
+            if (dayMap.containsKey(d)) {
+                dayMap.get(d)[1] = toInt(row.get("cnt"));
+                dayMap.get(d)[2] = toInt(row.get("rev"));
+            }
+        }
+
         String[] dates = new String[7];
         int[] newUsers = new int[7];
         int[] orders = new int[7];
         double[] revenue = new double[7];
-
-        java.time.LocalDate today = java.time.LocalDate.now();
-        java.util.Random rand = new java.util.Random();
-        for (int i = 6; i >= 0; i--) {
-            dates[6 - i] = today.minusDays(i).toString().substring(5); // 月-日 格式
-            newUsers[6 - i] = rand.nextInt(10) + 1;
-            orders[6 - i] = rand.nextInt(8) + 1;
-            revenue[6 - i] = Math.round((rand.nextDouble() * 5000 + 100) * 100.0) / 100.0;
+        int idx = 0;
+        for (Map.Entry<String, int[]> e : dayMap.entrySet()) {
+            dates[idx] = e.getKey().substring(5); // MM-DD
+            newUsers[idx] = e.getValue()[0];
+            orders[idx] = e.getValue()[1];
+            revenue[idx] = e.getValue()[2];
+            idx++;
         }
+
         return R.ok(com.c2c.common.utils.MapUtils.of("dates", dates, "newUsers", newUsers, "orders", orders, "revenue", revenue));
+    }
+
+    private int toInt(Object val) {
+        if (val instanceof Number) return ((Number) val).intValue();
+        try { return Integer.parseInt(String.valueOf(val)); } catch (Exception e) { return 0; }
     }
 }
