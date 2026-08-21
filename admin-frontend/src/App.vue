@@ -9,14 +9,14 @@
         </div>
       </div>
       <nav class="sidebar-nav">
-        <router-link to="/dashboard" class="nav-item"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
-        <router-link to="/users" class="nav-item"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
-        <router-link to="/permissions" class="nav-item"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
-        <router-link to="/review" class="nav-item"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
-        <router-link to="/products" class="nav-item"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
-        <router-link to="/orders" class="nav-item"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
-        <router-link to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
-        <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
+        <router-link to="/dashboard" class="nav-item" title="数据大屏"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
+        <router-link to="/users" class="nav-item" title="用户管理"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
+        <router-link to="/permissions" class="nav-item" title="权限管理"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
+        <router-link to="/review" class="nav-item" title="审核管理"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
+        <router-link to="/products" class="nav-item" title="商品管理"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
+        <router-link to="/orders" class="nav-item" title="订单管理"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
+        <router-link to="/banner" class="nav-item" title="轮播图管理"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
+        <router-link to="/announcement" class="nav-item" title="公告管理"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
       </nav>
       <!-- 收起按钮（导航与退出之间，居中） -->
       <div class="sidebar-collapse">
