@@ -40,27 +40,41 @@
     </el-row>
 
     <!-- 折线图 -->
-    <div class="chart-toolbar">
-      <div class="chart-range">
-        <el-select v-model="range" @change="loadTrends" style="width:110px">
-          <el-option label="近 7 天" value="7d" />
-          <el-option label="近 30 天" value="30d" />
-          <el-option label="自定义" value="custom" />
-        </el-select>
-        <template v-if="range === 'custom'">
-          <el-date-picker v-model="customStart" type="date" placeholder="开始日期" value-format="YYYY-MM-DD" @change="loadTrends" style="width:140px" />
-          <span style="color:#b2bec3;font-size:13px">至</span>
-          <el-date-picker v-model="customEnd" type="date" placeholder="结束日期" value-format="YYYY-MM-DD" @change="loadTrends" style="width:140px" />
-        </template>
-      </div>
-    </div>
     <div class="chart-row">
       <div class="chart-card">
-        <h3>{{ rangeLabel }}用户新增趋势</h3>
+        <div class="chart-head">
+          <h3>{{ userRangeLabel }}用户新增趋势</h3>
+          <div class="chart-range">
+            <el-select v-model="userRange" @change="loadUserTrend" size="small" style="width:100px">
+              <el-option label="近 7 天" value="7d" />
+              <el-option label="近 30 天" value="30d" />
+              <el-option label="自定义" value="custom" />
+            </el-select>
+            <template v-if="userRange === 'custom'">
+              <el-date-picker v-model="userStart" type="date" placeholder="开始" value-format="YYYY-MM-DD" @change="loadUserTrend" size="small" style="width:120px" />
+              <span style="color:#b2bec3">~</span>
+              <el-date-picker v-model="userEnd" type="date" placeholder="结束" value-format="YYYY-MM-DD" @change="loadUserTrend" size="small" style="width:120px" />
+            </template>
+          </div>
+        </div>
         <div ref="userChartRef" class="chart-box"></div>
       </div>
       <div class="chart-card">
-        <h3>{{ rangeLabel }}订单与交易额</h3>
+        <div class="chart-head">
+          <h3>{{ orderRangeLabel }}订单与交易额</h3>
+          <div class="chart-range">
+            <el-select v-model="orderRange" @change="loadOrderTrend" size="small" style="width:100px">
+              <el-option label="近 7 天" value="7d" />
+              <el-option label="近 30 天" value="30d" />
+              <el-option label="自定义" value="custom" />
+            </el-select>
+            <template v-if="orderRange === 'custom'">
+              <el-date-picker v-model="orderStart" type="date" placeholder="开始" value-format="YYYY-MM-DD" @change="loadOrderTrend" size="small" style="width:120px" />
+              <span style="color:#b2bec3">~</span>
+              <el-date-picker v-model="orderEnd" type="date" placeholder="结束" value-format="YYYY-MM-DD" @change="loadOrderTrend" size="small" style="width:120px" />
+            </template>
+          </div>
+        </div>
         <div ref="orderChartRef" class="chart-box"></div>
       </div>
     </div>
@@ -89,36 +103,51 @@ const userChartRef = ref(null)
 const orderChartRef = ref(null)
 let userChart = null
 let orderChart = null
-const range = ref('7d')
-const customStart = ref('')
-const customEnd = ref('')
 let ro = null
 
-const rangeLabel = computed(() => {
-  if (range.value === '30d') return '近 30 日'
-  if (range.value === 'custom') return '自定义'
-  return '近 7 日'
-})
+// 用户图表独立选择
+const userRange = ref('7d')
+const userStart = ref('')
+const userEnd = ref('')
+const userRangeLabel = computed(() => userRange.value === '30d' ? '近 30 日' : userRange.value === 'custom' ? '自定义' : '近 7 日')
 
-const loadTrends = async () => {
-  const params = { range: range.value }
-  if (range.value === 'custom') {
-    if (!customStart.value || !customEnd.value) return
-    params.start = customStart.value
-    params.end = customEnd.value
-  }
+// 订单图表独立选择
+const orderRange = ref('7d')
+const orderStart = ref('')
+const orderEnd = ref('')
+const orderRangeLabel = computed(() => orderRange.value === '30d' ? '近 30 日' : orderRange.value === 'custom' ? '自定义' : '近 7 日')
+
+const buildParams = (range, start, end) => {
+  const params = { range }
+  if (range === 'custom' && start && end) { params.start = start; params.end = end }
+  return params
+}
+
+const loadUserTrend = async () => {
   try {
-    const trends = await adminApi.getTrends(params)
+    const trends = await adminApi.getTrends(buildParams(userRange.value, userStart.value, userEnd.value))
     if (trends) {
-      nextTick(() => initCharts(trends))
+      userChart?.dispose(); userChart = null
+      nextTick(() => initUserChart(trends))
+    }
+  } catch (e) { /* */ }
+}
+
+const loadOrderTrend = async () => {
+  try {
+    const trends = await adminApi.getTrends(buildParams(orderRange.value, orderStart.value, orderEnd.value))
+    if (trends) {
+      orderChart?.dispose(); orderChart = null
+      nextTick(() => initOrderChart(trends))
     }
   } catch (e) { /* */ }
 }
 
 onMounted(async () => {
   try {
-    const [summary, trends] = await Promise.all([
+    const [summary, userTrends, orderTrends] = await Promise.all([
       adminApi.getSummary(),
+      adminApi.getTrends({ range: '7d' }),
       adminApi.getTrends({ range: '7d' })
     ])
     stats.value = {
@@ -132,12 +161,12 @@ onMounted(async () => {
       pendingNicknames: summary.pendingNicknames || 0
     }
     nextTick(() => {
-      if (trends) initCharts(trends)
+      if (userTrends) initUserChart(userTrends)
+      if (orderTrends) initOrderChart(orderTrends)
     })
   } catch (e) { /* */ }
 
   window.addEventListener('resize', resizeCharts)
-  // 用 ResizeObserver 监听图表容器自适应（侧边栏展开收起时自动跟随）
   ro = new ResizeObserver(() => resizeCharts())
   if (userChartRef.value) ro.observe(userChartRef.value)
   if (orderChartRef.value) ro.observe(orderChartRef.value)
@@ -150,66 +179,36 @@ onUnmounted(() => {
   orderChart?.dispose()
 })
 
-const resizeCharts = () => {
-  userChart?.resize()
-  orderChart?.resize()
+const resizeCharts = () => { userChart?.resize(); orderChart?.resize() }
+
+const initUserChart = (trends) => {
+  const { dates, newUsers } = trends
+  if (!userChartRef.value) return
+  userChart = echarts.init(userChartRef.value)
+  userChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: { type: 'category', data: dates, boundaryGap: false },
+    yAxis: { type: 'value', minInterval: 1 },
+    series: [{ name: '新增用户', type: 'line', smooth: true, data: newUsers, lineStyle: { color: '#409eff', width: 3 }, itemStyle: { color: '#409eff' }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(64,158,255,0.35)'},{offset:1,color:'rgba(64,158,255,0.02)'}]) } }]
+  })
 }
 
-const initCharts = (trends) => {
-  const { dates, newUsers, orders, revenue } = trends
-
-  // 用户新增折线图
-  if (userChartRef.value) {
-    userChart = echarts.init(userChartRef.value)
-    userChart.setOption({
-      tooltip: { trigger: 'axis' },
-      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-      xAxis: { type: 'category', data: dates, boundaryGap: false },
-      yAxis: { type: 'value', minInterval: 1 },
-      series: [{
-        name: '新增用户', type: 'line', smooth: true,
-        data: newUsers,
-        lineStyle: { color: '#409eff', width: 3 },
-        itemStyle: { color: '#409eff' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(64,158,255,0.35)' },
-            { offset: 1, color: 'rgba(64,158,255,0.02)' }
-          ])
-        }
-      }]
-    })
-  }
-
-  // 订单+交易额双轴图
-  if (orderChartRef.value) {
-    orderChart = echarts.init(orderChartRef.value)
-    orderChart.setOption({
-      tooltip: { trigger: 'axis' },
-      legend: { data: ['订单数', '交易额'], bottom: 0 },
-      grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
-      xAxis: { type: 'category', data: dates, boundaryGap: false },
-      yAxis: [
-        { type: 'value', name: '订单', minInterval: 1 },
-        { type: 'value', name: '元' }
-      ],
-      series: [
-        {
-          name: '订单数', type: 'bar', data: orders,
-          itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#ff6b35'},{offset:1,color:'#ffaa7a'}]), borderRadius: [6,6,0,0] },
-          barWidth: '30%'
-        },
-        {
-          name: '交易额', type: 'line', smooth: true, yAxisIndex: 1, data: revenue,
-          lineStyle: { color: '#00b894', width: 3 },
-          itemStyle: { color: '#00b894' },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,184,148,0.3)'},{offset:1,color:'rgba(0,184,148,0.02)'}])
-          }
-        }
-      ]
-    })
-  }
+const initOrderChart = (trends) => {
+  const { dates, orders, revenue } = trends
+  if (!orderChartRef.value) return
+  orderChart = echarts.init(orderChartRef.value)
+  orderChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['订单数', '交易额'], bottom: 0 },
+    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+    xAxis: { type: 'category', data: dates, boundaryGap: false },
+    yAxis: [{ type: 'value', name: '订单', minInterval: 1 }, { type: 'value', name: '元' }],
+    series: [
+      { name: '订单数', type: 'bar', data: orders, itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#ff6b35'},{offset:1,color:'#ffaa7a'}]), borderRadius: [6,6,0,0] }, barWidth: '30%' },
+      { name: '交易额', type: 'line', smooth: true, yAxisIndex: 1, data: revenue, lineStyle: { color: '#00b894', width: 3 }, itemStyle: { color: '#00b894' }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(0,184,148,0.3)'},{offset:1,color:'rgba(0,184,148,0.02)'}]) } }
+    ]
+  })
 }
 </script>
 
@@ -239,6 +238,8 @@ const initCharts = (trends) => {
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px }
 @media (max-width: 900px) { .chart-row { grid-template-columns: 1fr } }
 .chart-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04) }
-.chart-card h3 { font-size: 15px; color: #2d3436; margin-bottom: 12px }
-.chart-box { width: 100%; height: 320px }
+.chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+.chart-head h3 { font-size: 14px; color: #2d3436; margin: 0; }
+.chart-range { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.chart-box { width: 100%; height: 300px }
 </style>
