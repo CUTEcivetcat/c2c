@@ -17,8 +17,10 @@
 | 💬 即时通讯 | 买卖双方站内私信、会话列表、未读角标、已读回执、微信风格聊天界面 |
 | 📦 订单 | 下单/支付/发货/收货/取消 全状态流转、订单快照 |
 | ⭐ 评价 | 交易完成后买卖双方互评、信誉累计 |
+| 📢 公告 | 平台公告管理（强制弹窗/停留秒数/滚动显示/发布页展示），管理员可发布公告/公约/通知 |
+| 💰 钱包 | 余额充值、平台担保交易（支付托管/确认收款/取消退款）、资金流水 |
 | ⚑ 审核 | 用户举报、违规下架（理由必填）、卖家整改申诉（限次）、审核员工作台（用户可被授权为"小法官"） |
-| 🖥️ 管理后台 | 仪表盘统计（ECharts）、用户/商品/订单/审核管理、角色权限分配 |
+| 🖥️ 管理后台 | 仪表盘统计（ECharts）、用户/商品/订单/审核/公告管理、角色权限分配 |
 | 📄 接口文档 | Swagger UI 在线文档（中文注释），接口 URL 常量集中管理 |
 
 ## 🛠️ 技术栈
@@ -28,6 +30,7 @@
 | 后端 | Java 8 · Spring Boot 2.7 · MyBatis-Plus 3.5 · MySQL 8 · Redis · JWT · Hutool · Lombok · SpringDoc(Swagger) |
 | 用户端前端 | Vue 3 · Vite 5 · Vue Router · Pinia · Element Plus |
 | 管理端前端 | Vue 3 · Element Plus · ECharts |
+| 微信小程序 | 原生微信小程序（weapp/） |
 | 部署 | Maven 打包 jar · Nginx 静态托管 · 宝塔面板 |
 
 ## 📁 项目结构
@@ -47,7 +50,8 @@ c2c/
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
 ├── blog/                         # 博客前端（Vite 5175）
-├── sql/                          # init.sql 全量建表(18张) / data.sql 全量演示数据 / README.md 说明
+├── weapp/                        # 微信小程序（商品列表/展示）
+├── sql/                          # init.sql 全量建表(18张) / data.sql 全量演示数据
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
 └── deploy/                       # 部署脚本与示例配置（脱敏）
@@ -90,6 +94,13 @@ bash start/start-frontend.sh all         # 全部
 
 # 方式二：手动
 cd frontend && npm install && npm run dev
+```
+
+### 4. 微信小程序（可选）
+```bash
+# 微信开发者工具 → 导入项目 → 选择 weapp/ 目录
+# 修改 weapp/app.js 中的 serverUrl 为你的后端地址
+# 需填入 AppID（或使用测试号）
 ```
 
 ## 📄 API 文档
