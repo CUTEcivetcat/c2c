@@ -167,6 +167,113 @@ onUnmounted(() => {
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* ===== 全局 uiverse 风格覆盖（用户端） ===== */
+
+/* 卡片统一样式 */
+#app-container .el-card {
+  border-radius: 16px !important;
+  border: 1px solid #f0f2f5 !important;
+  transition: all 0.25s ease !important;
+}
+#app-container .el-card:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.07) !important;
+}
+
+/* 按钮统一样式 */
+#app-container .el-button {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+#app-container .el-button--primary {
+  background: linear-gradient(135deg, #ff6b35, #ff8c5a) !important;
+  border: none !important;
+  color: #fff !important;
+}
+#app-container .el-button--primary:hover {
+  background: linear-gradient(135deg, #e55a2b, #ff6b35) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255,107,53,0.3) !important;
+}
+#app-container .el-button--primary:active {
+  transform: translateY(0);
+}
+#app-container .el-button--success {
+  background: linear-gradient(135deg, #67c23a, #85ce61) !important;
+  border: none !important;
+  color: #fff !important;
+}
+#app-container .el-button--success:hover {
+  box-shadow: 0 4px 14px rgba(103,194,58,0.3) !important;
+  transform: translateY(-1px);
+}
+#app-container .el-button--danger {
+  background: linear-gradient(135deg, #e74c3c, #f06b5a) !important;
+  border: none !important;
+  color: #fff !important;
+}
+#app-container .el-button--danger:hover {
+  box-shadow: 0 4px 14px rgba(231,76,60,0.3) !important;
+  transform: translateY(-1px);
+}
+#app-container .el-button.is-plain {
+  background: transparent !important;
+  border: 1.5px solid currentColor !important;
+}
+#app-container .el-button.is-plain:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+}
+
+/* 输入框统一样式 */
+#app-container .el-input__wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02) !important;
+  transition: all 0.2s ease !important;
+}
+#app-container .el-input__wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.1) !important;
+  border-color: #ff6b35 !important;
+}
+#app-container .el-select .el-input__wrapper {
+  border-radius: 12px !important;
+}
+
+/* 标签统一样式 */
+#app-container .el-tag {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* 弹窗统一样式 */
+#app-container .el-dialog {
+  border-radius: 18px !important;
+}
+#app-container .el-dialog__header {
+  padding: 24px 24px 0 !important;
+  font-weight: 700 !important;
+}
+#app-container .el-dialog__body {
+  padding: 20px 24px !important;
+}
+#app-container .el-dialog__footer {
+  padding: 0 24px 20px !important;
+}
+
+/* 分页统一样式 */
+#app-container .el-pagination {
+  font-weight: 500;
+  padding: 12px 0 !important;
+}
+#app-container .el-pagination button {
+  border-radius: 8px !important;
+}
+#app-container .el-pager li {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
 @media (max-width: 768px) {
   .back-top { bottom: 20px; right: 12px; width: 38px; height: 38px; }
   .main-content.has-header { margin-top: 56px; }
