@@ -1,6 +1,6 @@
 # SQL 目录说明
 
-> 新部署只用 `init.sql` + `data.sql`；后续变更放 `sql/` 外面。
+> 新部署只用 `init.sql` + `data.sql`。
 
 ## 文件
 
@@ -18,10 +18,8 @@ mysql -uroot -p c2c < data.sql   # ② 导入演示数据
 
 ## 后续更新规范
 
-新增表或数据变更，**不再合并到 `init.sql` / `data.sql`**，而是：
+新增表或数据变更，**不再合并到 `init.sql` / `data.sql`**，而是放在 `sql/` 下：
 
-1. 在项目根目录（`sql/` 外面）新建独立文件 `update-YYYYMMDD-xxx.sql`
+1. 新建 `sql/update-YYYYMMDD-xxx.sql`
 2. 文件头注释写明用途，幂等可用（`IF NOT EXISTS`、`ADD COLUMN` 等）
-3. 执行方式：`mysql -uroot -p c2c < update-xxx.sql`
-
-> 例：`D:\Ide_HOME\IDe_HOME\java\c2c\update-20260901-feature.sql`
+3. 执行方式：`mysql -uroot -p c2c < sql/update-xxx.sql`
