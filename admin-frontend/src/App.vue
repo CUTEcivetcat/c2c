@@ -26,14 +26,15 @@
             <small>在线</small>
           </div>
         </div>
-        <button class="logout-btn" @click="logout">
-          <el-icon><SwitchButton /></el-icon><span v-show="!collapsed">退出后台</span>
-        </button>
+        <div class="footer-actions">
+          <button class="logout-btn" @click="logout">
+            <el-icon><SwitchButton /></el-icon><span v-show="!collapsed">退出后台</span>
+          </button>
+          <button class="collapse-btn" @click="collapsed = !collapsed">
+            <el-icon><ArrowLeft v-if="!collapsed" /><ArrowRight v-else /></el-icon>
+          </button>
+        </div>
       </div>
-      <!-- 切换按钮（侧边栏外侧边缘） -->
-      <button class="collapse-btn" @click="collapsed = !collapsed">
-        <el-icon><ArrowLeft v-if="!collapsed" /><ArrowRight v-else /></el-icon>
-      </button>
     </aside>
     <main class="admin-main" :class="{ collapsed }">
       <router-view />
@@ -75,7 +76,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .admin-sidebar.collapsed .nav-item{padding:14px 0;justify-content:center;border-left:none}
 .nav-item:hover{color:#fff;background:rgba(255,255,255,0.06)}
 .nav-item.router-link-active{color:#fff;background:rgba(255,255,255,0.1);border-left-color:#ff6b35}
-.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08)}
+.sidebar-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.08);position:relative}
 .admin-sidebar.collapsed .sidebar-footer{padding:14px 8px}
 .admin-user{display:flex;align-items:center;gap:10px;padding:6px 4px 12px}
 .admin-sidebar.collapsed .admin-user{justify-content:center;padding:6px 0 12px}
@@ -87,23 +88,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .admin-sidebar.collapsed .logout-btn span{display:none}
 .logout-btn:hover{background:rgba(231,76,60,0.25);border-color:#e74c3c;color:#fff}
 
-/* uiverse 风格切换按钮：侧边栏外侧右边缘 */
+/* 底部操作栏：退出按钮 + 收起按钮同行 */
+.footer-actions{display:flex;align-items:center;gap:8px}
+.admin-sidebar.collapsed .footer-actions{justify-content:center}
+
+/* 收起按钮（侧边栏底部，与退出按钮同行，融合风格） */
 .collapse-btn {
-  position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 52px; border: none; border-radius: 0 12px 12px 0;
-  background: rgba(255,255,255,0.12); backdrop-filter: blur(6px);
-  color: rgba(255,255,255,0.7); cursor: pointer;
+  width: 36px; height: 36px; border: none; border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.5); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px; transition: all 0.25s ease;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-  z-index: 101;
+  font-size: 16px; transition: all 0.25s ease; flex-shrink: 0;
 }
 .collapse-btn:hover {
-  background: rgba(255,255,255,0.25); color: #fff;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
-  right: -15px; width: 30px;
+  background: rgba(255,255,255,0.18); color: #ff6b35;
+  transform: scale(1.1);
 }
-.collapse-btn:active { transform: translateY(-50%) scale(0.95); }
+.collapse-btn:active { transform: scale(0.95); }
+.admin-sidebar.collapsed .collapse-btn {
+  background: rgba(255,255,255,0.06);
+}
 
 .admin-main{flex:1;margin-left:220px;padding:24px;transition:margin-left 0.25s cubic-bezier(0.4,0,0.2,1)}
 .admin-main.collapsed{margin-left:60px}
