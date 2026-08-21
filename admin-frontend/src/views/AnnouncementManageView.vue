@@ -62,6 +62,10 @@
           <el-switch v-model="form.scroll" :active-value="1" :inactive-value="0" />
           <span class="form-tip">首页横幅参与轮播（默认滚动）</span>
         </el-form-item>
+        <el-form-item label="发布页展示">
+          <el-switch v-model="form.showOnPublish" :active-value="1" :inactive-value="0" />
+          <span class="form-tip">在发布商品页右侧展示公告内容</span>
+        </el-form-item>
         <el-form-item label="内容" required>
           <el-input v-model="form.content" type="textarea" :rows="8" maxlength="5000" show-word-limit placeholder="公告内容（可换行）" />
         </el-form-item>
@@ -85,7 +89,7 @@ const page = ref(1)
 const size = ref(10)
 const dialogVisible = ref(false)
 const saving = ref(false)
-const form = ref({ id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1 })
+const form = ref({ id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1, showOnPublish: 0 })
 
 const typeText = (t) => ({ 1: '公告', 2: '平台公约', 3: '通知' }[t] || '公告')
 const typeTag = (t) => ({ 1: '', 2: 'warning', 3: 'info' }[t] || '')
@@ -99,7 +103,7 @@ const load = async () => {
 }
 
 const openDialog = (row) => {
-  form.value = row ? { id: row.id, title: row.title, content: row.content, type: row.type, pinned: row.pinned, isForce: row.isForce, minSeconds: row.minSeconds || 5, scroll: row.scroll ?? 1 } : { id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1 }
+  form.value = row ? { id: row.id, title: row.title, content: row.content, type: row.type, pinned: row.pinned, isForce: row.isForce, minSeconds: row.minSeconds || 5, scroll: row.scroll ?? 1, showOnPublish: row.showOnPublish ?? 0 } : { id: null, title: '', content: '', type: 1, pinned: 0, isForce: 0, minSeconds: 5, scroll: 1, showOnPublish: 0 }
   dialogVisible.value = true
 }
 

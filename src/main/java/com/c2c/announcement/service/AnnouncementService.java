@@ -49,6 +49,15 @@ public class AnnouncementService {
                 .orderByDesc(Announcement::getId));
     }
 
+    /** 发布商品页右侧展示公告（show_on_publish=1 且已发布） */
+    public List<Announcement> listPublish() {
+        return announcementMapper.selectList(new LambdaQueryWrapper<Announcement>()
+                .eq(Announcement::getStatus, 1)
+                .eq(Announcement::getShowOnPublish, 1)
+                .orderByDesc(Announcement::getPinned)
+                .orderByDesc(Announcement::getId));
+    }
+
     /** 管理端全部公告（含已下架） */
     public Page<Announcement> listAll(int page, int size, String keyword) {
         LambdaQueryWrapper<Announcement> w = new LambdaQueryWrapper<Announcement>()
