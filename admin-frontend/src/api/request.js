@@ -45,7 +45,7 @@ export default request
 export const adminApi = {
   adminLogin: (data) => request.post('/admin/login', data),
   getSummary: () => request.get('/admin/dashboard/summary'),
-  getTrends: () => request.get('/admin/dashboard/trends'),
+  getTrends: (params) => request.get('/admin/dashboard/trends', { params }),
   getUsers: (params) => request.get('/admin/users', { params }),
   toggleUserStatus: (id, status) => request.put(`/admin/users/${id}/status`, { status }),
   getProducts: (params) => request.get('/admin/products', { params }),
