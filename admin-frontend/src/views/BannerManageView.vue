@@ -31,12 +31,14 @@
           <el-input v-model="form.title" maxlength="100" placeholder="选填" />
         </el-form-item>
         <el-form-item label="图片" required>
-          <el-upload action="/api/v1/upload/image" :headers="uploadHeaders" :show-file-list="false" :on-success="onUpload">
-            <el-button>上传图片</el-button>
+          <el-upload action="/api/v1/upload/image" :headers="uploadHeaders" :show-file-list="false" :on-success="onUpload" :on-change="onFileChange" :before-upload="beforeUpload" class="upload-btn">
+            <el-button :loading="uploading">上传图片</el-button>
           </el-upload>
-          <div v-if="form.imageUrl" style="margin-top:8px">
-            <product-cover :src="form.imageUrl" style="width:200px;height:100px;border-radius:8px" />
+          <div v-if="previewUrl" style="margin-top:8px;position:relative">
+            <el-image :src="previewUrl" style="width:200px;height:100px;border-radius:8px" fit="cover" />
+            <div v-if="uploading" class="upload-overlay"><el-icon class="is-loading" :size="24"><Loading /></el-icon></div>
           </div>
+          <div v-else style="margin-top:8px;background:#f0f2f5;border-radius:8px;width:200px;height:100px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#b2bec3">暂无图片</div>
         </el-form-item>
         <el-form-item label="跳转链接">
           <el-input v-model="form.linkUrl" placeholder="选填，点击轮播图跳转的地址" />
@@ -63,6 +65,8 @@ const dialogVisible = ref(false)
 const saving = ref(false)
 const form = ref({ id: null, title: '', imageUrl: '', linkUrl: '', sortOrder: 0, status: 1 })
 const uploadHeaders = { Authorization: `Bearer ${localStorage.getItem('admin_token')}` }
+const previewUrl = ref('')
+const uploading = ref(false)
 
 const load = async () => {
   try { list.value = await adminApi.getBanners() || [] } catch (e) { /* */ }
@@ -70,10 +74,33 @@ const load = async () => {
 
 const openDialog = (row) => {
   form.value = row ? { id: row.id, title: row.title, imageUrl: row.imageUrl, linkUrl: row.linkUrl, sortOrder: row.sortOrder, status: row.status } : { id: null, title: '', imageUrl: '', linkUrl: '', sortOrder: 0, status: 1 }
+  previewUrl.value = row ? row.imageUrl : ''
   dialogVisible.value = true
 }
 
-const onUpload = (res) => { if (res.code === 200) { form.value.imageUrl = res.data.url; ElMessage.success('图片已上传') } }
+const beforeUpload = (file) => {
+  const isImage = file.type.startsWith('image/')
+  if (!isImage) { ElMessage.warning('请上传图片文件'); return false }
+  uploading.value = true
+  return true
+}
+
+const onFileChange = (file) => {
+  if (file.status === 'ready') {
+    previewUrl.value = URL.createObjectURL(file.raw)
+  }
+}
+
+const onUpload = (res) => {
+  uploading.value = false
+  if (res.code === 200) {
+    form.value.imageUrl = res.data.url
+    previewUrl.value = res.data.url
+    ElMessage.success('上传成功')
+  } else {
+    ElMessage.error('上传失败')
+  }
+}
 
 const save = async () => {
   if (!form.value.imageUrl) { ElMessage.warning('请上传图片'); return }
@@ -102,3 +129,11 @@ const remove = async (row) => {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.upload-btn { display: inline-block; }
+.upload-overlay {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.7); border-radius: 8px;
+}
+</style>
