@@ -130,6 +130,11 @@ const routes = [
     name: 'Wallet',
     component: () => import('@/views/WalletView.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/views/NotFoundView.vue')
   }
 ]
 

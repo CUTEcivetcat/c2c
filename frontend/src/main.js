@@ -7,6 +7,9 @@ import App from './App.vue'
 import router from './router'
 import PageBackBar from './components/layout/PageBackBar.vue'
 import ProductCover from './components/common/ProductCover.vue'
+import ErrorPage from './components/common/ErrorPage.vue'
+import SkeletonCard from './components/common/SkeletonCard.vue'
+import LoadingSpinner from './components/common/LoadingSpinner.vue'
 import './assets/styles/global.scss'
 
 const app = createApp(App)
@@ -20,6 +23,10 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.component('PageBackBar', PageBackBar)
 // 全局注册商品图片组件（无图/加载失败显示"暂无图片"占位）
 app.component('ProductCover', ProductCover)
+// 全局注册通用组件（错误页 / 骨架屏 / 加载动画）
+app.component('ErrorPage', ErrorPage)
+app.component('SkeletonCard', SkeletonCard)
+app.component('LoadingSpinner', LoadingSpinner)
 
 app.use(createPinia())
 app.use(router)

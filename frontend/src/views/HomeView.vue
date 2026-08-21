@@ -91,15 +91,8 @@
       </router-link>
     </div>
 
-    <!-- 加载骨架 -->
-    <div class="product-grid" v-if="loading">
-      <div v-for="i in 8" :key="i" class="skeleton-card">
-        <div class="skeleton-img"></div>
-        <div class="skeleton-line w80"></div>
-        <div class="skeleton-line w60"></div>
-        <div class="skeleton-line w40"></div>
-      </div>
-    </div>
+    <!-- 加载骨架（uiverse 风格 shimmer 动画） -->
+    <skeleton-card v-if="loading" :count="8" />
 
     <!-- 分页 -->
     <div class="pagination-wrap" v-if="total > 20">
