@@ -16,7 +16,7 @@
       <el-col :span="8">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=report')">
           <div class="pending-inner">
-            <span class="pending-ico warn">⚑</span>
+            <span class="pending-ico">⚑</span>
             <div class="pending-text"><strong>{{ stats.pendingReports }}</strong><span>待处理举报</span></div>
           </div>
         </el-card>
@@ -24,7 +24,7 @@
       <el-col :span="8">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=appeal')">
           <div class="pending-inner">
-            <span class="pending-ico info">🔁</span>
+            <span class="pending-ico">🔁</span>
             <div class="pending-text"><strong>{{ stats.pendingAppeals }}</strong><span>待审核申诉</span></div>
           </div>
         </el-card>
@@ -32,7 +32,7 @@
       <el-col :span="8">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=nickname')">
           <div class="pending-inner">
-            <span class="pending-ico purple">👤</span>
+            <span class="pending-ico">👤</span>
             <div class="pending-text"><strong>{{ stats.pendingNicknames }}</strong><span>待审昵称</span></div>
           </div>
         </el-card>
@@ -183,14 +183,12 @@ const initCharts = (trends) => {
 .pending-card:hover { transform: translateY(-3px); }
 .pending-inner { display: flex; align-items: center; gap: 14px; }
 .pending-ico { font-size: 28px; }
-.pending-ico.warn { color: #e6a23c; }
-.pending-ico.info { color: #409eff; }
-.pending-ico.purple { color: #8e44ad; }
+.pending-card:nth-child(1) .pending-ico { color: #ff6b35; }
+.pending-card:nth-child(2) .pending-ico { color: #e67e22; }
+.pending-card:nth-child(3) .pending-ico { color: #d35400; }
 .pending-text { display: flex; flex-direction: column; line-height: 1.3; }
 .pending-text strong { font-size: 26px; font-weight: 800; color: #2d3436; }
 .pending-text span { font-size: 13px; color: #909399; }
-.pending-info strong { font-size: 24px; font-weight: 800; color: #2d3436; }
-.pending-info span { font-size: 12px; color: #909399; }
 
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px }
 @media (max-width: 900px) { .chart-row { grid-template-columns: 1fr } }
