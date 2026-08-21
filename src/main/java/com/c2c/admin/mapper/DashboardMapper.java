@@ -19,4 +19,13 @@ public interface DashboardMapper {
 
     @Select("SELECT DATE(created_at) AS d, COUNT(*) AS cnt, COALESCE(SUM(total_amount), 0) AS rev FROM `order` WHERE created_at >= #{since} GROUP BY d ORDER BY d")
     List<Map<String, Object>> orderTrend(@Param("since") LocalDateTime since);
+
+    @Select("SELECT COUNT(*) FROM report WHERE status = 1")
+    int pendingReports();
+
+    @Select("SELECT COUNT(*) FROM product_appeal WHERE status = 1")
+    int pendingAppeals();
+
+    @Select("SELECT COUNT(*) FROM nickname_audit WHERE status = 0")
+    int pendingNicknames();
 }

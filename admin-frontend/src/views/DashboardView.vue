@@ -11,6 +11,22 @@
       <div class="stat-card"><div class="stat-num" style="color:#8e44ad">{{ stats.totalAnnouncements }}</div><div class="stat-label">公告总数</div></div>
     </div>
 
+    <!-- 待处理卡片（点击跳转对应审核页） -->
+    <div class="pending-grid">
+      <div class="pending-card warn" @click="$router.push('/review?tab=report')">
+        <span class="pending-ico">⚑</span>
+        <div class="pending-info"><strong>{{ stats.pendingReports }}</strong><span>待处理举报</span></div>
+      </div>
+      <div class="pending-card info" @click="$router.push('/review?tab=appeal')">
+        <span class="pending-ico">🔁</span>
+        <div class="pending-info"><strong>{{ stats.pendingAppeals }}</strong><span>待审核申诉</span></div>
+      </div>
+      <div class="pending-card purple" @click="$router.push('/review?tab=nickname')">
+        <span class="pending-ico">👤</span>
+        <div class="pending-info"><strong>{{ stats.pendingNicknames }}</strong><span>待审昵称</span></div>
+      </div>
+    </div>
+
     <!-- 折线图 -->
     <div class="chart-row">
       <div class="chart-card">
@@ -59,7 +75,10 @@ onMounted(async () => {
       totalProducts: summary.totalProducts || 0,
       onSaleProducts: summary.onSaleProducts || 0,
       todayOrders: summary.todayOrders || 0,
-      totalAnnouncements: summary.totalAnnouncements || 0
+      totalAnnouncements: summary.totalAnnouncements || 0,
+      pendingReports: summary.pendingReports || 0,
+      pendingAppeals: summary.pendingAppeals || 0,
+      pendingNicknames: summary.pendingNicknames || 0
     }
     nextTick(() => {
       if (trends) initCharts(trends)
@@ -146,6 +165,23 @@ const initCharts = (trends) => {
 .stat-num { font-size: 36px; font-weight: 700; color: #409eff }
 .stat-num.green { color: #67c23a } .stat-num.orange { color: #e6a23c } .stat-num.red { color: #e74c3c }
 .stat-label { font-size: 13px; color: #909399; margin-top: 4px }
+
+.pending-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px }
+@media (max-width: 900px) { .pending-grid { grid-template-columns: repeat(1, 1fr) } }
+.pending-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border-radius: 14px; padding: 18px 22px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04); cursor: pointer;
+  transition: all 0.25s; border: 1px solid transparent;
+}
+.pending-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.pending-card.warn { border-left: 4px solid #e6a23c; }
+.pending-card.info { border-left: 4px solid #409eff; }
+.pending-card.purple { border-left: 4px solid #8e44ad; }
+.pending-ico { font-size: 26px; }
+.pending-info { display: flex; flex-direction: column; line-height: 1.3; }
+.pending-info strong { font-size: 24px; font-weight: 800; color: #2d3436; }
+.pending-info span { font-size: 12px; color: #909399; }
 
 .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px }
 @media (max-width: 900px) { .chart-row { grid-template-columns: 1fr } }
