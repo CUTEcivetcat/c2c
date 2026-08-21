@@ -134,4 +134,134 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 
 .admin-main{flex:1;margin-left:220px;padding:24px;transition:margin-left 0.25s cubic-bezier(0.4,0,0.2,1)}
 .admin-main.collapsed{margin-left:60px}
+
+/* ===== 全局 uiverse 风格覆盖 ===== */
+
+/* 卡片统一样式 */
+.admin-main .el-card {
+  border-radius: 16px !important;
+  border: 1px solid #f0f2f5 !important;
+  transition: all 0.25s ease !important;
+}
+.admin-main .el-card:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,0.07) !important;
+}
+
+/* 表格统一样式 */
+.admin-main .el-table {
+  border-radius: 14px;
+  overflow: hidden;
+}
+.admin-main .el-table th.el-table__cell {
+  background: #fafbfc !important;
+  font-weight: 700 !important;
+  color: #2d3436 !important;
+}
+.admin-main .el-table--striped .el-table__body tr.el-table__row--striped td {
+  background: #f8f9fa !important;
+}
+
+/* 输入框统一样式 */
+.admin-main .el-input__wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02) !important;
+  transition: all 0.2s ease !important;
+}
+.admin-main .el-input__wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.1) !important;
+  border-color: #ff6b35 !important;
+}
+.admin-main .el-select .el-input__wrapper {
+  border-radius: 12px !important;
+}
+
+/* 按钮统一样式 */
+.admin-main .el-button {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+.admin-main .el-button--primary {
+  background: linear-gradient(135deg, #ff6b35, #ff8c5a) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.admin-main .el-button--primary:hover {
+  background: linear-gradient(135deg, #e55a2b, #ff6b35) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255,107,53,0.3) !important;
+}
+.admin-main .el-button--primary:active {
+  transform: translateY(0);
+}
+.admin-main .el-button--success {
+  background: linear-gradient(135deg, #67c23a, #85ce61) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.admin-main .el-button--success:hover {
+  box-shadow: 0 4px 14px rgba(103,194,58,0.3) !important;
+  transform: translateY(-1px);
+}
+.admin-main .el-button--warning {
+  background: linear-gradient(135deg, #e6a23c, #f0b84d) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.admin-main .el-button--warning:hover {
+  box-shadow: 0 4px 14px rgba(230,162,60,0.3) !important;
+  transform: translateY(-1px);
+}
+.admin-main .el-button--danger {
+  background: linear-gradient(135deg, #e74c3c, #f06b5a) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.admin-main .el-button--danger:hover {
+  box-shadow: 0 4px 14px rgba(231,76,60,0.3) !important;
+  transform: translateY(-1px);
+}
+.admin-main .el-button.is-plain {
+  background: transparent !important;
+  border: 1.5px solid currentColor !important;
+}
+.admin-main .el-button.is-plain:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+}
+
+/* 分页统一样式 */
+.admin-main .el-pagination {
+  font-weight: 500;
+  padding: 12px 0 !important;
+}
+.admin-main .el-pagination button {
+  border-radius: 8px !important;
+}
+.admin-main .el-pager li {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+/* 标签统一样式 */
+.admin-main .el-tag {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  border: none !important;
+}
+
+/* 弹窗统一样式 */
+.admin-main .el-dialog {
+  border-radius: 18px !important;
+}
+.admin-main .el-dialog__header {
+  padding: 24px 24px 0 !important;
+  font-weight: 700 !important;
+}
+.admin-main .el-dialog__body {
+  padding: 20px 24px !important;
+}
+.admin-main .el-dialog__footer {
+  padding: 0 24px 20px !important;
+}
 </style>
