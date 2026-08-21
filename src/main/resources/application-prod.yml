@@ -67,6 +67,6 @@ management:
 
 logging:
   file:
-    name: ${APP_LOG_FILE:/softservice/c2c/logs/app.log}
+    name: ${APP_LOG_FILE:./logs/app.log}
   level:
     com.c2c: info
