@@ -44,4 +44,10 @@ public class AnnouncementController {
     public R<List<Announcement>> force() {
         return R.ok(announcementService.listForce());
     }
+
+    @Operation(summary = "发布页展示公告", description = "返回 show_on_publish=1 且已发布的公告，发布商品页右侧展示")
+    @GetMapping(ApiPath.ANNOUNCEMENT_PUBLISH)
+    public R<List<Announcement>> publish() {
+        return R.ok(announcementService.listPublish());
+    }
 }

@@ -61,7 +61,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/user/profile/",       // 查看他人公开信息
             "/announcement/list",   // 平台公告列表（游客可看）
             "/announcement/latest", // 首页最新公告横幅（游客可看）
-            "/announcement/force"   // 强制弹窗公告（登录后前端调用）
+            "/announcement/force",   // 强制弹窗公告（登录后前端调用）
+            "/announcement/publish"  // 发布页展示公告
     );
 
     @Override

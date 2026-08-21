@@ -42,6 +42,9 @@ public class Announcement {
     /** 首页横幅是否参与滚动显示：1 滚动 / 0 不滚动 */
     private Integer scroll;
 
+    /** 是否在发布商品页右侧展示：1 展示 / 0 不展示 */
+    private Integer showOnPublish;
+
     /** 发布人用户 ID */
     private Long createdBy;
 
