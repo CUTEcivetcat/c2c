@@ -122,6 +122,10 @@ cd frontend && npm install && npm run dev
 - 真实密码/密钥/IP 一律放在本地 `config/`（gitignore 排除），仓库内仅保留占位符模板
 - 同步/上传仓库前请自查：`config/`、`*.sql` 导出、部署文档等含真实信息的文件不得入仓
 
+## 🤝 可提供部署帮助
+![img.png](img.png)
+
+
 ## 📜 许可证
 
 本项目仅供学习交流使用，请勿用于商业用途。
