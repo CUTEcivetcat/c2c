@@ -96,6 +96,11 @@ public class AnnouncementService {
         if (a.getContent() != null) exist.setContent(a.getContent());
         if (a.getType() != null) exist.setType(a.getType());
         if (a.getPinned() != null) exist.setPinned(a.getPinned());
+        if (a.getIsForce() != null) exist.setIsForce(a.getIsForce());
+        if (a.getMinSeconds() != null) exist.setMinSeconds(a.getMinSeconds());
+        if (a.getScroll() != null) exist.setScroll(a.getScroll());
+        if (a.getShowOnPublish() != null) exist.setShowOnPublish(a.getShowOnPublish());
+        if (a.getStatus() != null) exist.setStatus(a.getStatus());
         announcementMapper.updateById(exist);
         return exist;
     }

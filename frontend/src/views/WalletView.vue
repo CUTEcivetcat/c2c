@@ -8,7 +8,7 @@
       <div class="balance-num">{{ balance }}</div>
       <div class="balance-actions">
         <el-button type="primary" round @click="showRecharge = true" :loading="recharging">充值</el-button>
-        <el-button round @click="$router.push('/profile')">返回个人中心</el-button>
+        <el-button round class="back-btn" @click="$router.push('/profile')">返回个人中心</el-button>
       </div>
     </div>
     <!-- 充值弹窗 -->
@@ -87,8 +87,10 @@ onMounted(load)
 .balance-label { font-size: 13px; opacity: 0.85; }
 .balance-num { font-size: 42px; font-weight: 800; margin: 8px 0 16px; font-variant-numeric: tabular-nums; }
 .balance-actions { display: flex; gap: 12px; justify-content: center; }
-.balance-actions .el-button { color: #fff; border-color: rgba(255,255,255,0.5); }
-.balance-actions .el-button--primary { background: rgba(255,255,255,0.2); border-color: transparent; }
+.balance-actions .el-button--primary { background: #fff; border-color: transparent; color: #ff6b35; font-weight: 700; }
+.balance-actions .el-button--primary:hover { background: #fff5f0; }
+.balance-actions .back-btn { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.6); color: #fff; }
+.balance-actions .back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; }
 .log-card { border-radius: 14px; margin-bottom: 8px; }
 .log-row { display: flex; justify-content: space-between; align-items: center; }
 .log-left { display: flex; align-items: center; gap: 8px; }
