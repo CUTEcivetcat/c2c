@@ -1,0 +1,14 @@
+{
+  "description": "闲小鱼 C2C 二手交易平台 - 微信小程序",
+  "packOptions": { "ignore": [] },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.3.4",
+  "projectname": "c2c-weapp",
+  "appid": "wx0000000000000000"
+}

@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="header">
+    <text class="title">🔄 闲小鱼</text>
+    <text class="subtitle">C2C 二手交易平台</text>
+  </view>
+
+  <view class="product-grid">
+    <view class="product-card" wx:for="{{products}}" wx:key="id" data-id="{{item.id}}">
+      <image class="card-img" src="{{item.images?.[0]?.url || ''}}" mode="aspectFill" />
+      <view class="card-body">
+        <text class="card-title">{{item.title}}</text>
+        <text class="card-price">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+</view>
