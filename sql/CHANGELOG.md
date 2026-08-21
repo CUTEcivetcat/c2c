@@ -44,6 +44,27 @@ UPDATE `announcement` SET scroll = 1 WHERE scroll IS NULL OR scroll = 0;
 
 ---
 
+## 2026-08-21 · 发布页公告展示（show_on_publish）
+
+**变更内容**：`announcement` 表新增 `show_on_publish` 列，用于控制公告是否在发布商品页右侧展示。
+
+**执行 SQL**：
+
+```sql
+ALTER TABLE `announcement`
+  ADD COLUMN `show_on_publish` TINYINT NOT NULL DEFAULT 0
+  COMMENT '是否在发布商品页右侧展示：1展示 0不展示' AFTER `scroll`;
+UPDATE `announcement` SET show_on_publish = 1 WHERE title = '欢迎使用闲小鱼';
+```
+
+---
+
+## 2026-08-21 · 趋势数据改为真实查询
+
+**变更内容**：管理端数据大屏的 7 日趋势折线图从**模拟数据**改为**真实数据库查询**（`user` 表的 `created_at`、`order` 表的 `created_at`/`total_amount`）。新增 `admin.mapper.DashboardMapper`。
+
+---
+
 ## 更早变更（已并入基础表/新增表文件）
 
 | 日期 | 变更 | 位置 |
