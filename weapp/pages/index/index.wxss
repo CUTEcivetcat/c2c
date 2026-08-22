@@ -1,11 +1,78 @@
-.page { padding: 12px; min-height: 100vh; background: #f8f9fa; }
-.header { text-align: center; padding: 24px 0; }
-.title { font-size: 22px; font-weight: 700; color: #2d3436; }
-.subtitle { display: block; font-size: 12px; color: #ff6b35; margin-top: 4px; }
-.product-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-.product-card { width: calc(50% - 5px); background: #fff; border-radius: 12px; overflow: hidden; }
-.card-img { width: 100%; height: 160px; background: #f0f2f5; }
-.card-body { padding: 10px 12px; }
-.card-title { font-size: 14px; font-weight: 600; color: #2d3436; display: -webkit-box; -webkit-line-clamp: 2; overflow: hidden; }
-.card-price { display: block; margin-top: 4px; font-size: 16px; font-weight: 700; color: #ff6b35; }
-.loading { text-align: center; padding: 40px; color: #b2bec3; }
+/* 首页 */
+.page { background: transparent; }
+
+/* 顶部品牌 hero */
+.hero {
+  padding: 34rpx 30rpx 100rpx;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(600rpx 300rpx at 100% 0%, rgba(255,255,255,0.5), transparent 60%),
+    linear-gradient(135deg, #ff7038, #ff8f5e);
+  border: none;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60rpx; bottom: -80rpx;
+  width: 260rpx; height: 260rpx;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+}
+.hero-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.brand-name { display: block; font-size: 46rpx; font-weight: 800; color: #fff; letter-spacing: 2rpx; }
+.brand-slogan { display: block; margin-top: 8rpx; font-size: 24rpx; color: rgba(255,255,255,0.9); }
+.chat-ico {
+  width: 72rpx; height: 72rpx; border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  color: #fff; font-size: 40rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* 搜索胶囊 */
+.search-pill {
+  position: absolute; left: 60rpx; right: 60rpx; bottom: -36rpx;
+  height: 88rpx;
+  background: #fff;
+  border-radius: 999rpx;
+  box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; padding: 0 28rpx;
+  box-sizing: border-box;
+  z-index: 2;
+}
+.search-ico { color: var(--primary); font-size: 32rpx; margin-right: 14rpx; }
+.search-ph { color: var(--ink-3); font-size: 27rpx; }
+
+/* 网格标题 */
+.grid-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 64rpx 6rpx 22rpx;
+}
+.grid-title { font-size: 34rpx; font-weight: 700; }
+.grid-sub { font-size: 24rpx; color: var(--ink-3); }
+
+/* 商品卡片 */
+.product-grid {
+  display: flex; flex-wrap: wrap; justify-content: space-between;
+}
+.product-card {
+  width: calc(50% - 8rpx);
+  overflow: hidden;
+  margin-bottom: 18rpx;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.product-card:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
+.card-img { width: 100%; height: 340rpx; background: #eef1f5; display: block; }
+.card-body { padding: 18rpx 20rpx 22rpx; }
+.card-title {
+  font-size: 28rpx; font-weight: 600; color: var(--ink);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  line-height: 1.4;
+}
+.card-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 12rpx; }
+.card-price { font-size: 34rpx; font-weight: 800; color: var(--primary); }
+.card-loc { font-size: 22rpx; color: var(--ink-3); }
+
+.no-more { text-align: center; padding: 28rpx; color: var(--ink-3); font-size: 24rpx; }

@@ -1,0 +1,24 @@
+<view class="op fade-up">
+  <view class="tabs glass-card">
+    <view class="tab {{tab==='buy'?'active':''}}" bindtap="switchTab" data-t="buy">我买到的</view>
+    <view class="tab {{tab==='sell'?'active':''}}" bindtap="switchTab" data-t="sell">我卖出的</view>
+  </view>
+
+  <view class="card glass-card" wx:for="{{orders}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
+    <view class="hd">
+      <text class="no">{{item.orderNo}}</text>
+      <text class="st chip">{{statuses[item.status]}}</text>
+    </view>
+    <view class="bd">
+      <text class="t">{{item.productTitle}}</text>
+      <view class="mir">
+        <text class="p">¥{{item.totalAmount}}</text>
+        <text class="ar">›</text>
+      </view>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!orders.length}}">
+    <text class="empty-ico">🧾</text>
+    暂无订单
+  </view>
+</view>

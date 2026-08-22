@@ -1,0 +1,27 @@
+<view class="wp fade-up">
+  <view class="bal">
+    <text class="b-label">账户余额（元）</text>
+    <text class="b-num">{{balance}}</text>
+    <button class="b-btn" bindtap="show">充 值</button>
+  </view>
+
+  <view class="logs-title">交易明细</view>
+  <view class="logs">
+    <view class="log" wx:for="{{logs}}" wx:key="id">
+      <view class="l-side">
+        <text class="l-type">{{type(item.type)}}</text>
+        <text class="l-remark">{{item.remark}}</text>
+      </view>
+      <text class="l-amt {{item.amount > 0 ? 'up' : 'down'}}">{{item.amount > 0 ? '+' : ''}}{{item.amount}}</text>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!logs.length}}"><text class="empty-ico">💳</text>暂无流水</view>
+
+  <view class="mask" wx:if="{{showRecharge}}" bindtap="hide">
+    <view class="sheet" catchtap>
+      <text class="sheet-title">充值金额</text>
+      <input class="amt-input" type="digit" value="{{amount}}" bindinput="onAmount"/>
+      <button class="confirm" bindtap="recharge">确认充值</button>
+    </view>
+  </view>
+</view>

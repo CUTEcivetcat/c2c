@@ -1,0 +1,8 @@
+<view class="fp fade-up">
+  <view class="card glass-card" wx:for="{{favs}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
+    <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"/>
+    <view class="info"><text class="t">{{item.title}}</text><text class="p">¥{{item.price}}</text></view>
+  </view>
+  <view class="spinner" wx:if="{{loading}}"></view>
+  <view class="empty" wx:if="{{!loading && !favs.length}}"><text class="empty-ico">❤️</text>暂无收藏</view>
+</view>

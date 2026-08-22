@@ -1,0 +1,13 @@
+.op { padding: 28rpx 24rpx; background: transparent; }
+.tabs { display: flex; padding: 10rpx; margin-bottom: 24rpx; background: var(--glass); box-shadow: var(--shadow-sm); }
+.tab { flex: 1; text-align: center; padding: 20rpx 0; font-size: 28rpx; color: var(--ink-2); border-radius: var(--radius); }
+.tab.active { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-weight: 700; box-shadow: var(--shadow-md); }
+.card { padding: 24rpx; margin-bottom: 18rpx; }
+.hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
+.no { font-size: 24rpx; color: var(--ink-3); }
+.st { font-size: 22rpx; }
+.bd { display: flex; justify-content: space-between; align-items: center; }
+.t { font-size: 29rpx; color: var(--ink); max-width: 60%; }
+.mir { display: flex; align-items: center; gap: 12rpx; }
+.p { font-size: 32rpx; font-weight: 800; color: var(--primary); }
+.ar { color: var(--ink-3); font-size: 32rpx; }

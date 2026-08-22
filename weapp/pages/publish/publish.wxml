@@ -1,0 +1,69 @@
+<view class="pub-page fade-up">
+  <view class="field-group">
+    <view class="field">
+      <text class="label">商品标题</text>
+      <input class="value" placeholder="请输入商品标题" placeholder-class="ph" bindinput="set1" value="{{title}}"/>
+    </view>
+    <picker mode="selector" range="{{categories}}" range-key="name" value="{{catIndex}}" bindchange="onCat">
+      <view class="field pick">
+        <text class="label">分类</text>
+        <text class="value">{{catName}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </picker>
+    <view class="field">
+      <text class="label">价格</text>
+      <text class="value-prepend">¥</text>
+      <input class="value prep" type="digit" placeholder="售价" bindinput="set3" value="{{price}}"/>
+    </view>
+    <view class="field">
+      <text class="label">原价</text>
+      <input class="value" type="digit" placeholder="选填" bindinput="set5" value="{{originalPrice}}"/>
+    </view>
+    <picker mode="selector" range="{{conditionList}}" value="{{condition}}" bindchange="onCond">
+      <view class="field pick">
+        <text class="label">成色</text>
+        <text class="value">{{conditionList[condition]}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </picker>
+    <picker mode="selector" range="{{freightList}}" value="{{freight}}" bindchange="onFreight">
+      <view class="field pick">
+        <text class="label">运费</text>
+        <text class="value">{{freightList[freight]}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </picker>
+    <view class="field">
+      <text class="label">所在地</text>
+      <input class="value" placeholder="选填" bindinput="set4" value="{{location}}"/>
+    </view>
+  </view>
+
+  <view class="field-group">
+    <view class="field col">
+      <text class="label">描述</text>
+      <textarea class="desc" placeholder="补充商品细节" placeholder-class="ph" bindinput="set2" value="{{desc}}" maxlength="2000"/>
+    </view>
+  </view>
+
+  <view class="image-group">
+    <view class="img-head">
+      <text class="group-title">商品图片</text>
+      <text class="group-sub">第一张为封面</text>
+    </view>
+    <view class="img-list">
+      <view class="img-item" wx:for="{{images}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill"/>
+        <view class="del" bindtap="removeImg" data-i="{{index}}">✕</view>
+      </view>
+      <view class="add-img" bindtap="chooseImage">
+        <text class="add-ic">＋</text>
+      </view>
+    </view>
+  </view>
+
+  <button class="submit btn-primary" bindtap="submit" disabled="{{uploading}}">
+    {{uploading ? '上传中...' : (editingId ? '保存修改' : '发布商品')}}
+  </button>
+</view>

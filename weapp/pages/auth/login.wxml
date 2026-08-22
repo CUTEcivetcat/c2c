@@ -1,0 +1,46 @@
+<view class="lp fade-up">
+  <view class="brand">
+    <view class="logo-ring"><text class="logo">🔄</text></view>
+    <text class="title">闲小鱼</text>
+    <text class="subtitle">欢迎回来，开启二手好物之旅</text>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{tab==0?'active':''}}" data-t="0" bindtap="switchTab">微信</view>
+    <view class="tab {{tab==1?'active':''}}" data-t="1" bindtap="switchTab">验证码</view>
+    <view class="tab {{tab==2?'active':''}}" data-t="2" bindtap="switchTab">密码</view>
+  </view>
+
+  <view class="panel" wx:if="{{tab==0}}">
+    <text class="panel-desc">使用微信账号快速登录</text>
+    <button class="btn-primary wechat-btn" bindtap="wechatLogin" disabled="{{loading}}">
+      {{loading ? '登录中...' : '微信一键登录'}}
+    </button>
+  </view>
+
+  <view class="panel" wx:if="{{tab==1}}">
+    <view class="field">
+      <input class="inp" placeholder="请输入手机号或邮箱" placeholder-class="ph" bindinput="onAccount" value="{{account}}"/>
+    </view>
+    <view class="field code-row">
+      <input class="inp" placeholder="请输入验证码" placeholder-class="ph" bindinput="onCode" value="{{code}}"/>
+      <button class="code-btn" bindtap="sendCode" disabled="{{countdown>0}}">{{codeBtnText}}</button>
+    </view>
+    <button class="btn-primary submit-btn" bindtap="loginByCode" disabled="{{loading}}">
+      {{loading ? '登录中...' : '验证码登录'}}
+    </button>
+  </view>
+
+  <view class="panel" wx:if="{{tab==2}}">
+    <view class="field">
+      <input class="inp" placeholder="请输入手机号或邮箱" placeholder-class="ph" bindinput="onAccount" value="{{account}}"/>
+    </view>
+    <view class="field">
+      <input class="inp" password placeholder="请输入密码" placeholder-class="ph" bindinput="onPassword" value="{{password}}"/>
+    </view>
+    <button class="btn-primary submit-btn" bindtap="loginByPassword" disabled="{{loading}}">
+      {{loading ? '登录中...' : '账号密码登录'}}
+    </button>
+    <text class="hint">未注册账号：验证码登录会自动注册</text>
+  </view>
+</view>
