@@ -15,9 +15,11 @@ public interface ApiPath {
     String USER = "/user";
     String USER_SMS_SEND = "/user/sms/send";
     String USER_LOGIN = "/user/login";
+    String USER_WECHAT_LOGIN = "/user/wechat-login";
     String USER_REGISTER = "/user/register";
     String USER_RESET_PASSWORD = "/user/reset-password";
     String USER_BIND_PHONE = "/user/bind-phone";
+    String USER_BIND_EMAIL = "/user/bind-email";
     String USER_LOGOUT = "/user/logout";
     String USER_PROFILE = "/user/profile";
     String USER_PROFILE_ID = "/user/profile/{userId}";

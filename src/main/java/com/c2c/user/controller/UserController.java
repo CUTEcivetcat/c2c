@@ -76,6 +76,14 @@ public class UserController {
         return R.ok();
     }
 
+    // ==================== 微信登录 ====================
+
+    @Operation(summary = "微信小程序登录", description = "前端 wx.login 的 code 登录，未注册则自动注册")
+    @PostMapping(ApiPath.USER_WECHAT_LOGIN)
+    public R<LoginVO> wechatLogin(@Valid @RequestBody WechatLoginDTO dto) {
+        return R.ok(userService.loginByWechat(dto));
+    }
+
     // ==================== 找回密码 ====================
 
     @Operation(summary = "找回密码", description = "通过验证码重置密码")
@@ -92,6 +100,16 @@ public class UserController {
     public R<Void> bindPhone(@Valid @RequestBody BindPhoneDTO dto,
                              @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
         userService.bindPhone(userId, dto.getPhone(), dto.getSmsCode());
+        return R.ok();
+    }
+
+    // ==================== 绑定邮箱（微信登录后） ====================
+
+    @Operation(summary = "绑定邮箱", description = "微信登录用户绑定邮箱，需先发送邮箱验证码")
+    @PostMapping(ApiPath.USER_BIND_EMAIL)
+    public R<Void> bindEmail(@Valid @RequestBody BindEmailDTO dto,
+                             @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
+        userService.bindEmail(userId, dto.getEmail(), dto.getCode());
         return R.ok();
     }
 

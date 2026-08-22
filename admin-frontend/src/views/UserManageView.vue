@@ -18,6 +18,9 @@
           <el-tag v-else type="info" size="small">普通用户</el-tag>
         </template></el-table-column>
         <el-table-column prop="reputationScore" label="信誉" width="80" />
+        <el-table-column label="登录来源" width="90"><template #default="{row}">
+          <el-tag :type="sourceType(row.loginSource)" size="small">{{ sourceText(row.loginSource) }}</el-tag>
+        </template></el-table-column>
         <el-table-column label="状态" width="100"><template #default="{row}"><el-tag :type="row.status===1?'success':'danger'" size="small">{{ row.status===1?'正常':'封禁' }}</el-tag></template></el-table-column>
         <el-table-column label="注册时间" width="170"><template #default="{row}">{{ fmtTime(row.createdAt) }}</template></el-table-column>
         <el-table-column label="操作" width="100" fixed="right"><template #default="{row}">
@@ -45,6 +48,8 @@ const loading = ref(false)
 const toggling = ref(false)
 
 const fmtTime = (s) => s ? String(s).replace('T', ' ').slice(0, 19) : ''
+const sourceText = (s) => ({ wechat: '微信', email: '邮箱', phone: '手机' }[s] || (s || '邮箱'))
+const sourceType = (s) => ({ wechat: 'success', email: 'primary', phone: 'warning' }[s] || 'info')
 
 const load = async () => {
   loading.value = true

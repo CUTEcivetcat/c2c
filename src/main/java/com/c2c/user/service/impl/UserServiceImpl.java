@@ -11,10 +11,12 @@ import com.c2c.user.dto.LoginVO;
 import com.c2c.user.dto.RegisterDTO;
 import com.c2c.user.dto.ResetPasswordDTO;
 import com.c2c.user.dto.UserVO;
+import com.c2c.user.dto.WechatLoginDTO;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
 import com.c2c.user.service.EmailService;
 import com.c2c.user.service.UserService;
+import com.c2c.user.service.WechatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final StringRedisTemplate redisTemplate;
     private final NicknameAuditMapper nicknameAuditMapper;
+    private final WechatService wechatService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Value("${jwt.secret}")
@@ -152,6 +155,63 @@ public class UserServiceImpl implements UserService {
         userMapper.insert(user);
         redisTemplate.delete(codeKey);
         log.info("user registered: account={}, nickname={}", account, user.getNickname());
+    }
+
+    @Override
+    @Transactional
+    public LoginVO loginByWechat(WechatLoginDTO dto) {
+        String openid = wechatService.code2Openid(dto.getCode());
+        // 已存在 openid 的用户直接登录，否则自动注册
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getOpenid, openid));
+        if (user == null) {
+            user = new User();
+            user.setOpenid(openid);
+            user.setUsername("wx_" + openid.hashCode());
+            user.setPassword(passwordEncoder.encode(generateRandomPassword()));
+            user.setLoginSource("wechat");
+            user.setNickname(StrUtil.isNotBlank(dto.getNickname()) ? dto.getNickname() : "微信用户");
+            if (StrUtil.isNotBlank(dto.getAvatarUrl())) user.setAvatarUrl(dto.getAvatarUrl());
+            user.setBio("这个用户还没有填写简介。");
+            user.setReputationScore(new BigDecimal("5.0"));
+            user.setStatus(1);
+            userMapper.insert(user);
+            log.info("wechat user auto registered: userId={}", user.getId());
+        }
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            throw new BusinessException("账号已被封禁");
+        }
+        user.setLastLoginAt(LocalDateTime.now());
+        userMapper.updateById(user);
+        log.info("wechat login success: userId={}", user.getId());
+        return buildLoginVO(user);
+    }
+
+    @Override
+    @Transactional
+    public void bindEmail(Long userId, String email, String code) {
+        String codeKey = "sms:code:" + email;
+        String cachedCode = redisTemplate.opsForValue().get(codeKey);
+        if (StrUtil.isBlank(cachedCode)) {
+            throw new BusinessException(1001, "验证码已过期");
+        }
+        if (!cachedCode.equals(code)) {
+            throw new BusinessException(1002, "验证码错误");
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        // 邮箱已被他人占用
+        User exists = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getEmail, email).ne(User::getId, userId));
+        if (exists != null) {
+            throw new BusinessException("该邮箱已被其他账号绑定");
+        }
+        user.setEmail(email);
+        user.setEmailVerified(1);
+        userMapper.updateById(user);
+        redisTemplate.delete(codeKey);
+        log.info("email bound: userId={}, email={}", userId, email);
     }
 
     @Override
@@ -345,6 +405,7 @@ public class UserServiceImpl implements UserService {
                 .avatarUrl(user.getAvatarUrl())
                 .gender(user.getGender())
                 .role(user.getRole())
+                .loginSource(user.getLoginSource())
                 .reputationScore(user.getReputationScore())
                 .balance(user.getBalance())
                 .lastLoginAt(user.getLastLoginAt())
