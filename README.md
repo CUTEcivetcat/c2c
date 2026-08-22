@@ -137,14 +137,17 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 本项目仅供学习交流使用，请勿用于商业用途。
 
 
+
 ## 📊 数据库表结构
 
 共 18 张表，210 个字段。
 
 ### `admin_log`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`operator_id`|bigint(20)|操作人ID|Y||
 |`operator_role`|tinyint(4)|操作人角色|Y|0|
@@ -153,10 +156,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`target_id`|bigint(20)|目标ID|Y||
 |`detail`|varchar(1000)|详情|Y||
 |`created_at`|datetime|操作时间|N|CURRENT_TIMESTAMP|
+
 ### `announcement`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`title`|varchar(200)|标题|N||
 |`content`|text|内容|N||
@@ -170,10 +176,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`created_by`|bigint(20)|发布人ID|Y||
 |`created_at`|datetime|发布时间|N|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+
 ### `banner`
 
+> 首页轮播图
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`title`|varchar(100)|标题|Y||
 |`image_url`|varchar(500)|图片地址|N||
@@ -182,10 +191,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`status`|tinyint(4)|状态 1启用0停用|Y|1|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `category`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`name`|varchar(50)|分类名|N||
 |`parent_id`|bigint(20)|父分类ID|Y|0|
@@ -193,10 +205,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`sort_order`|int(11)|排序|Y|0|
 |`icon_url`|varchar(500)|图标|Y||
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+
 ### `conversation`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`user1_id`|bigint(20)|用户1ID|N||
 |`user2_id`|bigint(20)|用户2ID|N||
@@ -207,18 +222,24 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`user2_unread`|int(11)|用户2未读数|Y|0|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `favorite`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`user_id`|bigint(20)|用户ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`created_at`|datetime|收藏时间|Y|CURRENT_TIMESTAMP|
+
 ### `message`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`conversation_id`|bigint(20)|会话ID|N||
 |`sender_id`|bigint(20)|发送者|N||
@@ -228,10 +249,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`extra`|json|额外数据JSON|Y||
 |`is_read`|tinyint(4)|是否已读|Y|0|
 |`created_at`|datetime(3)|发送时间|Y|CURRENT_TIMESTAMP(3)|
+
 ### `nickname_audit`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`user_id`|bigint(20)|用户ID|N||
 |`old_nickname`|varchar(50)|原昵称|Y||
@@ -241,10 +265,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`handled_by`|bigint(20)|处理人ID|Y||
 |`created_at`|datetime|申请时间|N|CURRENT_TIMESTAMP|
 |`handled_at`|datetime|处理时间|Y||
+
 ### `order`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`order_no`|varchar(32)|订单号|N||
 |`buyer_id`|bigint(20)|买家ID|N||
@@ -272,10 +299,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`seller_rated`|tinyint(4)|卖家已评价|Y|0|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `product`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`seller_id`|bigint(20)|卖家ID|N||
 |`category_id`|bigint(20)|分类ID|N||
@@ -293,10 +323,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`location`|varchar(100)|所在地|Y||
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `product_appeal`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`seller_id`|bigint(20)|卖家ID|N||
@@ -309,10 +342,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`handled_at`|datetime|处理时间|Y||
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+
 ### `product_comment`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20) unsigned|ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`user_id`|bigint(20)|用户ID|N||
@@ -320,20 +356,26 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`content`|varchar(1000)|内容|N||
 |`status`|tinyint(4)|状态 1正常0删除|N|1|
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+
 ### `product_image`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`url`|varchar(500)|图片地址|N||
 |`sort_order`|int(11)|排序|Y|0|
 |`is_cover`|tinyint(4)|是否封面 1是0否|Y|0|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+
 ### `product_intent`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20) unsigned|ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`seller_id`|bigint(20)|卖家ID|N||
@@ -344,10 +386,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`seller_reply`|varchar(500)|卖家回复|Y||
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+
 ### `rating`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`order_id`|bigint(20)|订单ID|N||
 |`rater_id`|bigint(20)|评价人|N||
@@ -357,10 +402,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`comment`|varchar(500)|评价内容|Y||
 |`tags`|json|标签JSON|Y||
 |`created_at`|datetime|评价时间|Y|CURRENT_TIMESTAMP|
+
 ### `report`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`reporter_id`|bigint(20)|举报人|N||
 |`product_id`|bigint(20)|商品ID|N||
@@ -373,10 +421,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`handled_at`|datetime|处理时间|Y||
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+
 ### `user`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|用户ID|N||
 |`username`|varchar(100)|用户名(登录账号,唯一)|N||
 |`password`|varchar(255)|密码(加密存储)|N||
@@ -398,10 +449,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`last_login_at`|datetime|最近登录|Y||
 |`created_at`|datetime|注册时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `user_address`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`user_id`|bigint(20)|所属用户|N||
 |`receiver_name`|varchar(50)|收货人|N||
@@ -414,10 +468,13 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`is_default`|tinyint(4)|是否默认地址 1是0否|Y|0|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `wallet_log`
 
+> (无表注释)
+
 |字段|类型|注释|可空|默认|
-|---|---|---|---|---|
+|:---|---|:---|:---:|---|
 |`id`|bigint(20)|ID|N||
 |`user_id`|bigint(20)|用户ID|N||
 |`type`|varchar(20)|类型 recharge/pay/refund/receive|N||
@@ -427,3 +484,4 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 |`order_id`|bigint(20)|关联订单ID|Y||
 |`remark`|varchar(200)|备注|Y||
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+
