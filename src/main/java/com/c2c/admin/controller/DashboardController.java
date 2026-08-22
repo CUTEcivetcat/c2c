@@ -184,17 +184,15 @@ public class DashboardController {
             }
         }
 
-        String[] dates = new String[7];
-        int[] newUsers = new int[7];
-        int[] orders = new int[7];
-        double[] revenue = new double[7];
-        int idx = 0;
+        java.util.List<String> dates = new java.util.ArrayList<>();
+        java.util.List<Integer> newUsers = new java.util.ArrayList<>();
+        java.util.List<Integer> orders = new java.util.ArrayList<>();
+        java.util.List<Double> revenue = new java.util.ArrayList<>();
         for (Map.Entry<String, int[]> e : dayMap.entrySet()) {
-            dates[idx] = e.getKey().substring(5); // MM-DD
-            newUsers[idx] = e.getValue()[0];
-            orders[idx] = e.getValue()[1];
-            revenue[idx] = e.getValue()[2];
-            idx++;
+            dates.add(e.getKey().substring(5)); // MM-DD
+            newUsers.add(e.getValue()[0]);
+            orders.add(e.getValue()[1]);
+            revenue.add((double) e.getValue()[2]);
         }
 
         return R.ok(com.c2c.common.utils.MapUtils.of("dates", dates, "newUsers", newUsers, "orders", orders, "revenue", revenue));
