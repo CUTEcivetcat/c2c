@@ -35,6 +35,15 @@ public class RatingService {
         if (rating.getScore() == null || rating.getScore() < 1 || rating.getScore() > 5) {
             throw new BusinessException("评分必须在1-5分之间");
         }
+        if (rating.getOrderId() == null) {
+            throw new BusinessException("订单ID不能为空");
+        }
+        if (rating.getRatedUserId() == null) {
+            throw new BusinessException("被评价用户ID不能为空");
+        }
+        if (rating.getRole() == null || (rating.getRole() != 1 && rating.getRole() != 2)) {
+            throw new BusinessException("评价角色无效（1=买家 2=卖家）");
+        }
 
         Rating exist = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>()
                 .eq(Rating::getOrderId, rating.getOrderId())
