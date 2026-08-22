@@ -132,10 +132,298 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 - 真实密码/密钥/IP 一律放在本地 `config/`（gitignore 排除），仓库内仅保留占位符模板
 - 同步/上传仓库前请自查：`config/`、`*.sql` 导出、部署文档等含真实信息的文件不得入仓
 
-## 🤝 可提供部署帮助
-![img.png](img.png)
-
-
 ## 📜 许可证
 
 本项目仅供学习交流使用，请勿用于商业用途。
+
+
+## 📊 数据库表结构
+
+共 18 张表，210 个字段。
+
+### `admin_log`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`operator_id`|bigint(20)|操作人ID|Y||
+|`operator_role`|tinyint(4)|操作人角色|Y|0|
+|`action`|varchar(50)|操作类型|N||
+|`target_type`|varchar(20)|目标类型|N||
+|`target_id`|bigint(20)|目标ID|Y||
+|`detail`|varchar(1000)|详情|Y||
+|`created_at`|datetime|操作时间|N|CURRENT_TIMESTAMP|
+### `announcement`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`title`|varchar(200)|标题|N||
+|`content`|text|内容|N||
+|`type`|tinyint(4)|类型 1公告2公约3通知|N|1|
+|`status`|tinyint(4)|状态 1已发布0已下架|N|1|
+|`pinned`|tinyint(4)|是否置顶|N|0|
+|`is_force`|tinyint(4)|是否强制弹窗|N|0|
+|`min_seconds`|int(11)|最低停留秒|N|0|
+|`scroll`|tinyint(4)|是否滚动展示|N|1|
+|`show_on_publish`|tinyint(4)|发布页展示|N|0|
+|`created_by`|bigint(20)|发布人ID|Y||
+|`created_at`|datetime|发布时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+### `banner`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`title`|varchar(100)|标题|Y||
+|`image_url`|varchar(500)|图片地址|N||
+|`link_url`|varchar(500)|跳转链接|Y||
+|`sort_order`|int(11)|排序|Y|0|
+|`status`|tinyint(4)|状态 1启用0停用|Y|1|
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `category`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`name`|varchar(50)|分类名|N||
+|`parent_id`|bigint(20)|父分类ID|Y|0|
+|`level`|tinyint(4)|层级 1一级2二级|Y|1|
+|`sort_order`|int(11)|排序|Y|0|
+|`icon_url`|varchar(500)|图标|Y||
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+### `conversation`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`user1_id`|bigint(20)|用户1ID|N||
+|`user2_id`|bigint(20)|用户2ID|N||
+|`product_id`|bigint(20)|关联商品ID|Y||
+|`last_message`|varchar(500)|最后一条消息|Y||
+|`last_message_time`|datetime|最后消息时间|Y||
+|`user1_unread`|int(11)|用户1未读数|Y|0|
+|`user2_unread`|int(11)|用户2未读数|Y|0|
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `favorite`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`user_id`|bigint(20)|用户ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`created_at`|datetime|收藏时间|Y|CURRENT_TIMESTAMP|
+### `message`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`conversation_id`|bigint(20)|会话ID|N||
+|`sender_id`|bigint(20)|发送者|N||
+|`receiver_id`|bigint(20)|接收者|N||
+|`content`|text|消息内容|N||
+|`message_type`|tinyint(4)|类型 1文字2图片3系统|Y|1|
+|`extra`|json|额外数据JSON|Y||
+|`is_read`|tinyint(4)|是否已读|Y|0|
+|`created_at`|datetime(3)|发送时间|Y|CURRENT_TIMESTAMP(3)|
+### `nickname_audit`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`user_id`|bigint(20)|用户ID|N||
+|`old_nickname`|varchar(50)|原昵称|Y||
+|`new_nickname`|varchar(50)|新昵称|N||
+|`status`|tinyint(4)|状态 0待审核1通过2拒绝|N|0|
+|`reason`|varchar(500)|处理说明|Y||
+|`handled_by`|bigint(20)|处理人ID|Y||
+|`created_at`|datetime|申请时间|N|CURRENT_TIMESTAMP|
+|`handled_at`|datetime|处理时间|Y||
+### `order`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`order_no`|varchar(32)|订单号|N||
+|`buyer_id`|bigint(20)|买家ID|N||
+|`seller_id`|bigint(20)|卖家ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`product_title`|varchar(200)|商品标题(快照)|N||
+|`product_image`|varchar(500)|商品封面(快照)|Y||
+|`price`|decimal(10,2)|商品价格|N||
+|`freight_amount`|decimal(10,2)|运费|Y|0.00|
+|`total_amount`|decimal(10,2)|订单总额|N||
+|`address_id`|bigint(20)|地址ID|N||
+|`address_snapshot`|json|地址快照JSON|Y||
+|`status`|tinyint(4)|状态 0待支付1已支付2已发货3已收货4已完成5已取消|N|0|
+|`payment_method`|varchar(20)|支付方式|Y||
+|`escrow`|decimal(10,2)|平台托管金|Y||
+|`payment_time`|datetime|支付时间|Y||
+|`ship_company`|varchar(50)|快递公司|Y||
+|`ship_no`|varchar(50)|快递单号|Y||
+|`ship_time`|datetime|发货时间|Y||
+|`receive_time`|datetime|收货时间|Y||
+|`complete_time`|datetime|完成时间|Y||
+|`cancel_time`|datetime|取消时间|Y||
+|`cancel_reason`|varchar(500)|取消原因|Y||
+|`buyer_rated`|tinyint(4)|买家已评价|Y|0|
+|`seller_rated`|tinyint(4)|卖家已评价|Y|0|
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `product`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`seller_id`|bigint(20)|卖家ID|N||
+|`category_id`|bigint(20)|分类ID|N||
+|`title`|varchar(200)|标题|N||
+|`description`|text|描述|Y||
+|`price`|decimal(10,2)|售价|N||
+|`original_price`|decimal(10,2)|原价|Y||
+|`condition`|tinyint(4)|成色 1全新2几乎全新3轻微使用4明显使用|N||
+|`status`|tinyint(4)|状态 1在售2下架3违规4已售|Y|1|
+|`review_reason`|varchar(500)|违规原因|Y||
+|`freight_type`|tinyint(4)|运费类型 1包邮2买家承担|Y|1|
+|`freight_amount`|decimal(10,2)|运费|Y|0.00|
+|`view_count`|int(11)|浏览量|Y|0|
+|`favorite_count`|int(11)|收藏数|Y|0|
+|`location`|varchar(100)|所在地|Y||
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `product_appeal`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`seller_id`|bigint(20)|卖家ID|N||
+|`appeal_reason`|varchar(1000)|申诉理由|Y||
+|`images`|varchar(2000)|图片|Y||
+|`status`|tinyint(4)|状态 1待审核2通过3驳回|N|1|
+|`appeal_count`|tinyint(4)|申诉次数|N|1|
+|`handled_by`|bigint(20)|处理人|Y||
+|`reply`|varchar(500)|处理回复|Y||
+|`handled_at`|datetime|处理时间|Y||
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+### `product_comment`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20) unsigned|ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`user_id`|bigint(20)|用户ID|N||
+|`parent_id`|bigint(20)|父评论ID|N|0|
+|`content`|varchar(1000)|内容|N||
+|`status`|tinyint(4)|状态 1正常0删除|N|1|
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+### `product_image`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`url`|varchar(500)|图片地址|N||
+|`sort_order`|int(11)|排序|Y|0|
+|`is_cover`|tinyint(4)|是否封面 1是0否|Y|0|
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+### `product_intent`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20) unsigned|ID|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`seller_id`|bigint(20)|卖家ID|N||
+|`buyer_id`|bigint(20)|买家ID|N||
+|`message`|varchar(500)|留言|Y||
+|`expected_price`|decimal(10,2)|期望价|Y||
+|`status`|tinyint(4)|状态 1待回复2已回复3已成交4已关闭|N|1|
+|`seller_reply`|varchar(500)|卖家回复|Y||
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+### `rating`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`order_id`|bigint(20)|订单ID|N||
+|`rater_id`|bigint(20)|评价人|N||
+|`rated_user_id`|bigint(20)|被评价人|N||
+|`role`|tinyint(4)|角色 1买家2卖家|N||
+|`score`|tinyint(4)|评分 1~5|N||
+|`comment`|varchar(500)|评价内容|Y||
+|`tags`|json|标签JSON|Y||
+|`created_at`|datetime|评价时间|Y|CURRENT_TIMESTAMP|
+### `report`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`reporter_id`|bigint(20)|举报人|N||
+|`product_id`|bigint(20)|商品ID|N||
+|`report_type`|tinyint(4)|类型 1违规2虚假3其他|N|1|
+|`reason`|varchar(500)|举报原因|Y||
+|`images`|varchar(2000)|图片|Y||
+|`status`|tinyint(4)|状态 1待处理2已处理3驳回|N|1|
+|`handled_by`|bigint(20)|处理人|Y||
+|`handle_remark`|varchar(500)|处理备注|Y||
+|`handled_at`|datetime|处理时间|Y||
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+### `user`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|用户ID|N||
+|`username`|varchar(100)|用户名(登录账号,唯一)|N||
+|`password`|varchar(255)|密码(加密存储)|N||
+|`phone`|varchar(20)|手机号|Y||
+|`email`|varchar(100)|邮箱|Y||
+|`openid`|varchar(64)|微信openid|Y||
+|`email_verified`|tinyint(4)|邮箱是否验证|Y|0|
+|`avatar_url`|varchar(500)|头像地址|Y||
+|`nickname`|varchar(50)|昵称|Y||
+|`nickname_pending`|varchar(50)|待审核昵称|Y||
+|`nickname_status`|tinyint(4)|昵称状态 0正常1审核中|N|0|
+|`bio`|text|个人简介|Y||
+|`gender`|tinyint(4)|性别 0保密1男2女|Y|0|
+|`status`|tinyint(4)|状态 1正常0封禁|Y|1|
+|`role`|tinyint(4)|角色 0普通1管理员2审核|Y|0|
+|`login_source`|varchar(20)|注册来源 浏览email/wechat/phone|Y|email|
+|`reputation_score`|decimal(3,1)|信誉分 0~5|Y|5.0|
+|`balance`|decimal(10,2)|账户余额|N|0.00|
+|`last_login_at`|datetime|最近登录|Y||
+|`created_at`|datetime|注册时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `user_address`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`user_id`|bigint(20)|所属用户|N||
+|`receiver_name`|varchar(50)|收货人|N||
+|`phone`|varchar(20)|收货电话|N||
+|`province`|varchar(50)|省|Y||
+|`city`|varchar(50)|市|Y||
+|`district`|varchar(50)|区县|Y||
+|`detail`|varchar(255)|详细地址|N||
+|`postal_code`|varchar(10)|邮编|Y||
+|`is_default`|tinyint(4)|是否默认地址 1是0否|Y|0|
+|`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+### `wallet_log`
+
+|字段|类型|注释|可空|默认|
+|---|---|---|---|---|
+|`id`|bigint(20)|ID|N||
+|`user_id`|bigint(20)|用户ID|N||
+|`type`|varchar(20)|类型 recharge/pay/refund/receive|N||
+|`amount`|decimal(10,2)|金额(正收入负支出)|N||
+|`balance_before`|decimal(10,2)|变动前余额|N||
+|`balance_after`|decimal(10,2)|变动后余额|N||
+|`order_id`|bigint(20)|关联订单ID|Y||
+|`remark`|varchar(200)|备注|Y||
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
