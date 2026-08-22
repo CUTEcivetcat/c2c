@@ -138,13 +138,42 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 
 
+
 ## 📊 数据库表结构
 
 共 18 张表，210 个字段。
 
+### 关系图（E-R图）
+```mermaid
+erDiagram
+  USER ||--o{ `ORDER` : "买家下单"
+  USER ||--o{ `ORDER` : "卖家接单"
+  USER ||--o{ PRODUCT : "发布商品"
+  USER ||--o{ USER_ADDRESS : "收货地址"
+  USER ||--o{ FAVORITE : "收藏商品"
+  USER ||--o{ REPORT : "举报"
+  USER ||--o{ PRODUCT_APPEAL : "申诉"
+  USER ||--o{ PRODUCT_INTENT : "买家/卖家意向"
+  USER ||--o{ RATING : "评价人/被评价"
+  USER ||--o{ CONVERSATION : "会话"
+  USER ||--o{ WALLET_LOG : "资金流水"
+  USER ||--o{ ANNOUNCEMENT : "发布公告"
+  USER ||--o{ ADMIN_LOG : "操作日志"
+  PRODUCT ||--o{ PRODUCT_IMAGE : "图片"
+  PRODUCT ||--o{ PRODUCT_COMMENT : "评论"
+  PRODUCT ||--o{ PRODUCT_INTENT : "购买意向"
+  PRODUCT ||--o{ REPORT : "被举报"
+  PRODUCT ||--o{ PRODUCT_APPEAL : "申诉"
+  PRODUCT ||--o{ `ORDER` : "交易"
+  `ORDER` ||--o{ RATING : "评价"
+  `ORDER` ||--o{ WALLET_LOG : "流水"
+  CONVERSATION ||--o{ MESSAGE : "消息"
+```
+
+
 ### `admin_log`
 
-> (无表注释)
+> 管理端/审核操作日志
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -159,7 +188,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `announcement`
 
-> (无表注释)
+> 平台公告
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -194,7 +223,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `category`
 
-> (无表注释)
+> 商品分类
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -208,7 +237,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `conversation`
 
-> (无表注释)
+> 会话/私信记录
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -225,7 +254,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `favorite`
 
-> (无表注释)
+> 商品收藏
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -236,7 +265,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `message`
 
-> (无表注释)
+> 站内消息
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -252,7 +281,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `nickname_audit`
 
-> (无表注释)
+> 昵称修改审核记录
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -268,7 +297,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `order`
 
-> (无表注释)
+> 交易订单
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -302,7 +331,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `product`
 
-> (无表注释)
+> 商品
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -326,7 +355,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `product_appeal`
 
-> (无表注释)
+> 卖家整改申诉
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -345,7 +374,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `product_comment`
 
-> (无表注释)
+> 商品评论
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -359,7 +388,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `product_image`
 
-> (无表注释)
+> 商品图片
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -372,7 +401,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `product_intent`
 
-> (无表注释)
+> 购买意向/询价
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -389,7 +418,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `rating`
 
-> (无表注释)
+> 交易评价
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -405,7 +434,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `report`
 
-> (无表注释)
+> 举报记录
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -424,7 +453,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `user`
 
-> (无表注释)
+> 用户/账号
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -452,7 +481,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `user_address`
 
-> (无表注释)
+> 收货地址
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
@@ -471,7 +500,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ### `wallet_log`
 
-> (无表注释)
+> 资金流水
 
 |字段|类型|注释|可空|默认|
 |:---|---|:---|:---:|---|
