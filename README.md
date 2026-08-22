@@ -144,31 +144,43 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 共 18 张表，210 个字段。
 
 ### 关系图（E-R图）
+
 ```mermaid
-erDiagram
-  USER ||--o{ `ORDER` : "买家下单"
-  USER ||--o{ `ORDER` : "卖家接单"
-  USER ||--o{ PRODUCT : "发布商品"
-  USER ||--o{ USER_ADDRESS : "收货地址"
-  USER ||--o{ FAVORITE : "收藏商品"
-  USER ||--o{ REPORT : "举报"
-  USER ||--o{ PRODUCT_APPEAL : "申诉"
-  USER ||--o{ PRODUCT_INTENT : "买家/卖家意向"
-  USER ||--o{ RATING : "评价人/被评价"
-  USER ||--o{ CONVERSATION : "会话"
-  USER ||--o{ WALLET_LOG : "资金流水"
-  USER ||--o{ ANNOUNCEMENT : "发布公告"
-  USER ||--o{ ADMIN_LOG : "操作日志"
-  PRODUCT ||--o{ PRODUCT_IMAGE : "图片"
-  PRODUCT ||--o{ PRODUCT_COMMENT : "评论"
-  PRODUCT ||--o{ PRODUCT_INTENT : "购买意向"
-  PRODUCT ||--o{ REPORT : "被举报"
-  PRODUCT ||--o{ PRODUCT_APPEAL : "申诉"
-  PRODUCT ||--o{ `ORDER` : "交易"
-  `ORDER` ||--o{ RATING : "评价"
-  `ORDER` ||--o{ WALLET_LOG : "流水"
-  CONVERSATION ||--o{ MESSAGE : "消息"
+%%{init: {'flowchart': {'nodeSpacing': 40, 'rankSpacing': 50}}}%%
+flowchart LR
+  subgraph 用户体系
+    U[USER 用户表]-->UA[USER_ADDRESS 收货地址]
+    U-->F[FAVORITE 收藏]
+    U-->W[WALLET_LOG 资金流水]
+    U-->R[REPORT 举报]
+    U-->PA[PRODUCT_APPEAL 申诉]
+    U-->A[ANNOUNCEMENT 公告]
+    U-->AL[ADMIN_LOG 操作日志]
+  end
+  subgraph 商品体系
+    P[PRODUCT 商品]-->PI[PRODUCT_IMAGE 图片]
+    P-->PC[PRODUCT_COMMENT 评论]
+    P-->PT[PRODUCT_INTENT 购买意向]
+    P-->PA
+    P-->R
+  end
+  subgraph 交易体系
+    O[ORDER 订单]-->RT[RATING 评价]
+    O-->W
+    P-->O
+    U-->O
+  end
+  subgraph 消息体系
+    C[CONVERSATION 会话]-->M[MESSAGE 消息]
+    U-->C
+  end
+  subgraph 其他
+    N[NICKNAME_AUDIT 昵称审核]
+    B[BANNER 轮播图]
+    CAT[CATEGORY 分类]
+  end
 ```
+
 
 
 ### `admin_log`
