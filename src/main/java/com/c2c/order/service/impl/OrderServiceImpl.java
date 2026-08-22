@@ -157,15 +157,23 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal amount = order.getTotalAmount();
             walletService.deductBalance(buyerId, amount, orderId, "订单支付 #" + order.getOrderNo());
 
-            order.setStatus(1);
+            // 自动发货 + 自动确认收货
+            walletService.receive(order.getSellerId(), amount, orderId,
+                    "订单收款 #" + order.getOrderNo());
+
+            order.setStatus(4);
             order.setPaymentMethod("balance");
-            order.setEscrow(amount);
             order.setPaymentTime(LocalDateTime.now());
+            order.setShipTime(LocalDateTime.now());
+            order.setShipCompany("自动发货");
+            order.setReceiveTime(LocalDateTime.now());
+            order.setCompleteTime(LocalDateTime.now());
+            order.setEscrow(null);
             orderMapper.updateById(order);
 
             productFeignClient.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
             eventPublisher.publishOrderPaid(orderId);
-            log.info("order paid (wallet): orderId={}, amount={}", orderId, amount);
+            log.info("order paid & auto-completed: orderId={}, amount={}", orderId, amount);
         }
     }
 
