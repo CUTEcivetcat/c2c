@@ -16,7 +16,8 @@
 
     <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭） -->
     <el-dialog v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
-      :close-on-click-modal="false" :close-on-press-escape="false" align-center>
+      :close-on-click-modal="false" :close-on-press-escape="false" align-center
+      :destroy-on-close="true" :lock-scroll="false">
       <template #header>
         <div class="force-dialog-head">
           <span class="fd-icon">📢</span>
@@ -38,7 +39,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getAnnouncementForce } from '@/api/announcement'
@@ -59,7 +60,14 @@ const remain = ref(0)        // 剩余停留秒数
 let countdownTimer = null
 
 const showNext = () => {
-  if (!queue.value.length) { forceDialog.value = false; current.value = null; return }
+  if (!queue.value.length) {
+    forceDialog.value = false
+    current.value = null
+    nextTick(() => {
+      document.querySelectorAll('.el-overlay').forEach(el => el.remove())
+    })
+    return
+  }
   current.value = queue.value.shift()
   remain.value = Number(current.value.minSeconds || 0)
   forceDialog.value = true
