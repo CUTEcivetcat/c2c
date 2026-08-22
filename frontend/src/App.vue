@@ -3,9 +3,11 @@
     <app-header v-if="showHeader" />
     <main class="main-content" :class="mainClass">
       <router-view v-slot="{ Component }">
-        <transition :name="transitionName" mode="out-in">
-          <component :is="Component" />
-        </transition>
+        <keep-alive include="HomeView">
+          <transition :name="transitionName" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </keep-alive>
       </router-view>
     </main>
     <app-footer v-if="showFooter" />

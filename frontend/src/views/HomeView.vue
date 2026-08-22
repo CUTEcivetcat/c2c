@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onActivated, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { getCategories, searchProducts } from '@/api/product'
 import { addFavorite, removeFavorite } from '@/api/favorite'
@@ -187,6 +187,10 @@ onMounted(async () => {
   }).catch(() => {})
   // 加载轮播图
   getBanners().then(r => { banners.value = r || [] }).catch(() => {})
+})
+// 从其他页面回来时自动刷新（搭配 App.vue 的 keep-alive）
+onActivated(() => {
+  loadProducts()
 })
 onUnmounted(stopAnnRoll)
 
