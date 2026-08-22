@@ -1,0 +1,6 @@
+.ep { padding: 28rpx 24rpx; background: transparent; }
+.field { display: flex; align-items: center; gap: 20rpx; background: var(--glass); border-radius: var(--radius); padding: 24rpx 26rpx; margin-bottom: 18rpx; box-shadow: var(--shadow-sm); border: 1rpx solid rgba(255,255,255,0.9); }
+.label { width: 140rpx; font-size: 28rpx; color: var(--ink-2); flex-shrink: 0; }
+.inp { flex: 1; font-size: 28rpx; }
+.ph { color: var(--ink-3); }
+.save-btn { position: fixed; left: 24rpx; right: 24rpx; bottom: 24rpx; padding: 26rpx 0; z-index: 10; }

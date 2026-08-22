@@ -1,0 +1,46 @@
+<view class="mine-page fade-up">
+  <block wx:if="{{userInfo}}">
+    <view class="profile-card glass-card">
+      <view class="avatar-ring">
+        <view class="avatar">{{userInfo.nickname[0]}}</view>
+      </view>
+      <view class="profile-info">
+        <text class="nick">{{userInfo.nickname}}</text>
+        <text class="source chip">微信登录</text>
+      </view>
+    </view>
+    <view class="menu-card glass-card">
+      <view class="menu-item" bindtap="nav" data-url="/pages/my-product/my-product">
+        <text class="mi">📦</text><text class="mi-t">我的发布</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list">
+        <text class="mi">🧾</text><text class="mi-t">我的订单</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/favorite/favorite">
+        <text class="mi">❤️</text><text class="mi-t">我的收藏</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/wallet/wallet">
+        <text class="mi">💳</text><text class="mi-t">我的钱包</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/address/address">
+        <text class="mi">📍</text><text class="mi-t">收货地址</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/login/login">
+        <text class="mi">✉️</text><text class="mi-t">绑定邮箱</text><text class="mi-ar">›</text>
+      </view>
+    </view>
+    <button class="logout btn-ghost" bindtap="logout">退出登录</button>
+  </block>
+
+  <block wx:else>
+    <view class="login-card glass-card">
+      <view class="login-ico-wrap">
+        <text class="login-ico">🔄</text>
+      </view>
+      <text class="login-title">闲小鱼</text>
+      <text class="login-desc">登录后开启二手好物之旅</text>
+      <button class="wx-btn" bindtap="wechatLogin">微信一键登录</button>
+      <button class="acct-btn" bindtap="goAuthLogin">手机号 / 邮箱验证码</button>
+    </view>
+  </block>
+</view>

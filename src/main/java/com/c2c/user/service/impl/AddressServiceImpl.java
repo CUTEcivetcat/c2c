@@ -44,6 +44,15 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void add(UserAddress address, Long userId) {
+        if (address.getReceiverName() == null || address.getReceiverName().trim().isEmpty()) {
+            throw new BusinessException("收货人姓名不能为空");
+        }
+        if (address.getPhone() == null || address.getPhone().trim().isEmpty()) {
+            throw new BusinessException("联系电话不能为空");
+        }
+        if (address.getDetail() == null || address.getDetail().trim().isEmpty()) {
+            throw new BusinessException("详细地址不能为空");
+        }
         address.setUserId(userId);
         if (address.getIsDefault() != null && address.getIsDefault() == 1) {
             clearDefault(userId);
@@ -57,6 +66,15 @@ public class AddressServiceImpl implements AddressService {
         UserAddress exist = addressMapper.selectById(address.getId());
         if (exist == null || !exist.getUserId().equals(userId)) {
             throw new BusinessException("地址不存在");
+        }
+        if (address.getReceiverName() != null && address.getReceiverName().trim().isEmpty()) {
+            throw new BusinessException("收货人姓名不能为空");
+        }
+        if (address.getPhone() != null && address.getPhone().trim().isEmpty()) {
+            throw new BusinessException("联系电话不能为空");
+        }
+        if (address.getDetail() != null && address.getDetail().trim().isEmpty()) {
+            throw new BusinessException("详细地址不能为空");
         }
         if (address.getIsDefault() != null && address.getIsDefault() == 1) {
             clearDefault(userId);

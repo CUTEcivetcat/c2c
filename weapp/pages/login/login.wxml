@@ -1,0 +1,16 @@
+<view class="bind-page fade-up">
+  <view class="head">
+    <view class="logo-ring"><text class="logo">✉️</text></view>
+    <text class="title">绑定邮箱</text>
+    <text class="tip">绑定后可通过邮箱找回密码或密码登录</text>
+  </view>
+
+  <view class="field">
+    <input class="inp" placeholder="请输入邮箱" placeholder-class="ph" bindinput="onEmail" value="{{email}}"/>
+  </view>
+  <view class="field code-row">
+    <input class="inp" placeholder="请输入验证码" placeholder-class="ph" bindinput="onCode" value="{{code}}"/>
+    <button class="code-btn" bindtap="sendCode">{{codeBtnText}}</button>
+  </view>
+  <button class="submit-btn btn-primary" bindtap="bindEmail" disabled="{{bindLoading}}">{{bindLoading ? '绑定中...' : '确认绑定'}}</button>
+</view>

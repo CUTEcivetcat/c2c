@@ -1,0 +1,27 @@
+<view class="page cat-page">
+  <!-- 左侧分类栏 -->
+  <scroll-view class="cat-side" scroll-y>
+    <view wx:for="{{categories}}" wx:key="id"
+          class="cat-item {{activeId === index ? 'active' : ''}}"
+          bindtap="select" data-index="{{index}}">{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 右侧商品区 -->
+  <scroll-view class="prod-area" scroll-y>
+    <view class="prod-grid">
+      <view class="prod-card glass-card fade-up"
+            wx:for="{{products}}" wx:key="id" bindtap="goProduct" data-id="{{item.id}}">
+        <image class="p-img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
+               lazy-load="{{true}}"/>
+        <view class="p-body">
+          <text class="p-title">{{item.title}}</text>
+          <text class="p-price">¥{{item.price}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!products.length}}">
+      <text class="empty-ico">📦</text>
+      该分类暂无商品
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,12 @@
+.bind-page { padding: 60rpx 40rpx; background: transparent; }
+.head { text-align: center; margin-bottom: 60rpx; }
+.logo-ring { width: 120rpx; height: 120rpx; border-radius: 50%; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; margin: 0 auto 20rpx; }
+.logo { font-size: 60rpx; }
+.title { display: block; font-size: 38rpx; font-weight: 800; color: var(--ink); }
+.tip { display: block; font-size: 24rpx; color: var(--ink-3); margin-top: 12rpx; }
+.field { background: #fff; border: 2rpx solid var(--line); border-radius: var(--radius); padding: 22rpx 26rpx; margin-bottom: 20rpx; box-shadow: var(--shadow-sm); }
+.inp { font-size: 28rpx; width: 100%; }
+.ph { color: var(--ink-3); }
+.code-row { display: flex; align-items: center; gap: 18rpx; }
+.code-btn { flex-shrink: 0; background: var(--primary-soft); color: var(--primary); border-radius: 999rpx; padding: 14rpx 28rpx; font-size: 24rpx; font-weight: 600; }
+.submit-btn { margin-top: 30rpx; width: 100%; padding: 26rpx 0; }

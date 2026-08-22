@@ -1,0 +1,44 @@
+<view class="sp fade-up">
+  <!-- 搜索栏 -->
+  <view class="bar">
+    <view class="search-box">
+      <text class="s-ico">⌕</text>
+      <input class="s-input" placeholder="搜索商品…" placeholder-class="ph"
+             bindinput="onInput" bindconfirm="doSearch" value="{{keyword}}" confirm-type="search"/>
+    </view>
+    <button class="s-btn" bindtap="doSearch">搜索</button>
+  </view>
+
+  <!-- 历史 / 热门 (未搜索时) -->
+  <view class="tags" wx:if="{{!products.length}}">
+    <view class="row">
+      <text class="tag-label">搜索历史</text>
+      <text wx:for="{{history}}" wx:key="*this" class="tag" bindtap="quick" data-w="{{item}}">{{item}}</text>
+      <text wx:if="{{history.length}}" class="clear" bindtap="clearHistory">清空</text>
+    </view>
+    <view class="row">
+      <text class="tag-label">热门搜索</text>
+      <text wx:for="{{hot}}" wx:key="*this" class="tag hot" bindtap="quick" data-w="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 搜索列表 -->
+  <view class="list">
+    <view class="card glass-card" wx:for="{{products}}" wx:key="id" bindtap="goProduct" data-id="{{item.id}}">
+      <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
+             lazy-load="{{true}}"/>
+      <view class="info">
+        <text class="t">{{item.title}}</text>
+        <view class="p-line">
+          <text class="p">¥{{item.price}}</text>
+          <text class="loc">{{item.location || '同城'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!products.length}}">
+    <text class="empty-ico">🔍</text>
+    搜点什么吧~
+  </view>
+</view>

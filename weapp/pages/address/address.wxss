@@ -1,0 +1,12 @@
+.ap { padding: 28rpx 24rpx 180rpx; background: transparent; }
+.tip { text-align: center; color: var(--primary); font-size: 26rpx; margin-bottom: 20rpx; }
+.addr-card { padding: 26rpx; margin-bottom: 18rpx; }
+.addr-top { display: flex; align-items: center; gap: 16rpx; }
+.name { font-size: 32rpx; font-weight: 700; color: var(--ink); }
+.phone { font-size: 26rpx; color: var(--ink-3); }
+.def { margin-left: auto; background: var(--primary-soft); color: var(--primary); font-size: 20rpx; padding: 4rpx 16rpx; border-radius: 999rpx; }
+.addr-line { display: block; font-size: 28rpx; color: var(--ink-2); line-height: 1.5; margin-top: 14rpx; }
+.opts { display: flex; gap: 30rpx; margin-top: 18rpx; border-top: 1rpx solid var(--line); padding-top: 14rpx; }
+.opt { font-size: 24rpx; color: var(--ink-2); }
+.opt.danger { color: var(--danger); }
+.add-btn { position: fixed; left: 24rpx; right: 24rpx; bottom: 24rpx; padding: 26rpx 0; z-index: 10; }

@@ -1,24 +1,62 @@
-const app = getApp()
+const request = require('../../utils/request.js')
 
 Page({
   data: {
     products: [],
-    loading: true
+    page: 1,
+    size: 20,
+    loading: false,
+    hasMore: true
   },
 
-  onLoad() {
+  onLoad: function () {
     this.loadProducts()
   },
 
-  loadProducts() {
-    const url = app.globalData.serverUrl + '/product/list?page=1&size=20&sort=created_at'
-    wx.request({
-      url,
-      success: (res) => {
-        if (res.data.code === 200) {
-          this.setData({ products: res.data.data.records || [], loading: false })
-        }
-      }
+  onPullDownRefresh: function () {
+    this.setData({ page: 1, hasMore: true })
+    this.loadProducts(true)
+  },
+
+  onReachBottom: function () {
+    if (this.data.hasMore && !this.data.loading) {
+      this.loadProducts()
+    }
+  },
+
+  loadProducts: function (refresh) {
+    if (this.data.loading) return
+    var that = this
+    this.setData({ loading: true })
+    request.get('/product/list', {
+      page: this.data.page,
+      size: this.data.size,
+      sort: 'created_at'
+    }).then(function (res) {
+      var list = res.records || []
+      var merged = refresh ? list : that.data.products.concat(list)
+      that.setData({
+        products: merged,
+        page: that.data.page + 1,
+        hasMore: merged.length < res.total,
+        loading: false
+      })
+      if (refresh) wx.stopPullDownRefresh()
+    }).catch(function () {
+      that.setData({ loading: false })
+      if (refresh) wx.stopPullDownRefresh()
     })
+  },
+
+  goProduct: function (e) {
+    wx.navigateTo({ url: '/pages/product/product?id=' + e.currentTarget.dataset.id })
+  },
+
+  goMine: function () {
+    wx.switchTab({ url: '/pages/mine/mine' })
+  },
+
+  goSearch: function () {
+    wx.navigateTo({ url: '/pages/search/search' })
   }
 })

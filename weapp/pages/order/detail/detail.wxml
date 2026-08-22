@@ -1,0 +1,23 @@
+<view class="dp fade-up" wx:if="{{o}}">
+  <view class="st-card">
+    <text class="st-ico">📦</text>
+    <text class="st-text">{{statuses[o.status]}}</text>
+  </view>
+
+  <view class="card glass-card">
+    <view class="line"><text class="l">订单号</text><text class="v">{{o.orderNo}}</text></view>
+    <view class="line"><text class="l">商品</text><text class="v">{{o.productTitle}}</text></view>
+    <view class="line"><text class="l">金额</text><text class="v hot">¥{{o.totalAmount}}</text></view>
+    <view class="line" wx:if="{{o.paymentMethod}}"><text class="l">支付</text><text class="v">{{o.paymentMethod==='balance'?'余额支付':'在线支付'}}</text></view>
+    <view class="line" wx:if="{{o.shipCompany}}"><text class="l">物流</text><text class="v">{{o.shipCompany}} {{o.shipNo}}</text></view>
+    <view class="line" wx:if="{{o.escrow}}"><text class="l">平台托管</text><text class="v">¥{{o.escrow}}</text></view>
+  </view>
+
+  <view class="actions">
+    <button wx:if="{{o.status===0}}" class="btn plain" bindtap="cancel">取消订单</button>
+    <button wx:if="{{o.status===0}}" class="btn" bindtap="pay">立即支付</button>
+    <button wx:if="{{o.status===1 && o.sellerId===meId}}" class="btn" bindtap="ship">发货</button>
+    <button wx:if="{{o.status===2 && o.buyerId===meId}}" class="btn" bindtap="receive">确认收货</button>
+  </view>
+</view>
+<view wx:else class="empty"><text class="empty-ico">⏳</text>加载中...</view>

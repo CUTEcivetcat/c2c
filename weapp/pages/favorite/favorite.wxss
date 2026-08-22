@@ -1,0 +1,6 @@
+.fp { padding: 28rpx 24rpx; background: transparent; }
+.card { display: flex; gap: 20rpx; padding: 22rpx; margin-bottom: 18rpx; align-items: center; }
+.img { width: 140rpx; height: 140rpx; border-radius: 16rpx; background: #eef1f5; flex-shrink: 0; }
+.info { flex: 1; min-width: 0; }
+.t { font-size: 29rpx; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.p { display: block; font-size: 32rpx; font-weight: 800; color: var(--primary); margin-top: 10rpx; }

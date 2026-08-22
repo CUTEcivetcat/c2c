@@ -1,0 +1,27 @@
+<view class="ap fade-up">
+  <view class="tip" wx:if="{{selectMode}}">请选择收货地址</view>
+
+  <view class="addr-card glass-card" wx:for="{{list}}" wx:key="id"
+        bindtap="choose" data-id="{{item.id}}">
+    <view class="addr-top">
+      <text class="name">{{item.receiverName}}</text>
+      <text class="phone">{{item.phone}}</text>
+      <text class="def" wx:if="{{item.isDefault==1}}">默认</text>
+    </view>
+    <text class="addr-line">{{item.province}}{{item.city}}{{item.district}}{{item.detail}}</text>
+    <view class="opts" wx:if="{{!selectMode}}">
+      <text class="opt" catchtap="setDefault" data-id="{{item.id}}">
+        {{item.isDefault==1 ? '默认地址' : '设为默认'}}
+      </text>
+      <text class="opt" catchtap="goEdit" data-id="{{item.id}}">编辑</text>
+      <text class="opt danger" catchtap="remove" data-id="{{item.id}}">删除</text>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !list.length}}">
+    <text class="empty-ico">📮</text>
+    还没有收货地址
+  </view>
+
+  <button class="add-btn btn-primary" bindtap="goAdd">+ 新增收货地址</button>
+</view>

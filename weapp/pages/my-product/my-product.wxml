@@ -1,0 +1,21 @@
+<view class="mp fade-up">
+  <view class="card glass-card" wx:for="{{list}}" wx:key="id">
+    <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
+           lazy-load="{{true}}"/>
+    <view class="info">
+      <text class="t">{{item.title}}</text>
+      <view class="p-id">
+        <text class="p">¥{{item.price}}</text>
+        <text class="st">{{statuses[item.status] || ''}}</text>
+      </view>
+      <view class="ops">
+        <button class="op-edit" bindtap="edit" data-id="{{item.id}}">编辑</button>
+        <button class="op-off" bindtap="off" data-id="{{item.id}}">下架</button>
+      </view>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!list.length}}">
+    <text class="empty-ico">📦</text>
+    还没有发布任何商品
+  </view>
+</view>
