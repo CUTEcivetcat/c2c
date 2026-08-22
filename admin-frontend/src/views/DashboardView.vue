@@ -4,11 +4,11 @@
 
     <!-- 统计卡片 -->
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num">{{ stats.totalUsers }}</div><div class="stat-label">累计用户</div></div>
-      <div class="stat-card"><div class="stat-num green">{{ stats.totalProducts }}</div><div class="stat-label">总商品数</div></div>
-      <div class="stat-card"><div class="stat-num orange">{{ stats.onSaleProducts }}</div><div class="stat-label">在售商品</div></div>
-      <div class="stat-card"><div class="stat-num red">{{ stats.todayOrders }}</div><div class="stat-label">今日订单</div></div>
-      <div class="stat-card"><div class="stat-num" style="color:#8e44ad">{{ stats.totalAnnouncements }}</div><div class="stat-label">公告总数</div></div>
+      <div class="stat-card" @click="$router.push('/users')"><div class="stat-num">{{ stats.totalUsers }}</div><div class="stat-label">累计用户</div></div>
+      <div class="stat-card" @click="$router.push('/products')"><div class="stat-num green">{{ stats.totalProducts }}</div><div class="stat-label">总商品数</div></div>
+      <div class="stat-card" @click="$router.push('/products')"><div class="stat-num orange">{{ stats.onSaleProducts }}</div><div class="stat-label">在售商品</div></div>
+      <div class="stat-card" @click="$router.push('/orders')"><div class="stat-num red">{{ stats.todayOrders }}</div><div class="stat-label">今日订单</div></div>
+      <div class="stat-card" @click="$router.push('/announcement')"><div class="stat-num" style="color:#8e44ad">{{ stats.totalAnnouncements }}</div><div class="stat-label">公告总数</div></div>
     </div>
 
     <!-- 待处理卡片（点击跳转对应审核页） -->
@@ -215,7 +215,7 @@ const initOrderChart = (trends) => {
 <style scoped>
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px }
 @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr) } }
-.stat-card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); text-align: center; transition: transform 0.2s }
+.stat-card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); text-align: center; transition: transform 0.2s; cursor: pointer }
 .stat-card:hover { transform: translateY(-2px) }
 .stat-num { font-size: 36px; font-weight: 700; color: #409eff }
 .stat-num.green { color: #67c23a } .stat-num.orange { color: #e6a23c } .stat-num.red { color: #e74c3c }
