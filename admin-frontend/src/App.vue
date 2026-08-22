@@ -221,6 +221,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
   background: transparent !important;
   border: 1.5px solid currentColor !important;
 }
+.admin-main .el-button--primary.is-plain {
+  color: #ff6b35 !important;
+}
+.admin-main .el-button--primary.is-plain:hover {
+  background: #fff5f0 !important;
+  color: #e55a2b !important;
+  box-shadow: 0 4px 14px rgba(255,107,53,0.15) !important;
+}
+.admin-main .el-button--success.is-plain {
+  color: #67c23a !important;
+}
+.admin-main .el-button--success.is-plain:hover {
+  background: #f0f9eb !important;
+  color: #5daf34 !important;
+}
+.admin-main .el-button--warning.is-plain {
+  color: #e6a23c !important;
+}
+.admin-main .el-button--warning.is-plain:hover {
+  background: #fdf6ec !important;
+  color: #cf9236 !important;
+}
+.admin-main .el-button--danger.is-plain {
+  color: #e74c3c !important;
+}
+.admin-main .el-button--danger.is-plain:hover {
+  background: #fef0ef !important;
+  color: #d63031 !important;
+}
 .admin-main .el-button.is-plain:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
