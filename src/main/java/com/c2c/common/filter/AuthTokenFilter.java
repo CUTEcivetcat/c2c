@@ -38,6 +38,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
      */
     private static final List<String> WHITE_LIST = Arrays.asList(
             "/user/login",
+            "/user/wechat-login",
             "/user/register",
             "/user/sms/send",
             "/user/reset-password",

@@ -24,6 +24,12 @@ public interface UserService {
     /** 注册 */
     void register(RegisterDTO dto);
 
+    /** 微信小程序登录（按 openid 查找或自动注册） */
+    LoginVO loginByWechat(WechatLoginDTO dto);
+
+    /** 绑定邮箱（需先发邮箱验证码） */
+    void bindEmail(Long userId, String email, String code);
+
     /** 找回密码 */
     void resetPassword(ResetPasswordDTO dto);
 

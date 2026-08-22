@@ -35,6 +35,12 @@ public class User {
     /** 邮箱是否已验证：0 未验证 / 1 已验证 */
     private Integer emailVerified;
 
+    /** 微信 openid（微信登录的唯一标识，可空） */
+    private String openid;
+
+    /** 注册来源：email / wechat / phone */
+    private String loginSource;
+
     /** 头像 URL */
     private String avatarUrl;
 

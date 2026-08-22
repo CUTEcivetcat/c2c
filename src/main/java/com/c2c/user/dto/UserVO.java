@@ -42,6 +42,9 @@ public class UserVO {
     /** 角色：0=普通用户，1=管理员，2=审核员 */
     private Integer role;
 
+    /** 注册来源：email / wechat / phone */
+    private String loginSource;
+
     /** 信誉评分 */
     private BigDecimal reputationScore;
 
