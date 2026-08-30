@@ -173,18 +173,6 @@ public class UserController {
         return R.ok(com.c2c.common.utils.MapUtils.of("records", result.getRecords(), "total", result.getTotal(), "page", page, "size", size));
     }
 
-    @Operation(summary = "启用/禁用用户（管理端）")
-    @PutMapping(ApiPath.ADMIN_USER_STATUS)
-    public R<Void> updateStatus(@Parameter(description = "用户 ID") @PathVariable Long userId,
-                                @RequestBody Map<String, Integer> body) {
-        User user = userMapper.selectById(userId);
-        if (user != null && body.containsKey("status")) {
-            user.setStatus(body.get("status"));
-            userMapper.updateById(user);
-        }
-        return R.ok();
-    }
-
     @Operation(summary = "用户总数统计（管理端）")
     @GetMapping(ApiPath.USER_ADMIN_COUNT)
     public R<Map<String, Long>> countUsers() {
