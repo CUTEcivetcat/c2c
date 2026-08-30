@@ -3,7 +3,6 @@ package com.c2c.wallet.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.exception.BusinessException;
-import com.c2c.common.utils.MapUtils;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
 import com.c2c.wallet.entity.WalletLog;
@@ -18,6 +17,7 @@ import java.util.Map;
 
 /**
  * 钱包服务：余额充值、查询概况、资金流水记录。
+ * <p>余额增减全部走 UserMapper 的原子 SQL（条件更新），避免并发超扣/竞态。</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -40,8 +40,7 @@ public class WalletService {
 
         BigDecimal before = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
         BigDecimal after = before.add(amount);
-        user.setBalance(after);
-        userMapper.updateById(user);
+        userMapper.addBalance(userId, amount);
 
         WalletLog log = new WalletLog();
         log.setUserId(userId);
@@ -68,16 +67,18 @@ public class WalletService {
         return result;
     }
 
-    /** 扣余额（供 OrderService 调用） */
+    /** 扣余额（供 OrderService 调用）。原子条件扣减，余额不足抛异常。 */
     @Transactional
     public void deductBalance(Long userId, BigDecimal amount, Long orderId, String remark) {
         User user = userMapper.selectById(userId);
         if (user == null) throw new BusinessException("用户不存在");
         BigDecimal before = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
-        if (before.compareTo(amount) < 0) throw new BusinessException("余额不足");
+
+        int rows = userMapper.deductBalance(userId, amount);
+        if (rows == 0) {
+            throw new BusinessException("余额不足");
+        }
         BigDecimal after = before.subtract(amount);
-        user.setBalance(after);
-        userMapper.updateById(user);
 
         WalletLog log = new WalletLog();
         log.setUserId(userId);
@@ -97,8 +98,7 @@ public class WalletService {
         if (user == null) throw new BusinessException("用户不存在");
         BigDecimal before = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
         BigDecimal after = before.add(amount);
-        user.setBalance(after);
-        userMapper.updateById(user);
+        userMapper.addBalance(userId, amount);
 
         WalletLog log = new WalletLog();
         log.setUserId(userId);
@@ -118,8 +118,7 @@ public class WalletService {
         if (user == null) throw new BusinessException("用户不存在");
         BigDecimal before = user.getBalance() != null ? user.getBalance() : BigDecimal.ZERO;
         BigDecimal after = before.add(amount);
-        user.setBalance(after);
-        userMapper.updateById(user);
+        userMapper.addBalance(userId, amount);
 
         WalletLog log = new WalletLog();
         log.setUserId(userId);

@@ -48,9 +48,17 @@ mybatis-plus:
     banner: false
 
 jwt:
-  # HS256 要求密钥 ≥ 32 字节(256 bit)，请务必设置你自己的随机密钥
-  secret: ${JWT_SECRET:change-me-to-a-random-secret-at-least-32-bytes}
+  # HS256 要求密钥 ≥ 32 字节(256 bit)。无默认值：未注入 JWT_SECRET 时应用启动校验将拒绝启动。
+  # 生成：openssl rand -base64 32
+  secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:604800}
+
+springdoc:
+  # 生产环境关闭 Swagger/OpenAPI 文档，避免接口签名公开暴露
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
 app:
   upload-root: ${APP_UPLOAD_ROOT:/softservice/c2c/uploads}

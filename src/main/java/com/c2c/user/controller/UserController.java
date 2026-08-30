@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -34,18 +33,27 @@ public class UserController {
     private final StringRedisTemplate redisTemplate;
     private final UserMapper userMapper;
 
+    /** 是否在响应中回显验证码（仅本地开发置 true，生产必须 false） */
+    @org.springframework.beans.factory.annotation.Value("${app.sms-echo-code:false}")
+    private boolean smsEchoCode;
+
     // ==================== 验证码 ====================
 
     /**
      * 发送验证码（智能识别手机号/邮箱）
      * 手机号 → 开发模式弹窗显示
      * 邮箱 → QQ邮箱SMTP发送
+     * <p>安全说明：默认不回显验证码，仅当 app.sms-echo-code=true（本地开发）时返回 code 字段，生产必须保持 false。</p>
      */
-    @Operation(summary = "发送验证码", description = "account 自动识别手机号或邮箱。开发模式手机号验证码会在响应中返回 code 字段")
+    @Operation(summary = "发送验证码", description = "account 自动识别手机号或邮箱。验证码仅通过短信/邮件下发，生产环境不回显")
     @PostMapping(ApiPath.USER_SMS_SEND)
     public R<Map<String, String>> sendSms(@Parameter(description = "手机号或邮箱") @RequestParam("account") String account) {
         String code = userService.sendVerificationCodeAndReturn(account);
-        return R.ok(com.c2c.common.utils.MapUtils.of("code", code, "type", account.contains("@") ? "email" : "sms"));
+        Map<String, String> result = com.c2c.common.utils.MapUtils.of("type", account.contains("@") ? "email" : "sms");
+        if (smsEchoCode) {
+            result.put("code", code);
+        }
+        return R.ok(result);
     }
 
     // ==================== 登录 ====================
@@ -147,18 +155,6 @@ public class UserController {
         return R.ok(userService.getUserPublicInfo(userId));
     }
 
-    @Operation(summary = "更新用户信誉分（管理端）")
-    @PutMapping(ApiPath.USER_REPUTATION_ID)
-    public R<Void> updateReputation(@Parameter(description = "用户 ID") @PathVariable Long userId,
-                                    @RequestBody Map<String, BigDecimal> body) {
-        User user = userMapper.selectById(userId);
-        if (user != null && body.containsKey("reputationScore")) {
-            user.setReputationScore(body.get("reputationScore"));
-            userMapper.updateById(user);
-        }
-        return R.ok();
-    }
-
     // ==================== Admin 接口 ====================
 
     @Operation(summary = "用户分页列表（管理端）", description = "按手机号 / 邮箱 / 昵称模糊搜索")
@@ -178,7 +174,7 @@ public class UserController {
     }
 
     @Operation(summary = "启用/禁用用户（管理端）")
-    @PutMapping(ApiPath.USER_STATUS)
+    @PutMapping(ApiPath.ADMIN_USER_STATUS)
     public R<Void> updateStatus(@Parameter(description = "用户 ID") @PathVariable Long userId,
                                 @RequestBody Map<String, Integer> body) {
         User user = userMapper.selectById(userId);

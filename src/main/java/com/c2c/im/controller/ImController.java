@@ -39,13 +39,14 @@ public class ImController {
         return R.ok(imService.getOrCreateConversation(userId, body.get("targetUserId"), body.get("productId")));
     }
 
-    @Operation(summary = "历史消息（分页）", description = "支持 before / after 游标定位")
+    @Operation(summary = "历史消息（分页）", description = "支持 before / after 游标定位，仅会话双方可查看")
     @GetMapping(ApiPath.IM_MESSAGE_ID)
     public R<Page<Message>> getMessages(@Parameter(description = "会话 ID") @PathVariable Long conversationId,
+                                        @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId,
                                         @Parameter(description = "只取此消息 ID 之前（更早）的消息") @RequestParam(required = false) Long before,
                                         @Parameter(description = "只取此消息 ID 之后（更晚）的消息") @RequestParam(required = false) Long after,
                                         @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
-        return R.ok(imService.getMessages(conversationId, before, after, size));
+        return R.ok(imService.getMessages(conversationId, userId, before, after, size));
     }
 
     /**

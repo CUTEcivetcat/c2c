@@ -44,7 +44,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/user/reset-password",
             "/product/category",
             "/product/list",
-            "/upload",
             "/admin/login",
             "/actuator",
             // Swagger 在线接口文档（免登录访问）

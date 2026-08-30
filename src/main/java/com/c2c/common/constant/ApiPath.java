@@ -23,8 +23,6 @@ public interface ApiPath {
     String USER_LOGOUT = "/user/logout";
     String USER_PROFILE = "/user/profile";
     String USER_PROFILE_ID = "/user/profile/{userId}";
-    String USER_REPUTATION_ID = "/user/reputation/{userId}";
-    String USER_STATUS = "/user/{userId}/status";
     String USER_ADMIN_LIST = "/user/admin/list";
     String USER_ADMIN_COUNT = "/user/admin/count";
 

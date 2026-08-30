@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ public class UserServiceImpl implements UserService {
     private final NicknameAuditMapper nicknameAuditMapper;
     private final WechatService wechatService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final SecureRandom secureRandom = new SecureRandom();
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -62,7 +64,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String sendVerificationCodeAndReturn(String account) {
-        String code = String.valueOf((int) ((Math.random() * 900000) + 100000));
+        // 发送频率限制：同一账号 60 秒内只允许发送一次
+        String rateKey = "sms:rate:" + account;
+        String last = redisTemplate.opsForValue().get(rateKey);
+        if (StrUtil.isNotBlank(last)) {
+            throw new BusinessException("验证码发送过于频繁，请稍后再试");
+        }
+        redisTemplate.opsForValue().set(rateKey, "1", 60, TimeUnit.SECONDS);
+
+        String code = String.valueOf(secureRandom.nextInt(900000) + 100000);
         String codeKey = "sms:code:" + account;
         redisTemplate.opsForValue().set(codeKey, code, 5, TimeUnit.MINUTES);
 
@@ -70,19 +80,21 @@ public class UserServiceImpl implements UserService {
             emailService.sendVerificationCode(account, code);
         }
 
-        log.info("verification code generated: account={}, code={}", account, code);
+        log.info("verification code sent: account={}, channel={}", account, isEmail(account) ? "email" : "sms");
         return code;
     }
 
     @Override
     @Transactional
     public LoginVO loginByCode(String account, String smsCode) {
+        checkLoginLock(account);
         String codeKey = "sms:code:" + account;
         String cachedCode = redisTemplate.opsForValue().get(codeKey);
         if (StrUtil.isBlank(cachedCode)) {
             throw new BusinessException(1001, "验证码已过期");
         }
         if (!cachedCode.equals(smsCode)) {
+            failLoginLock(account);
             throw new BusinessException(1002, "验证码错误");
         }
 
@@ -91,6 +103,7 @@ public class UserServiceImpl implements UserService {
             user = autoRegister(account);
         }
 
+        clearLoginLock(account);
         redisTemplate.delete(codeKey);
         user.setLastLoginAt(LocalDateTime.now());
         userMapper.updateById(user);
@@ -100,6 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginVO loginByPassword(String account, String password) {
+        checkLoginLock(account);
         User user = findUserByAccount(account);
         if (user == null) {
             log.warn("login failed: account not found, account={}", account);
@@ -110,14 +124,42 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("账号已被封禁");
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
+            failLoginLock(account);
             log.warn("login failed: wrong password, userId={}", user.getId());
             throw new BusinessException("密码错误");
         }
 
+        clearLoginLock(account);
         user.setLastLoginAt(LocalDateTime.now());
         userMapper.updateById(user);
         log.info("user login success: userId={}, account={}", user.getId(), account);
         return buildLoginVO(user);
+    }
+
+    /** 登录失败锁定：15 分钟内累计 5 次失败则锁定 15 分钟 */
+    private void checkLoginLock(String account) {
+        String lockKey = "login:lock:" + account;
+        String v = redisTemplate.opsForValue().get(lockKey);
+        if (v != null && "lock".equals(v)) {
+            throw new BusinessException("尝试次数过多，账号已临时锁定，请 15 分钟后再试");
+        }
+    }
+
+    private void failLoginLock(String account) {
+        String countKey = "login:fail:" + account;
+        Long n = redisTemplate.opsForValue().increment(countKey);
+        if (n != null && n == 1) {
+            redisTemplate.expire(countKey, 15, TimeUnit.MINUTES);
+        }
+        if (n != null && n >= 5) {
+            redisTemplate.opsForValue().set("login:lock:" + account, "lock", 15, TimeUnit.MINUTES);
+            redisTemplate.delete(countKey);
+        }
+    }
+
+    private void clearLoginLock(String account) {
+        redisTemplate.delete("login:fail:" + account);
+        redisTemplate.delete("login:lock:" + account);
     }
 
     @Override
