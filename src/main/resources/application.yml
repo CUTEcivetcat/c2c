@@ -68,13 +68,16 @@ mybatis-plus:
     banner: false
 
 jwt:
-  # HS256 要求密钥 ≥ 32 字节(256 bit)，请务必设置你自己的随机密钥
-  secret: ${JWT_SECRET:change-me-to-a-random-secret-at-least-32-bytes}
+  # HS256 要求密钥 ≥ 32 字节(256 bit)。无默认值：未注入 JWT_SECRET 时启动校验将拒绝启动。
+  # 生成：openssl rand -base64 32
+  secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:604800}
 
 app:
   upload-root: ${APP_UPLOAD_ROOT:./uploads}
   upload-url-prefix: /files
+  # 安全：是否在验证码接口响应中回显 code。仅本地开发置 true，生产必须 false（默认 false）
+  sms-echo-code: ${APP_SMS_ECHO_CODE:false}
 
 management:
   health:

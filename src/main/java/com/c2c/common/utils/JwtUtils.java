@@ -14,8 +14,6 @@ import java.util.Map;
  */
 public class JwtUtils {
 
-    private static final String DEFAULT_SECRET = "c2c-dev-secret-key-2026-min-length-32";
-    private static final long DEFAULT_EXPIRATION = 604800000L; // 7 天
     /**
      * 生成 Token
      */

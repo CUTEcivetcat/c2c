@@ -6,10 +6,9 @@
       <el-input v-model="password" type="password" placeholder="密码" show-password size="large" style="margin-bottom:12px" @keyup.enter="login" />
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <el-checkbox v-model="remember">记住账号</el-checkbox>
-        <span style="font-size:12px;color:#909399">勾选后下次自动填充账号密码</span>
+        <span style="font-size:12px;color:#909399">勾选后下次自动填充账号</span>
       </div>
       <el-button type="primary" size="large" style="width:100%;height:48px;border-radius:12px" @click="login" :loading="loading">登 录</el-button>
-      <div style="margin-top:14px;font-size:12px;color:#909399;text-align:center">演示账号：admin / Abc123456</div>
       <div style="margin-top:10px;text-align:center">
         <a href="javascript:void(0)" style="font-size:12px;color:#909399;text-decoration:none" @click="goUser">← 返回用户端</a>
       </div>
@@ -22,9 +21,9 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { adminApi } from '@/api/request'
 const router = useRouter()
-const username = ref('admin')
-const password = ref('Abc123456')
-const remember = ref(true)
+const username = ref('')
+const password = ref('')
+const remember = ref(false)
 const loading = ref(false)
 
 onMounted(() => {
@@ -33,12 +32,11 @@ onMounted(() => {
     router.replace('/dashboard')
     return
   }
-  // 填充记住的账号密码
+  // 填充记住的账号（不记住密码）
   try {
     const saved = JSON.parse(localStorage.getItem('admin_remember') || 'null')
     if (saved && saved.username) {
       username.value = saved.username
-      password.value = saved.password || ''
       remember.value = true
     }
   } catch (e) { /* 解析失败忽略 */ }
@@ -53,9 +51,9 @@ const login = async () => {
     const res = await adminApi.adminLogin({ account: username.value.trim(), password: password.value })
     localStorage.setItem('admin_token', res.token)
     localStorage.setItem('admin_user', JSON.stringify(res.userInfo || {}))
-    // 记住账号密码（下次自动填充）
+    // 仅记住账号（绝不保存密码）
     if (remember.value) {
-      localStorage.setItem('admin_remember', JSON.stringify({ username: username.value.trim(), password: password.value }))
+      localStorage.setItem('admin_remember', JSON.stringify({ username: username.value.trim() }))
     } else {
       localStorage.removeItem('admin_remember')
     }

@@ -96,8 +96,9 @@ public class ImService {
         return msg;
     }
 
-    /** 分页拉取会话消息（支持按ID游标分页，结果按时间正序返回） */
-    public Page<Message> getMessages(Long conversationId, Long before, Long after, int size) {
+    /** 分页拉取会话消息（支持按ID游标分页，结果按时间正序返回）。仅会话双方可查看。 */
+    public Page<Message> getMessages(Long conversationId, Long userId, Long before, Long after, int size) {
+        checkConversationMember(conversationId, userId);
         LambdaQueryWrapper<Message> w = new LambdaQueryWrapper<Message>()
                 .eq(Message::getConversationId, conversationId)
                 .orderByDesc(Message::getCreatedAt);
@@ -112,6 +113,18 @@ public class ImService {
         java.util.Collections.reverse(page.getRecords());
         fillSenderName(page.getRecords());
         return page;
+    }
+
+    /** 校验某用户是否属于该会话，防止越权读取他人私信 */
+    private void checkConversationMember(Long conversationId, Long userId) {
+        Conversation conv = conversationMapper.selectById(conversationId);
+        if (conv == null) {
+            throw new BusinessException("会话不存在");
+        }
+        boolean isMember = conv.getUser1Id().equals(userId) || conv.getUser2Id().equals(userId);
+        if (!isMember) {
+            throw new BusinessException("无权查看该会话");
+        }
     }
 
     /** 批量填充消息发送人昵称（避免前端逐条查用户） */
@@ -155,9 +168,10 @@ public class ImService {
         return sendMessage(conversationId, senderId, receiverId, trimmed, 1, null);
     }
 
-    /** 标记会话已读（清零未读数并将未读消息置为已读） */
+    /** 标记会话已读（清零未读数并将未读消息置为已读）。仅会话双方可操作。 */
     @Transactional
     public void markRead(Long conversationId, Long userId) {
+        checkConversationMember(conversationId, userId);
         Conversation conv = conversationMapper.selectById(conversationId);
         if (conv != null) {
             if (conv.getUser1Id().equals(userId)) {
