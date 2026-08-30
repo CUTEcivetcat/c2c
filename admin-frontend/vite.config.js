@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5174,
-      open: true,
+      open: env.VITE_OPEN === 'true' || env.VITE_OPEN === '1',
       proxy: {
         '/api': { target: serverOrigin, changeOrigin: true }
       }

@@ -3,11 +3,9 @@
     <app-header v-if="showHeader" />
     <main class="main-content" :class="mainClass">
       <router-view v-slot="{ Component }">
-        <keep-alive include="HomeView">
-          <transition :name="transitionName" mode="out-in">
-            <component :is="Component" />
-          </transition>
-        </keep-alive>
+        <transition :name="transitionName" mode="out-in">
+          <component :is="Component" />
+        </transition>
       </router-view>
     </main>
     <app-footer v-if="showFooter" />
@@ -59,19 +57,30 @@ const forceDialog = ref(false)
 const queue = ref([])        // 待弹出的强制公告队列
 const current = ref(null)    // 当前展示的公告
 const remain = ref(0)        // 剩余停留秒数
+const shownIds = ref([])     // 本次已展示的公告 id（用于会话内去重）
 let countdownTimer = null
+const readFlagKey = 'c2c_force_read'
 
 const showNext = () => {
   if (!queue.value.length) {
     forceDialog.value = false
+    // 全部读完：记录已读 id 到 sessionStorage，刷新不再重复弹
+    if (shownIds.value.length) {
+      const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
+      const merged = Array.from(new Set(readIds.concat(shownIds.value)))
+      sessionStorage.setItem(readFlagKey, JSON.stringify(merged))
+    }
+    shownIds.value = []
     current.value = null
     nextTick(() => {
       document.querySelectorAll('.el-overlay').forEach(el => el.remove())
     })
     return
   }
-  current.value = queue.value.shift()
-  remain.value = Number(current.value.minSeconds || 0)
+  const item = queue.value.shift()
+  current.value = item
+  shownIds.value.push(item.id)
+  remain.value = Number(item.minSeconds || 0)
   forceDialog.value = true
   if (countdownTimer) clearInterval(countdownTimer)
   if (remain.value > 0) {
@@ -83,12 +92,15 @@ const showNext = () => {
 }
 const nextOrClose = () => { showNext() }
 
-// 登录后拉取强制公告并弹出
+// 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）
 watch(() => store.isLoggedIn(), async (loggedIn) => {
   if (!loggedIn) return
   try {
-    const list = await getAnnouncementForce()
-    queue.value = (list || []).slice()
+    const list = await getAnnouncementForce() || []
+    const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
+    const unread = list.filter(a => !readIds.includes(a.id))
+    if (!unread.length) return
+    queue.value = unread.slice()
     if (queue.value.length) showNext()
   } catch (e) { /* 接口异常忽略，不影响使用 */ }
 }, { immediate: true })
