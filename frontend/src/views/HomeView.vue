@@ -185,8 +185,10 @@ const toggleFav = async (p) => {
   } catch (e) { /* */ }
 }
 
-onMounted(async () => {
-  categories.value = await getCategories() || []
+onMounted(() => {
+  // 首页各模块并行加载、互不阻塞：任一接口慢/失败不影响其他区域渲染
+  // （修复：登录后弹公告期间页面空白 = 原串行 await 分类接口被阻塞，整页等待）
+  getCategories().then(r => { categories.value = r || [] }).catch(() => { categories.value = [] })
   loadProducts()
   // 加载最新公告（首页横幅，滚动轮播）
   getAnnouncementLatest(6).then(r => {

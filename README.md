@@ -70,13 +70,17 @@ c2c/
 
 ### 1. 数据库
 ```sql
--- 建库 + 建表 + 演示数据（任选其一）
-source sql/init.sql;      -- 全量建表（18 张表 + 字段注释，会清空库）
-source sql/data.sql;      -- 全量演示数据（用户/分类/商品/订单/公告/钱包等，已含扩充商品）
--- 已有数据的库升级（增量）：
+-- 全新部署：建库 + 建表 + 演示数据（init 会清空重建 c2c 库）
+source sql/init.sql;      -- 全量建表（18 张表 + 字段注释）
+source sql/data.sql;      -- 全量演示数据（8 用户含 admin 总管理员 + 30 商品覆盖全部分类）
+
+-- 已有数据的库升级（按需，勿与全量重复执行）：
 source sql/update-20260914-secondary-pwd.sql;  -- 二级密码字段
 source sql/update-20260915-admin-levels.sql;   -- 管理员等级 + 权限码字段（三级权限体系）
-source sql/data-extra.sql;                     -- 扩充测试数据（26 个商品覆盖全部分类）
+-- 可选：补扩充商品 / 修复 admin 等级（已并入全量，归档在 xz/）
+source sql/xz/data-extra.sql;
+source sql/xz/repair-admin-levels.sql;
+-- SQL 目录规范详见 sql/README.md
 ```
 
 ### 2. 后端

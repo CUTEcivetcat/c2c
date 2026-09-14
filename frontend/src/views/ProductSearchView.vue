@@ -121,7 +121,7 @@ const clearSuggest = () => { suggestions.value = [] }
 
 onMounted(async () => {
   loadHistory()
-  cats.value = await getCategories() || []
+  try { cats.value = await getCategories() || [] } catch (e) { cats.value = [] }
   if (filters.value.keyword) saveHistory(filters.value.keyword)
   search()
 })

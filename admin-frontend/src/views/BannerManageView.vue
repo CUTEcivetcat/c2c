@@ -16,7 +16,7 @@
         <el-table-column label="状态" width="90"><template #default="{row}">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">{{ row.status === 1 ? '启用' : '停用' }}</el-tag>
         </template></el-table-column>
-        <el-table-column label="操作" width="160" fixed="right"><template #default="{row}">
+        <el-table-column label="操作" width="200" fixed="right"><template #default="{row}">
           <el-button size="small" @click="openDialog(row)">编辑</el-button>
           <el-button size="small" :type="row.status === 1 ? 'warning' : 'success'" plain @click="toggle(row)">{{ row.status === 1 ? '停用' : '启用' }}</el-button>
           <el-button size="small" type="danger" plain @click="remove(row)">删除</el-button>

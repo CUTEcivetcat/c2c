@@ -101,7 +101,7 @@ const catGroups = computed(() =>
 )
 
 onMounted(async () => {
-  cats.value = await getCategories() || []
+  try { cats.value = await getCategories() || [] } catch (e) { cats.value = [] }
   if (isEdit.value) {
     const product = await getProductDetail(productId.value)
     form.value = {

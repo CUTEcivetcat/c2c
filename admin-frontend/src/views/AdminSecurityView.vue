@@ -8,13 +8,19 @@
       <p style="font-size:13px;color:#909399;margin:0 0 16px">
         二级密码用于删除账户等高危操作的身份二次校验。设置后，执行删除账户时必须输入该密码。
       </p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
-        <el-input v-model="pwd" type="password" show-password placeholder="新二级密码（至少 6 位）"
-                  style="width:240px" maxlength="32" @keyup.enter="savePwd" />
-        <el-input v-model="pwd2" type="password" show-password placeholder="再次输入确认"
-                  style="width:240px" maxlength="32" @keyup.enter="savePwd" />
-        <el-button type="primary" :loading="savingPwd" @click="savePwd">保存二级密码</el-button>
-      </div>
+      <el-form :model="pwdForm" ref="pwdFormRef" :rules="pwdRules" label-position="top" style="max-width:560px">
+        <el-form-item label="新二级密码（至少 6 位）" prop="pwd" style="margin-bottom:16px">
+          <el-input v-model="pwdForm.pwd" type="password" show-password placeholder="请输入新二级密码"
+                    style="width:300px" maxlength="32" @keyup.enter="savePwd" />
+        </el-form-item>
+        <el-form-item label="确认二级密码" prop="pwd2" style="margin-bottom:16px">
+          <el-input v-model="pwdForm.pwd2" type="password" show-password placeholder="再次输入确认"
+                    style="width:300px" maxlength="32" @keyup.enter="savePwd" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :loading="savingPwd" @click="savePwd">保存二级密码</el-button>
+        </el-form-item>
+      </el-form>
     </el-card>
 
     <!-- 管理员管理（仅总管理员 admin 可见） -->
@@ -78,7 +84,7 @@
         <el-table-column label="创建时间" width="160">
           <template #default="{row}">{{ fmtTime(row.createdAt) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{row}">
             <el-button type="primary" size="small" plain @click="openEdit(row)">编辑权限</el-button>
             <el-button type="danger" size="small" plain @click="removeAdmin(row)">删除</el-button>
@@ -118,9 +124,22 @@ import { ref, computed, onMounted } from 'vue'
 import { adminApi } from '@/api/request'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-const pwd = ref('')
-const pwd2 = ref('')
+const pwdFormRef = ref()
+const pwdForm = ref({ pwd: '', pwd2: '' })
 const savingPwd = ref(false)
+
+const validatePwd2 = (rule, value, cb) => {
+  if (!value) cb(new Error('请再次输入确认'))
+  else if (value !== pwdForm.value.pwd) cb(new Error('两次输入的密码不一致'))
+  else cb()
+}
+const pwdRules = {
+  pwd: [
+    { required: true, message: '请输入新二级密码', trigger: 'blur' },
+    { min: 6, max: 32, message: '二级密码至少 6 位', trigger: 'blur' }
+  ],
+  pwd2: [{ validator: validatePwd2, trigger: 'blur' }]
+}
 
 const isTop = computed(() => {
   try {
@@ -143,13 +162,13 @@ const PERM_LABEL = Object.fromEntries(PERM_OPTIONS.map(p => [p.code, p.label]))
 const permTexts = (str) => (str || '').split(',').filter(Boolean).map(c => PERM_LABEL[c] || c)
 
 const savePwd = async () => {
-  if (!pwd.value || pwd.value.length < 6) return ElMessage.warning('二级密码至少 6 位')
-  if (pwd.value !== pwd2.value) return ElMessage.warning('两次输入的密码不一致')
+  try { await pwdFormRef.value.validate() } catch { return }
   savingPwd.value = true
   try {
-    await adminApi.setSecondaryPassword({ password: pwd.value })
+    await adminApi.setSecondaryPassword({ password: pwdForm.value.pwd })
     ElMessage.success('二级密码已保存')
-    pwd.value = ''; pwd2.value = ''
+    pwdForm.value = { pwd: '', pwd2: '' }
+    pwdFormRef.value.resetFields()
   } catch (e) { /* 拦截器已提示 */ } finally {
     savingPwd.value = false
   }

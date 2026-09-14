@@ -8,12 +8,12 @@ SET FOREIGN_KEY_CHECKS = 0;
 USE c2c;
 
 INSERT INTO `user`
-(`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
+(`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `admin_level`, `admin_perms`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
 VALUES
-(1, '13800000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13800000001', NULL, 0, NULL, '小王', '学生卖家，出闲置', 1, 1, 0, 5.0, NOW(), NOW(), NOW()),
-(2, '13900000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13900000001', NULL, 0, NULL, '小李', '学生买家，淘好物', 1, 1, 0, 4.8, NOW(), NOW(), NOW()),
-(3, 'test@qq.com', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', NULL, 'test@qq.com', 1, NULL, '测试用户', '演示账号', 0, 1, 0, 5.0, NOW(), NOW(), NOW()),
-(4, 'admin', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '18800000001', NULL, 0, NULL, '管理员', '平台管理员', 1, 1, 1, 5.0, NOW(), NOW(), NOW());
+(1, '13800000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13800000001', NULL, 0, NULL, '小王', '学生卖家，出闲置', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(2, '13900000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13900000001', NULL, 0, NULL, '小李', '学生买家，淘好物', 1, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
+(3, 'test@qq.com', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', NULL, 'test@qq.com', 1, NULL, '测试用户', '演示账号', 0, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(4, 'admin', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '18800000001', NULL, 0, NULL, '管理员', '平台管理员', 1, 1, 1, 2, '*', 5.0, NOW(), NOW(), NOW());
 
 -- -------------------------------------------------------------
 -- 收货地址
@@ -115,12 +115,12 @@ USE c2c;
 -- 补充演示用户（id 5~8）
 -- -------------------------------------------------------------
 INSERT INTO `user`
-(`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
+(`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `admin_level`, `admin_perms`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
 VALUES
-(5, '13700000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13700000001', NULL, 0, NULL, '张同学', '计算机学院，出考研复习资料', 1, 1, 0, 5.0, NOW(), NOW(), NOW()),
-(6, '13600000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13600000001', NULL, 0, NULL, '李学长', '毕业清仓，好价出数码', 1, 1, 0, 4.9, NOW(), NOW(), NOW()),
-(7, '13500000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13500000001', NULL, 0, NULL, '王学姐', '学姐闲置，物美价廉', 2, 1, 0, 4.8, NOW(), NOW(), NOW()),
-(8, '13400000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13400000001', NULL, 0, NULL, '赵师兄', '机电学院，宿舍神器低价出', 1, 1, 0, 5.0, NOW(), NOW(), NOW());
+(5, '13700000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13700000001', NULL, 0, NULL, '张同学', '计算机学院，出考研复习资料', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(6, '13600000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13600000001', NULL, 0, NULL, '李学长', '毕业清仓，好价出数码', 1, 1, 0, 0, NULL, 4.9, NOW(), NOW(), NOW()),
+(7, '13500000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13500000001', NULL, 0, NULL, '王学姐', '学姐闲置，物美价廉', 2, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
+(8, '13400000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13400000001', NULL, 0, NULL, '赵师兄', '机电学院，宿舍神器低价出', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW());
 
 -- -------------------------------------------------------------
 -- 补充商品（id 5~30，覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）

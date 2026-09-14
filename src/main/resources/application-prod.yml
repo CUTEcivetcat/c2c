@@ -63,6 +63,7 @@ springdoc:
 app:
   upload-root: ${APP_UPLOAD_ROOT:/softservice/c2c/uploads}
   upload-url-prefix: /files
+  sms-echo-code: false
 
 management:
   health:
@@ -80,6 +81,3 @@ logging:
   level:
     com.c2c: info
 
-app:
-  # 生产环境强制关闭验证码回显，仅短信/邮件下发
-  sms-echo-code: false
