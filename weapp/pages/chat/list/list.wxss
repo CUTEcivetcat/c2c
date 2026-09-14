@@ -1,0 +1,11 @@
+.cl { padding: 28rpx 24rpx; background: transparent; }
+.conv { display: flex; gap: 22rpx; padding: 26rpx; margin-bottom: 18rpx; align-items: center; }
+.conv:active { transform: scale(0.99); }
+.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar-img { width: 100rpx; height: 100rpx; border-radius: 50%; background: var(--primary-soft); }
+.avatar-text { width: 100rpx; height: 100rpx; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-size: 38rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.conv-info { flex: 1; min-width: 0; }
+.conv-top { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.conv-name { font-size: 30rpx; font-weight: 700; color: var(--ink); }
+.conv-time { font-size: 22rpx; color: var(--ink-3); flex-shrink: 0; }
+.conv-last { display: block; font-size: 25rpx; color: var(--ink-3); margin-top: 10rpx; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

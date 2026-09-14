@@ -1,0 +1,39 @@
+<view class="uh fade-up">
+  <!-- 用户信息头 -->
+  <view class="head-card glass-card">
+    <view class="avatar-wrap">
+      <image wx:if="{{user.avatarUrl}}" class="avatar-img" src="{{user.avatarUrl}}" mode="aspectFill"/>
+      <view wx:else class="avatar-text">{{user.nickname ? user.nickname[0] : '鱼'}}</view>
+    </view>
+    <view class="u-info">
+      <text class="u-name">{{user.nickname || '用户' + uid}}</text>
+      <text class="u-rep" wx:if="{{user.reputationScore}}">⭐ 信誉 {{user.reputationScore}}</text>
+      <text class="u-bio" wx:if="{{user.bio}}">{{user.bio}}</text>
+      <text class="u-time" wx:if="{{user.createdAt}}">加入时间 {{user.createdAt}}</text>
+    </view>
+    <button class="btn-mini primary contact-btn" wx:if="{{!isSelf}}" bindtap="contact">联系TA</button>
+  </view>
+
+  <!-- 在售商品 -->
+  <view class="sec-title">
+    <text class="sec-label">TA 的在售商品</text>
+    <text class="sec-sub">{{products.length}} 件</text>
+  </view>
+
+  <view class="prod-grid">
+    <view class="prod-card glass-card" wx:for="{{products}}" wx:key="id"
+          bindtap="goProduct" data-id="{{item.id}}">
+      <image class="p-img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill" lazy-load="{{true}}"/>
+      <view class="p-body">
+        <text class="p-title">{{item.title}}</text>
+        <text class="p-price">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="spinner" wx:if="{{loading}}"></view>
+  <view class="empty" wx:if="{{!loading && !products.length}}">
+    <text class="empty-ico">📦</text>
+    暂无在售商品
+  </view>
+</view>

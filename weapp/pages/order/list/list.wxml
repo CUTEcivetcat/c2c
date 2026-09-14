@@ -1,24 +1,50 @@
 <view class="op fade-up">
+  <!-- 买卖切换 -->
   <view class="tabs glass-card">
     <view class="tab {{tab==='buy'?'active':''}}" bindtap="switchTab" data-t="buy">我买到的</view>
     <view class="tab {{tab==='sell'?'active':''}}" bindtap="switchTab" data-t="sell">我卖出的</view>
   </view>
 
+  <!-- 状态筛选 -->
+  <scroll-view class="status-bar" scroll-x wx:if="{{orders.length || status}}">
+    <view class="st {{status === item.key ? 'active' : ''}}"
+          wx:for="{{statusTabs}}" wx:key="key"
+          bindtap="switchStatus" data-k="{{item.key}}">{{item.label}}</view>
+  </scroll-view>
+
+  <!-- 订单卡片 -->
   <view class="card glass-card" wx:for="{{orders}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
     <view class="hd">
       <text class="no">{{item.orderNo}}</text>
-      <text class="st chip">{{statuses[item.status]}}</text>
+      <text class="st chip">{{statusText(item.status)}}</text>
     </view>
     <view class="bd">
-      <text class="t">{{item.productTitle}}</text>
+      <image class="img" wx:if="{{item.productImage}}" src="{{item.productImage}}" mode="aspectFill"/>
+      <view class="info">
+        <text class="t">{{item.productTitle}}</text>
+        <text class="time">{{fmt(item.createdAt)}}</text>
+      </view>
       <view class="mir">
         <text class="p">¥{{item.totalAmount}}</text>
         <text class="ar">›</text>
       </view>
     </view>
   </view>
-  <view class="empty" wx:if="{{!orders.length}}">
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading && !orders.length}}">
+    <view class="card glass-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="hd"><view class="sk-box" style="height:26rpx;width:40%;"></view><view class="sk-box" style="height:26rpx;width:20%;"></view></view>
+      <view class="bd">
+        <view class="sk-box" style="width:120rpx;height:120rpx;border-radius:16rpx;flex-shrink:0;"></view>
+        <view class="info"><view class="sk-box" style="height:28rpx;width:90%;margin-bottom:14rpx;"></view><view class="sk-box" style="height:24rpx;width:50%;"></view></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !orders.length}}">
     <text class="empty-ico">🧾</text>
     暂无订单
   </view>
+  <view class="no-more" wx:if="{{!hasMore && orders.length}}">— 已经到底啦 —</view>
 </view>

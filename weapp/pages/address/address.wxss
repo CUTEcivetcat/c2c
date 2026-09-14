@@ -1,5 +1,6 @@
 .ap { padding: 28rpx 24rpx 180rpx; background: transparent; }
 .tip { text-align: center; color: var(--primary); font-size: 26rpx; margin-bottom: 20rpx; }
+.manage-link { margin-left: 20rpx; font-size: 24rpx; color: var(--ink-3); text-decoration: underline; }
 .addr-card { padding: 26rpx; margin-bottom: 18rpx; }
 .addr-top { display: flex; align-items: center; gap: 16rpx; }
 .name { font-size: 32rpx; font-weight: 700; color: var(--ink); }
@@ -10,3 +11,5 @@
 .opt { font-size: 24rpx; color: var(--ink-2); }
 .opt.danger { color: var(--danger); }
 .add-btn { position: fixed; left: 24rpx; right: 24rpx; bottom: 24rpx; padding: 26rpx 0; z-index: 10; }
+.empty-add { margin-top: 22rpx; display: inline-block; background: var(--primary-soft); color: var(--primary); font-size: 26rpx; padding: 14rpx 48rpx; border-radius: 999rpx; border: none; }
+.empty-add:active { opacity: 0.85; }

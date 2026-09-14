@@ -1,8 +1,12 @@
-.detail-page { min-height: 100vh; background: transparent; padding: 0 0 160rpx; }
+.detail-page { min-height: 100vh; background: transparent; padding: 0 0 180rpx; }
+
+/* 图集 */
 .gallery { width: 100%; background: #fff; }
+.main-swiper { width: 100%; height: 620rpx; }
 .main-img { width: 100%; height: 620rpx; background: #eef1f5; display: block; }
-.thumb-row { display: flex; gap: 14rpx; padding: 20rpx 24rpx; background: #fff; }
+.thumb-row { display: flex; gap: 14rpx; padding: 20rpx 24rpx; background: #fff; white-space: nowrap; }
 .thumb {
+  display: inline-block;
   width: 100rpx; height: 100rpx; border-radius: 14rpx; overflow: hidden;
   border: 4rpx solid transparent; box-sizing: border-box;
   transition: border-color 0.2s ease; opacity: 0.7;
@@ -10,9 +14,11 @@
 .thumb.on { border-color: var(--primary); opacity: 1; }
 .thumb-img { width: 100%; height: 100%; }
 
+/* 信息卡 */
 .info-card { margin: 20rpx 24rpx 0; padding: 28rpx; }
-.price-row { display: flex; align-items: center; gap: 16rpx; }
+.price-row { display: flex; align-items: center; gap: 16rpx; flex-wrap: wrap; }
 .price { font-size: 52rpx; font-weight: 800; color: var(--primary); line-height: 1; }
+.origin-price { font-size: 24rpx; color: var(--ink-3); text-decoration: line-through; }
 .condition {
   background: var(--primary-soft); color: var(--primary); padding: 6rpx 18rpx;
   border-radius: 999rpx; font-size: 22rpx; font-weight: 600;
@@ -21,9 +27,26 @@
   display: block; font-size: 34rpx; font-weight: 700; color: var(--ink);
   margin: 20rpx 0; line-height: 1.4;
 }
-.meta { display: flex; gap: 30rpx; font-size: 24rpx; color: var(--ink-3); }
+.meta { display: flex; gap: 26rpx; font-size: 24rpx; color: var(--ink-3); flex-wrap: wrap; }
+.meta.sub { margin-top: 14rpx; border-top: 1rpx solid var(--line); padding-top: 16rpx; }
 .meta-item { display: inline-flex; align-items: center; }
 
+/* 卖家卡片 */
+.seller-card {
+  margin: 20rpx 24rpx 0; padding: 24rpx 28rpx;
+  display: flex; align-items: center; gap: 20rpx;
+}
+.avatar-wrap { flex-shrink: 0; }
+.s-avatar { width: 96rpx; height: 96rpx; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-size: 38rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.s-avatar.text { font-size: 40rpx; }
+.comment-list { margin: 24rpx 0 0; }
+.seller-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8rpx; }
+.seller-name { font-size: 30rpx; font-weight: 700; color: var(--ink); }
+.seller-rep { font-size: 23rpx; color: var(--warning); }
+.seller-ops { display: flex; align-items: center; gap: 14rpx; }
+.go-ar { color: var(--ink-3); font-size: 32rpx; }
+
+/* 描述 */
 .desc-card { margin: 20rpx 24rpx 0; padding: 26rpx; }
 .desc-label {
   display: block; font-size: 30rpx; font-weight: 700; color: var(--ink); margin-bottom: 16rpx;
@@ -31,10 +54,45 @@
 }
 .desc-text { font-size: 26rpx; color: var(--ink-2); line-height: 1.8; }
 
-.buy-bar {
-  position: fixed; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.92); backdrop-filter: blur(14rpx);
-  padding: 20rpx 24rpx calc(20rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -8rpx 30rpx rgba(36,59,83,0.1); z-index: 10;
-}
-.buy-btn { width: 100%; padding: 24rpx 0; }
+/* 评论 */
+.comment-card { margin: 20rpx 24rpx 0; padding: 26rpx; }
+.comment-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx; }
+.comment-head .desc-label { margin-bottom: 0; }
+.comment-count { font-size: 24rpx; color: var(--ink-3); }
+.comment-input-row { display: flex; gap: 16rpx; align-items: center; margin-bottom: 22rpx; }
+.comment-input { flex: 1; background: var(--bg); border-radius: 999rpx; padding: 16rpx 26rpx; font-size: 26rpx; }
+.ph { color: var(--ink-3); }
+.comment-send { flex-shrink: 0; }
+.comment-item { display: flex; gap: 18rpx; padding: 20rpx 0; border-bottom: 1rpx solid var(--line); }
+.comment-item:last-child { border-bottom: none; }
+.c-avatar { width: 64rpx; height: 64rpx; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-size: 26rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+.c-avatar image { width: 100%; height: 100%; }
+.c-main { flex: 1; min-width: 0; }
+.c-top { display: flex; align-items: center; justify-content: space-between; }
+.c-name { font-size: 26rpx; font-weight: 600; color: var(--ink-2); }
+.c-del { font-size: 22rpx; color: var(--danger); }
+.c-content { display: block; font-size: 27rpx; color: var(--ink); line-height: 1.6; margin: 8rpx 0; }
+.c-time { font-size: 22rpx; color: var(--ink-3); }
+.empty.sm { padding: 40rpx 0; }
+
+/* 底部栏 */
+.footer-bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 16rpx; align-items: center; padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom)); }
+.fav-wrap { display: flex; flex-direction: column; align-items: center; gap: 2rpx; padding: 0 10rpx; }
+.fav-ico { font-size: 44rpx; color: var(--ink-3); line-height: 1; }
+.fav-ico.on { color: var(--danger); }
+.fav-txt { font-size: 20rpx; color: var(--ink-3); }
+.bar-btn { flex: 1; padding: 22rpx 0; margin: 0; border-radius: 999rpx; font-size: 29rpx; font-weight: 600; line-height: 1.4; }
+.bar-btn.intent { background: var(--primary-soft); color: var(--primary); }
+.bar-btn.buy { box-shadow: var(--shadow-md); }
+.bar-btn.plain { background: #fff; color: var(--ink-2); border: 2rpx solid var(--line); }
+.bar-btn.plain.danger { color: var(--danger); border-color: var(--danger); }
+
+/* 举报 */
+.report-link { text-align: center; font-size: 24rpx; color: var(--ink-3); padding: 26rpx 0; margin-top: 10rpx; }
+
+/* 询价弹层 */
+.intent-field { margin-bottom: 22rpx; }
+.intent-label { display: block; font-size: 26rpx; color: var(--ink-2); margin-bottom: 12rpx; font-weight: 600; }
+.intent-input { width: 100%; box-sizing: border-box; background: var(--bg); border-radius: var(--radius); padding: 20rpx 24rpx; font-size: 28rpx; height: 84rpx; }
+.intent-field textarea.intent-input { height: 160rpx; }
+.intent-submit { width: 100%; padding: 24rpx 0; }

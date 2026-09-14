@@ -1,0 +1,25 @@
+<view class="al fade-up">
+  <!-- 类型筛选 -->
+  <view class="tabs glass-card">
+    <view class="tab {{type === item.key ? 'active' : ''}}"
+          wx:for="{{typeTabs}}" wx:key="key"
+          bindtap="switchType" data-k="{{item.key}}">{{item.label}}</view>
+  </view>
+
+  <view class="card glass-card" wx:for="{{list}}" wx:key="id">
+    <view class="hd" bindtap="toggle" data-id="{{item.id}}">
+      <text class="type-chip" wx:if="{{item.type}}">{{typeText(item.type)}}</text>
+      <text class="title">{{item.title}}</text>
+      <text class="ar">{{expandedId === item.id ? '⌃' : '⌄'}}</text>
+    </view>
+    <text class="time">{{item._time}}</text>
+    <view class="content" wx:if="{{expandedId === item.id}}">{{item.content}}</view>
+  </view>
+
+  <view class="spinner" wx:if="{{loading && !list.length}}"></view>
+  <view class="empty" wx:if="{{!loading && !list.length}}">
+    <text class="empty-ico">📢</text>
+    暂无公告
+  </view>
+  <view class="no-more" wx:if="{{!hasMore && list.length}}">— 已经到底啦 —</view>
+</view>

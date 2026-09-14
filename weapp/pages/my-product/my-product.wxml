@@ -1,20 +1,35 @@
 <view class="mp fade-up">
   <view class="card glass-card" wx:for="{{list}}" wx:key="id">
     <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
-           lazy-load="{{true}}"/>
+           lazy-load="{{true}}" bindtap="go" data-id="{{item.id}}"/>
     <view class="info">
-      <text class="t">{{item.title}}</text>
+      <text class="t" bindtap="go" data-id="{{item.id}}">{{item.title}}</text>
       <view class="p-id">
         <text class="p">¥{{item.price}}</text>
-        <text class="st">{{statuses[item.status] || ''}}</text>
+        <text class="st {{item.status === 5 ? 'ban' : ''}}">{{statuses[item.status] || ''}}</text>
       </view>
       <view class="ops">
         <button class="op-edit" bindtap="edit" data-id="{{item.id}}">编辑</button>
-        <button class="op-off" bindtap="off" data-id="{{item.id}}">下架</button>
+        <button class="op-off" wx:if="{{item.status === 1 || item.status === 2 || item.status === 3}}"
+                bindtap="off" data-id="{{item.id}}">下架</button>
+        <button class="op-on" wx:if="{{item.status === 4}}"
+                bindtap="onShelf" data-id="{{item.id}}">上架</button>
       </view>
     </view>
   </view>
-  <view class="empty" wx:if="{{!list.length}}">
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading && !list.length}}">
+    <view class="card glass-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="sk-box" style="width:160rpx;height:160rpx;border-radius:16rpx;flex-shrink:0;"></view>
+      <view class="info">
+        <view class="sk-box" style="height:30rpx;width:90%;margin-bottom:18rpx;"></view>
+        <view class="sk-box" style="height:28rpx;width:45%;"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !list.length}}">
     <text class="empty-ico">📦</text>
     还没有发布任何商品
   </view>

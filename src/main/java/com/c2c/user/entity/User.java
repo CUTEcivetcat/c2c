@@ -65,6 +65,15 @@ public class User {
     /** 角色：0=普通用户，1=管理员, 2=审核 */
     private Integer role;
 
+    /** 二级密码（BCrypt 加密）：删除账户等高危操作二次校验 */
+    private String secondaryPwd;
+
+    /** 管理员等级：0 非管理员 / 1 次级·子级管理员 / 2 总管理员(admin，最高权限) */
+    private Integer adminLevel;
+
+    /** 管理员权限码（逗号分隔，模块级）；admin_level=2 视为全部权限 */
+    private String adminPerms;
+
     /** 信誉分（0~5） */
     private BigDecimal reputationScore;
 

@@ -1,5 +1,8 @@
 <view class="ap fade-up">
-  <view class="tip" wx:if="{{selectMode}}">请选择收货地址</view>
+  <view class="tip" wx:if="{{selectMode}}">
+    请选择收货地址
+    <text class="manage-link" bindtap="toggleMode">管理地址</text>
+  </view>
 
   <view class="addr-card glass-card" wx:for="{{list}}" wx:key="id"
         bindtap="choose" data-id="{{item.id}}">
@@ -20,8 +23,10 @@
 
   <view class="empty" wx:if="{{!loading && !list.length}}">
     <text class="empty-ico">📮</text>
-    还没有收货地址
+    <text wx:if="{{!selectMode}}">还没有收货地址</text>
+    <text wx:else>还没有收货地址，先新增一个吧</text>
+    <button class="empty-add" wx:if="{{selectMode}}" bindtap="goAdd">＋ 新增收货地址</button>
   </view>
 
-  <button class="add-btn btn-primary" bindtap="goAdd">+ 新增收货地址</button>
+  <button class="add-btn btn-primary" wx:if="{{!selectMode || list.length}}" bindtap="goAdd">+ 新增收货地址</button>
 </view>

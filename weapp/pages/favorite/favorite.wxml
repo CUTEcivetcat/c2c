@@ -1,8 +1,19 @@
 <view class="fp fade-up">
-  <view class="card glass-card" wx:for="{{favs}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
-    <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"/>
-    <view class="info"><text class="t">{{item.title}}</text><text class="p">¥{{item.price}}</text></view>
+  <view class="card glass-card" wx:for="{{favs}}" wx:key="id">
+    <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
+           bindtap="go" data-id="{{item.id}}"/>
+    <view class="info">
+      <text class="t" bindtap="go" data-id="{{item.id}}">{{item.title}}</text>
+      <text class="p">¥{{item.price}}</text>
+    </view>
+    <text class="remove" catchtap="remove" data-id="{{item.id}}">取消</text>
   </view>
-  <view class="spinner" wx:if="{{loading}}"></view>
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}">
+    <view class="card glass-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="sk-box" style="width:140rpx;height:140rpx;border-radius:16rpx;flex-shrink:0;"></view>
+      <view class="info"><view class="sk-box" style="height:28rpx;width:85%;margin-bottom:16rpx;"></view><view class="sk-box" style="height:30rpx;width:40%;"></view></view>
+    </view>
+  </view>
   <view class="empty" wx:if="{{!loading && !favs.length}}"><text class="empty-ico">❤️</text>暂无收藏</view>
 </view>

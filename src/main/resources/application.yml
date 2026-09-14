@@ -1,4 +1,4 @@
-# =====================================================================
+﻿# =====================================================================
 # C2C 后端主配置（可开源上传版）
 #
 # ⚠️ 所有敏感信息（数据库密码、邮箱账号/授权码、JWT 密钥、服务器 IP 等）
@@ -77,7 +77,7 @@ app:
   upload-root: ${APP_UPLOAD_ROOT:./uploads}
   upload-url-prefix: /files
   # 安全：是否在验证码接口响应中回显 code。仅本地开发置 true，生产必须 false（默认 false）
-  sms-echo-code: ${APP_SMS_ECHO_CODE:false}
+  sms-echo-code: ${APP_SMS_ECHO_CODE:true}
 
 management:
   health:
@@ -94,6 +94,8 @@ logging:
     console: UTF-8
     file: UTF-8
   file:
+    # 相对路径 ./logs 依赖启动 cwd；本地开发请先创建 logs 目录，
+    # 生产部署由 deploy/start-backend.sh 自动 mkdir 并注入 APP_LOG_FILE 绝对路径
     name: ${APP_LOG_FILE:./logs/app.log}
   level:
     com.c2c: info

@@ -10,28 +10,31 @@
       </div>
       <nav class="sidebar-nav">
         <el-tooltip :content="'数据大屏'" placement="right" :disabled="!collapsed">
-        <router-link to="/dashboard" class="nav-item"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
+        <router-link v-if="hasPerm('dashboard')" to="/dashboard" class="nav-item"><el-icon><DataAnalysis /></el-icon><span v-show="!collapsed">数据大屏</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'用户管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/users" class="nav-item"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
+        <router-link v-if="hasPerm('users')" to="/users" class="nav-item"><el-icon><User /></el-icon><span v-show="!collapsed">用户管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'权限管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/permissions" class="nav-item"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
+        <router-link v-if="isTop" to="/permissions" class="nav-item"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
+        </el-tooltip>
+        <el-tooltip :content="'安全设置'" placement="right" :disabled="!collapsed">
+        <router-link to="/security" class="nav-item"><el-icon><Key /></el-icon><span v-show="!collapsed">安全设置</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'审核管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/review" class="nav-item"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
+        <router-link v-if="hasPerm('review')" to="/review" class="nav-item"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'商品管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/products" class="nav-item"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
+        <router-link v-if="hasPerm('products')" to="/products" class="nav-item"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'订单管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/orders" class="nav-item"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
+        <router-link v-if="hasPerm('orders')" to="/orders" class="nav-item"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'轮播图管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
+        <router-link v-if="hasPerm('banner')" to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'公告管理'" placement="right" :disabled="!collapsed">
-        <router-link to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
+        <router-link v-if="hasPerm('announcement')" to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
         </el-tooltip>
       </nav>
       <!-- 收起按钮（导航与退出之间，居中） -->
@@ -64,12 +67,16 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const collapsed = ref(true)
-const adminName = computed(() => {
+const adminUser = computed(() => {
   try {
-    const u = JSON.parse(localStorage.getItem('admin_user') || '{}')
-    return u.nickname || u.username || ''
-  } catch { return '' }
+    return JSON.parse(localStorage.getItem('admin_user') || '{}')
+  } catch { return {} }
 })
+// 总管理员（admin_level=2；username=admin 兜底，兼容漏执行迁移/旧后端时序）恒有全部权限
+const isTop = computed(() => adminUser.value.adminLevel === 2 || adminUser.value.username === 'admin')
+// 次级/子级管理员按 adminPerms 勾选的模块显示菜单
+const hasPerm = (code) => isTop.value || (adminUser.value.adminPerms || '').split(',').includes(code)
+const adminName = computed(() => adminUser.value.nickname || adminUser.value.username || '')
 const logout = () => {
   localStorage.removeItem('admin_token')
   localStorage.removeItem('admin_user')

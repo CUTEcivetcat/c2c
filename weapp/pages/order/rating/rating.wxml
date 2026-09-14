@@ -1,0 +1,38 @@
+<view class="rp fade-up">
+  <view class="head-card glass-card">
+    <text class="head-title">{{role === 1 ? '评价卖家' : '评价买家'}}</text>
+    <text class="head-sub">{{title || orderNo}}</text>
+  </view>
+
+  <!-- 星级 -->
+  <view class="star-card glass-card">
+    <text class="star-label">总体评分</text>
+    <view class="stars">
+      <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+            class="star {{score >= item ? 'on' : ''}}"
+            bindtap="setScore" data-s="{{item}}">★</text>
+    </view>
+    <text class="star-tip">{{score >= 4 ? '很满意～' : (score === 3 ? '一般般' : '不太满意')}}</text>
+  </view>
+
+  <!-- 快捷标签 -->
+  <view class="tag-card glass-card">
+    <text class="tag-label">快捷标签（选填，最多4个）</text>
+    <view class="tag-list">
+      <text wx:for="{{tagOptions}}" wx:key="*this"
+            class="tag {{tags.indexOf(item) >= 0 ? 'on' : ''}}"
+            bindtap="toggleTag" data-t="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="text-card glass-card">
+    <text class="tag-label">评价内容（选填）</text>
+    <textarea class="comment" placeholder="说说这次交易体验吧…" placeholder-class="ph"
+              bindinput="onComment" value="{{comment}}" maxlength="500"/>
+  </view>
+
+  <button class="submit-btn btn-primary" bindtap="submit" disabled="{{submitting}}">
+    {{submitting ? '提交中...' : '提交评价'}}
+  </button>
+</view>

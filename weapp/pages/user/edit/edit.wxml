@@ -1,0 +1,100 @@
+<view class="ue fade-up">
+  <!-- 头像 -->
+  <view class="avatar-card glass-card" bindtap="chooseAvatar">
+    <view class="avatar-wrap">
+      <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"/>
+      <view wx:else class="avatar-text">{{nickname ? nickname[0] : '鱼'}}</view>
+      <view class="avatar-mask">📷</view>
+    </view>
+    <view class="avatar-tip">
+      <text class="tip-title">点击更换头像</text>
+      <text class="tip-sub">{{uploading ? '上传中…' : '支持 JPG / PNG'}}</text>
+    </view>
+  </view>
+
+  <!-- 基本资料表单 -->
+  <view class="form-card glass-card">
+    <view class="field">
+      <text class="label">昵称</text>
+      <input class="inp" placeholder="请输入昵称" placeholder-class="ph"
+             value="{{nickname}}" bindinput="onNickname" maxlength="20"/>
+    </view>
+    <picker mode="selector" range="{{genderList}}" value="{{gender}}" bindchange="onGender">
+      <view class="field">
+        <text class="label">性别</text>
+        <text class="inp val">{{genderList[gender]}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </picker>
+    <view class="field col">
+      <text class="label">个人简介</text>
+      <textarea class="bio" placeholder="介绍一下自己吧（选填）" placeholder-class="ph"
+                value="{{bio}}" bindinput="onBio" maxlength="100"/>
+    </view>
+  </view>
+
+  <view class="hint">昵称修改后需平台审核通过后生效</view>
+
+  <!-- 账号绑定 -->
+  <view class="bind-card glass-card">
+    <view class="bind-title">账号绑定</view>
+
+    <!-- 手机号 -->
+    <view class="bind-row">
+      <view class="bind-info">
+        <text class="bind-label">手机号</text>
+        <text class="bind-val {{phoneBound ? '' : 'unbound'}}">{{phoneBound ? phoneDisplay : '未绑定'}}</text>
+      </view>
+      <view wx:if="{{!phoneBound && !phoneMode}}" class="bind-btn" bindtap="openPhoneBind">绑定</view>
+      <view wx:if="{{phoneBound}}" class="bind-done">已绑定 ✓</view>
+    </view>
+    <view class="bind-form" wx:if="{{phoneMode}}">
+      <view class="bf-row">
+        <input class="inp bf-inp" type="number" maxlength="11" placeholder="请输入手机号" placeholder-class="ph"
+               value="{{phone}}" bindinput="onPhone"/>
+        <button class="code-btn" size="mini" bindtap="sendPhoneCode" disabled="{{phoneCountdown > 0}}">
+          {{phoneCountdown > 0 ? phoneCountdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+      <view class="bf-row">
+        <input class="inp bf-inp" type="number" maxlength="6" placeholder="请输入验证码" placeholder-class="ph"
+               value="{{phoneCode}}" bindinput="onPhoneCode"/>
+        <button class="bind-submit" size="mini" bindtap="bindPhoneAction" disabled="{{phoneBinding}}">
+          {{phoneBinding ? '绑定中…' : '确认绑定'}}
+        </button>
+      </view>
+      <view class="bf-tip" wx:if="{{phoneEchoCode}}">验证码：{{phoneEchoCode}}（开发环境自动回显，可直接使用）</view>
+    </view>
+
+    <!-- 邮箱 -->
+    <view class="bind-row">
+      <view class="bind-info">
+        <text class="bind-label">邮箱</text>
+        <text class="bind-val {{emailBound ? '' : 'unbound'}}">{{emailBound ? emailDisplay : '未绑定'}}</text>
+      </view>
+      <view wx:if="{{!emailBound && !emailMode}}" class="bind-btn" bindtap="openEmailBind">绑定</view>
+      <view wx:if="{{emailBound}}" class="bind-done">已绑定 ✓</view>
+    </view>
+    <view class="bind-form" wx:if="{{emailMode}}">
+      <view class="bf-row">
+        <input class="inp bf-inp" type="text" placeholder="请输入邮箱" placeholder-class="ph"
+               value="{{email}}" bindinput="onEmail"/>
+        <button class="code-btn" size="mini" bindtap="sendEmailCode" disabled="{{emailCountdown > 0}}">
+          {{emailCountdown > 0 ? emailCountdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+      <view class="bf-row">
+        <input class="inp bf-inp" type="number" maxlength="6" placeholder="请输入验证码" placeholder-class="ph"
+               value="{{emailCode}}" bindinput="onEmailCode"/>
+        <button class="bind-submit" size="mini" bindtap="bindEmailAction" disabled="{{emailBinding}}">
+          {{emailBinding ? '绑定中…' : '确认绑定'}}
+        </button>
+      </view>
+      <view class="bf-tip" wx:if="{{emailEchoCode}}">验证码：{{emailEchoCode}}（开发环境自动回显，可直接使用）</view>
+    </view>
+  </view>
+
+  <button class="save-btn btn-primary" bindtap="save" disabled="{{saving || uploading}}">
+    {{saving ? '保存中...' : '保 存'}}
+  </button>
+</view>

@@ -1,0 +1,21 @@
+.rp { padding: 28rpx 24rpx; background: transparent; }
+.head-card { padding: 40rpx 30rpx; text-align: center; margin-bottom: 20rpx; }
+.head-title { display: block; font-size: 36rpx; font-weight: 800; color: var(--ink); }
+.head-sub { display: block; font-size: 24rpx; color: var(--ink-3); margin-top: 12rpx; }
+
+.star-card, .tag-card, .text-card { padding: 28rpx 30rpx; margin-bottom: 20rpx; }
+.star-label, .tag-label { font-size: 28rpx; font-weight: 700; color: var(--ink); }
+.stars { display: flex; justify-content: center; gap: 26rpx; padding: 26rpx 0 10rpx; }
+.star { font-size: 72rpx; color: #e3e7ec; line-height: 1; transition: transform 0.15s ease; }
+.star.on { color: #fdcb6e; }
+.star:active { transform: scale(1.15); }
+.star-tip { display: block; text-align: center; font-size: 24rpx; color: var(--ink-3); }
+
+.tag-list { display: flex; flex-wrap: wrap; gap: 18rpx; margin-top: 22rpx; }
+.tag { padding: 12rpx 28rpx; border-radius: 999rpx; background: var(--bg); border: 2rpx solid var(--line); font-size: 25rpx; color: var(--ink-2); }
+.tag.on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+
+.comment { width: 100%; height: 200rpx; box-sizing: border-box; margin-top: 22rpx; background: var(--bg); border-radius: var(--radius); padding: 20rpx 24rpx; font-size: 27rpx; line-height: 1.6; }
+.ph { color: var(--ink-3); }
+
+.submit-btn { margin-top: 10rpx; width: 100%; padding: 26rpx 0; }

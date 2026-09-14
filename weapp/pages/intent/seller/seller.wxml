@@ -1,0 +1,49 @@
+<view class="is fade-up">
+  <view class="card glass-card" wx:for="{{list}}" wx:key="id">
+    <view class="hd">
+      <view class="buyer">
+        <image wx:if="{{item.buyerAvatar}}" class="b-avatar" src="{{item.buyerAvatar}}" mode="aspectFill"/>
+        <view wx:else class="b-avatar text">{{item.buyerNickname ? item.buyerNickname[0] : '鱼'}}</view>
+        <text class="b-name">{{item.buyerNickname || '用户' + item.buyerId}}</text>
+      </view>
+      <text class="st chip {{item.status === 3 ? 'done' : ''}}">{{statuses[item.status] || ''}}</text>
+    </view>
+    <view class="bd" bindtap="goProduct" data-id="{{item.productId}}">
+      <image class="img" wx:if="{{item.productCover}}" src="{{item.productCover}}" mode="aspectFill"/>
+      <view class="info">
+        <text class="t">{{item.productTitle}}</text>
+        <view class="p-line">
+          <text class="p">¥{{item.productPrice}}</text>
+          <text class="expect" wx:if="{{item.expectedPrice}}">期望 ¥{{item.expectedPrice}}</text>
+        </view>
+      </view>
+      <text class="ar">›</text>
+    </view>
+    <view class="msg" wx:if="{{item.message}}">买家留言：{{item.message}}</view>
+    <view class="reply" wx:if="{{item.sellerReply}}">我的回复：{{item.sellerReply}}</view>
+    <view class="time-row">{{item._time}}</view>
+    <view class="ops" wx:if="{{item.status === 1 || item.status === 2}}">
+      <button class="btn-mini" bindtap="close" data-id="{{item.id}}">关闭</button>
+      <button class="btn-mini" bindtap="deal" data-id="{{item.id}}">标记成交</button>
+      <button class="btn-mini primary" bindtap="openReply" data-id="{{item.id}}">回复</button>
+    </view>
+  </view>
+
+  <view class="spinner" wx:if="{{loading}}"></view>
+  <view class="empty" wx:if="{{!loading && !list.length}}">
+    <text class="empty-ico">📨</text>
+    还没有收到购买意向
+  </view>
+
+  <!-- 回复弹层 -->
+  <view class="mask" wx:if="{{replySheet}}" bindtap="closeReply">
+    <view class="sheet" catchtap="noop">
+      <text class="sheet-title">回复买家</text>
+      <textarea class="reply-input" placeholder="输入回复内容…" placeholder-class="ph"
+                bindinput="onReplyText" value="{{replyText}}" maxlength="500"/>
+      <button class="reply-submit btn-primary" bindtap="submitReply" disabled="{{replying}}">
+        {{replying ? '发送中...' : '发送回复'}}
+      </button>
+    </view>
+  </view>
+</view>

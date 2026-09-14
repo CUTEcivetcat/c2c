@@ -8,7 +8,7 @@
         :class="['cat-chip', { active: selectedCat === cat.id }]"
         @click="selectedCat = selectedCat === cat.id ? null : cat.id; page=1; loadProducts()"
       >
-        <span v-if="cat.iconUrl" class="cat-icon">{{ cat.iconUrl }}</span>
+        <img v-if="catIcon(cat.name)" :src="catIcon(cat.name)" class="cat-icon-img" alt="" />
         <span>{{ cat.name }}</span>
       </button>
     </div>
@@ -126,6 +126,15 @@ import { getAnnouncementLatest } from '@/api/announcement'
 import { getBanners } from '@/api/banner'
 
 const store = useUserStore()
+// 本地分类图标（后端 iconUrl 未配置时兜底，与小程序同一套风格）
+const CAT_ICONS = {
+  书籍: '/images/category/book.jpg', 数码: '/images/category/digital.jpg',
+  手机: '/images/category/phone.jpg', 日用: '/images/category/daily.jpg',
+  教材: '/images/category/textbook.jpg', 英语: '/images/category/english.jpg',
+  笔记本电脑: '/images/category/laptop.jpg', 苹果手机: '/images/category/apple-phone.jpg',
+  宿舍用品: '/images/category/dorm.jpg'
+}
+const catIcon = (name) => CAT_ICONS[name] || ''
 const categories = ref([])
 const selectedCat = ref(null)
 const products = ref([])
@@ -205,12 +214,12 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
   border: 1.5px solid #e4e7ed; background: #fff;
   font-size: 13px; font-weight: 500; color: #636e72;
   cursor: pointer; transition: all 0.25s;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: center; gap: 6px;
   white-space: nowrap;
 }
 .cat-chip:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
 .cat-chip.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
-.cat-icon { font-size: 16px; }
+.cat-icon-img { width: 20px; height: 20px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
 
 /* 首页轮播图 */
 .home-banner { margin-bottom: 16px; border-radius: 14px; overflow: hidden; }

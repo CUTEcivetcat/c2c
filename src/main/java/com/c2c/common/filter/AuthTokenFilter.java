@@ -1,6 +1,7 @@
 package com.c2c.common.filter;
 
 import cn.hutool.core.util.StrUtil;
+import com.c2c.common.constant.AdminPerm;
 import com.c2c.common.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -95,6 +97,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 if (!"ADMIN".equals(claims.get("role", String.class))) {
                     unauthorized(response, "无管理员权限");
                     return;
+                }
+                // 三级权限校验：admin_level=2 总管理员全放行；次级/子级管理员按 token 内的 adminPerms 校验模块权限
+                Integer adminLevel = claims.get("adminLevel", Integer.class);
+                if (adminLevel == null || adminLevel < 2) {
+                    if (!hasAdminPerm(claims, path)) {
+                        unauthorized(response, "无该模块的操作权限");
+                        return;
+                    }
                 }
                 Long userId = Long.valueOf(claims.getSubject());
                 chain.doFilter(new UserHeaderRequestWrapper(request, userId), response);
@@ -213,6 +223,57 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
         }
         return false;
+    }
+
+    /**
+     * 次级/子级管理员的模块权限校验（总管理员 admin_level=2 不走此方法）。
+     *
+     * <ul>
+     *   <li>设置自己的二级密码（/admin/auth/secondary-password）：管理员基础能力，无需模块权限</li>
+     *   <li>次级管理员管理（/admin/auth/secondary-admins*）：仅总管理员</li>
+     *   <li>角色分配（/admin/users/roles、/admin/users/{id}/role）：仅总管理员</li>
+     *   <li>其余 /admin/** 按路径映射到权限码，检查 token 内 adminPerms</li>
+     * </ul>
+     */
+    private boolean hasAdminPerm(Claims claims, String path) {
+        if (path.equals("/admin/auth/secondary-password")) {
+            return true;
+        }
+        if (path.startsWith("/admin/auth/secondary-admins")) {
+            return false;
+        }
+        if (path.startsWith("/admin/users/roles") || path.matches("/admin/users/\\d+/role")) {
+            return false;
+        }
+        String need = permForPath(path);
+        if (need == null) {
+            return false;
+        }
+        Object permsObj = claims.get("perms");
+        if (permsObj == null) {
+            return false;
+        }
+        List<String> perms = new ArrayList<>();
+        if (permsObj instanceof List) {
+            for (Object o : (List<?>) permsObj) {
+                perms.add(String.valueOf(o));
+            }
+        } else {
+            perms.addAll(Arrays.asList(String.valueOf(permsObj).split(",")));
+        }
+        return perms.contains(need) || perms.contains("*");
+    }
+
+    /** /admin/** 路径 → 模块权限码。 */
+    private String permForPath(String path) {
+        if (path.startsWith("/admin/dashboard")) return AdminPerm.DASHBOARD;
+        if (path.startsWith("/admin/users")) return AdminPerm.USERS;
+        if (path.startsWith("/admin/products")) return AdminPerm.PRODUCTS;
+        if (path.startsWith("/admin/orders")) return AdminPerm.ORDERS;
+        if (path.startsWith("/admin/announcement")) return AdminPerm.ANNOUNCEMENT;
+        if (path.startsWith("/admin/banner")) return AdminPerm.BANNER;
+        if (path.startsWith("/admin/auth")) return AdminPerm.SECURITY;
+        return null;
     }
 
     private String extractToken(HttpServletRequest request) {

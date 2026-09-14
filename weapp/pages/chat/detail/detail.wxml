@@ -1,0 +1,25 @@
+<view class="cd">
+  <!-- 消息区 -->
+  <scroll-view class="msg-area" scroll-y id="msg-list" scroll-top="{{scrollTop}}"
+               bindscrolltoupper="onScrollToUpper"
+               enhanced show-scrollbar="{{false}}">
+    <view class="load-more" wx:if="{{loading && messages.length}}">加载中...</view>
+    <view class="day" wx:if="{{!loading && !messages.length}}">
+      <text class="day-text">打个招呼吧～</text>
+    </view>
+    <view class="msg {{item.senderId === meId ? 'mine' : 'theirs'}}" wx:for="{{messages}}" wx:key="id">
+      <view class="bubble">
+        <text class="msg-content">{{item.content}}</text>
+      </view>
+      <text class="msg-time">{{fmtTime(item.createdAt)}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 输入栏 -->
+  <view class="input-bar">
+    <input class="chat-input" placeholder="输入消息…" placeholder-class="ph"
+           value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send"
+           adjust-position="{{true}}"/>
+    <button class="send-btn" bindtap="send" disabled="{{sending || !input.trim()}}">发送</button>
+  </view>
+</view>

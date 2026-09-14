@@ -53,7 +53,7 @@ page {
   backdrop-filter: blur(14rpx);
 }
 
-/* ===== 主渐变按钮 ===== */
+/* ===== 主渐变按钮（uiverse 风格：柔和外发光） ===== */
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #fff;
@@ -62,12 +62,16 @@ page {
   font-size: 30rpx;
   font-weight: 600;
   letter-spacing: 2rpx;
-  box-shadow: var(--shadow-md);
+  box-shadow:
+    0 10rpx 30rpx rgba(255, 107, 53, 0.22),
+    0 0 0 0 rgba(255, 140, 90, 0.35);
   transition: all 0.25s ease;
 }
 .btn-primary:active {
   transform: translateY(2rpx) scale(0.99);
-  box-shadow: 0 6rpx 20rpx rgba(255, 107, 53, 0.18);
+  box-shadow:
+    0 6rpx 20rpx rgba(255, 107, 53, 0.18),
+    0 0 0 10rpx rgba(255, 140, 90, 0.15);
 }
 .btn-primary[disabled] {
   opacity: 0.6;
@@ -84,6 +88,23 @@ page {
   transition: all 0.25s ease;
 }
 .btn-ghost:active { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+
+/* ===== 小号弱按钮 ===== */
+.btn-mini {
+  background: #fff;
+  color: var(--ink-2);
+  border: 2rpx solid var(--line);
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  padding: 10rpx 34rpx;
+  margin: 0;
+  line-height: 1.4;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-mini.primary { background: var(--primary-soft); color: var(--primary); border-color: transparent; font-weight: 600; }
+.btn-mini.danger { color: var(--danger); border-color: var(--danger); }
+.btn-mini:active { opacity: 0.8; }
 
 /* ===== 输入框 ===== */
 .input {
@@ -109,6 +130,23 @@ page {
   font-weight: 500;
 }
 
+/* ===== 未读红点 ===== */
+.badge-dot {
+  position: absolute;
+  top: -6rpx;
+  right: -6rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  border-radius: 999rpx;
+  background: var(--danger);
+  color: #fff;
+  font-size: 20rpx;
+  line-height: 32rpx;
+  text-align: center;
+  box-sizing: border-box;
+}
+
 /* ===== 空态 ===== */
 .empty {
   padding: 120rpx 20rpx;
@@ -129,9 +167,58 @@ page {
 }
 @keyframes dshspin { to { transform: rotate(360deg); } }
 
+/* ===== 底部到达提示 ===== */
+.no-more { text-align: center; padding: 28rpx; color: var(--ink-3); font-size: 24rpx; }
+
 /* ===== 入场动画 ===== */
 .fade-up { animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24rpx); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== 底部弹层（mask + sheet） ===== */
+.mask {
+  position: fixed; left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: flex-end;
+  z-index: 100;
+}
+.sheet {
+  background: #fff;
+  width: 100%;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 36rpx 30rpx calc(40rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  animation: sheetUp 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes sheetUp {
+  from { transform: translateY(40%); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.sheet-title { font-size: 32rpx; font-weight: 700; text-align: center; color: var(--ink); margin-bottom: 28rpx; display: block; }
+
+/* ===== 底部操作栏 ===== */
+.footer-bar {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.94); backdrop-filter: blur(14rpx);
+  padding: 18rpx 24rpx calc(18rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -8rpx 30rpx rgba(36, 59, 83, 0.1);
+  z-index: 30;
+  display: flex; gap: 18rpx; align-items: center;
+}
+
+/* ===== 骨架屏（全局复用） ===== */
+.sk-box {
+  background: linear-gradient(90deg, #eef1f5 25%, #f7f9fb 37%, #eef1f5 63%);
+  background-size: 400% 100%;
+  animation: skPulse 1.3s ease infinite;
+  border-radius: 10rpx;
+}
+@keyframes skPulse { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+/* ===== 宫格入口 ===== */
+.grid-4 { display: flex; flex-wrap: wrap; }
+.grid-4 .g-item { width: 25%; display: flex; flex-direction: column; align-items: center; padding: 26rpx 0; }
+.g-ico { width: 88rpx; height: 88rpx; border-radius: 28rpx; display: flex; align-items: center; justify-content: center; font-size: 40rpx; margin-bottom: 12rpx; background: var(--primary-soft); }
+.g-txt { font-size: 24rpx; color: var(--ink-2); }

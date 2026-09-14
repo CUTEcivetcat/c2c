@@ -12,23 +12,39 @@ Page({
     loading: false
   },
   switchTab: function (e) {
-    this.setData({ tab: e.currentTarget.dataset.t })
+    this.setData({ tab: Number(e.currentTarget.dataset.t) })
   },
   onAccount: function (e) { this.setData({ account: e.detail.value }) },
   onPassword: function (e) { this.setData({ password: e.detail.value }) },
   onCode: function (e) { this.setData({ code: e.detail.value }) },
 
   saveSession: function (data) {
-    var app = getApp()
-    app.globalData.token = data.token
-    app.globalData.userInfo = data.userInfo
-    wx.setStorageSync('token', data.token)
-    wx.setStorageSync('userInfo', JSON.stringify(data.userInfo || null))
+    getApp().saveLogin(data)
   },
 
   loginSuccess: function () {
     wx.showToast({ title: '登录成功', icon: 'success' })
-    setTimeout(function () { wx.navigateBack({ fail: function () { wx.switchTab({ url: '/pages/mine/mine' }) } }) }, 700)
+    getApp().maybeShowForceAnnouncement()
+    // 登录后引导绑定手机号（未绑定时）
+    var u = getApp().globalData.userInfo
+    if (u && !u.phone) {
+      wx.showModal({
+        title: '完善账号',
+        content: '绑定手机号后更安全，还可用于登录与找回密码，是否现在绑定？',
+        confirmText: '去绑定',
+        cancelText: '暂不',
+        confirmColor: '#ff6b35',
+        success: function (res) {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/user/edit/edit?bind=phone' })
+          } else {
+            setTimeout(function () { wx.navigateBack({ fail: function () { wx.switchTab({ url: '/pages/mine/mine' }) } }) }, 300)
+          }
+        }
+      })
+    } else {
+      setTimeout(function () { wx.navigateBack({ fail: function () { wx.switchTab({ url: '/pages/mine/mine' }) } }) }, 700)
+    }
   },
 
   // ===== 微信一键登录 =====
@@ -51,8 +67,14 @@ Page({
     var account = this.data.account.trim()
     if (!account) { wx.showToast({ title: '请输入手机号或邮箱', icon: 'none' }); return }
     var t = this
-    api.sendSms(account).then(function () {
-      wx.showToast({ title: '已发送，请查收', icon: 'none' })
+    api.sendSms(account).then(function (r) {
+      // 开发环境验证码回显，直接填入输入框
+      if (r && r.code) {
+        t.setData({ code: r.code })
+        wx.showToast({ title: '验证码已自动填入', icon: 'none' })
+      } else {
+        wx.showToast({ title: '已发送，请查收', icon: 'none' })
+      }
       var n = 60
       t.setData({ countdown: n, codeBtnText: n + 's' })
       var timer = setInterval(function () {

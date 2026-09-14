@@ -9,8 +9,18 @@
     <button class="s-btn" bindtap="doSearch">搜索</button>
   </view>
 
+  <!-- 排序 + 筛选 -->
+  <view class="tool-bar" wx:if="{{products.length || keyword}}">
+    <view class="sorts">
+      <view class="sort {{sort === item.key ? 'active' : ''}}"
+            wx:for="{{sortOptions}}" wx:key="key"
+            bindtap="onSort" data-key="{{item.key}}">{{item.label}}</view>
+    </view>
+    <view class="filter-btn {{showFilter ? 'active' : ''}}" bindtap="toggleFilter">筛选</view>
+  </view>
+
   <!-- 历史 / 热门 (未搜索时) -->
-  <view class="tags" wx:if="{{!products.length}}">
+  <view class="tags" wx:if="{{!products.length && !loading}}">
     <view class="row">
       <text class="tag-label">搜索历史</text>
       <text wx:for="{{history}}" wx:key="*this" class="tag" bindtap="quick" data-w="{{item}}">{{item}}</text>
@@ -22,8 +32,19 @@
     </view>
   </view>
 
+  <!-- 骨架屏 -->
+  <view class="list" wx:if="{{loading && !products.length}}">
+    <view class="card glass-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="sk-box img"></view>
+      <view class="info">
+        <view class="sk-box" style="height:28rpx;width:85%;margin-bottom:16rpx;"></view>
+        <view class="sk-box" style="height:28rpx;width:55%;"></view>
+      </view>
+    </view>
+  </view>
+
   <!-- 搜索列表 -->
-  <view class="list">
+  <view class="list" wx:if="{{!loading || products.length}}">
     <view class="card glass-card" wx:for="{{products}}" wx:key="id" bindtap="goProduct" data-id="{{item.id}}">
       <image class="img" src="{{item.images && item.images[0] ? item.images[0].url : ''}}" mode="aspectFill"
              lazy-load="{{true}}"/>
@@ -37,8 +58,36 @@
     </view>
   </view>
 
-  <view class="empty" wx:if="{{!products.length}}">
+  <view class="spinner" wx:if="{{loading}}"></view>
+  <view class="empty" wx:if="{{!loading && keyword && !products.length}}">
     <text class="empty-ico">🔍</text>
-    搜点什么吧~
+    没有找到相关商品，换个关键词试试~
+  </view>
+
+  <!-- 筛选弹层 -->
+  <view class="mask" wx:if="{{showFilter}}" bindtap="toggleFilter">
+    <view class="sheet" catchtap="noop">
+      <text class="sheet-title">筛选</text>
+      <view class="f-group">
+        <text class="f-label">成色</text>
+        <view class="f-chips">
+          <text wx:for="{{conditions}}" wx:key="key"
+                class="f-chip {{condition === item.key ? 'on' : ''}}"
+                bindtap="selectCondition" data-k="{{item.key}}">{{item.label}}</text>
+        </view>
+      </view>
+      <view class="f-group">
+        <text class="f-label">价格区间（元）</text>
+        <view class="f-price">
+          <input class="f-input" type="digit" placeholder="最低价" placeholder-class="ph" bindinput="onMinPrice" value="{{minPrice}}"/>
+          <text class="f-sep">—</text>
+          <input class="f-input" type="digit" placeholder="最高价" placeholder-class="ph" bindinput="onMaxPrice" value="{{maxPrice}}"/>
+        </view>
+      </view>
+      <view class="f-actions">
+        <button class="f-btn plain" bindtap="resetFilter">重置</button>
+        <button class="f-btn btn-primary" bindtap="applyFilter">确定</button>
+      </view>
+    </view>
   </view>
 </view>

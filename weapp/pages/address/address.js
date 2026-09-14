@@ -26,6 +26,11 @@ Page({
   goAdd: function () {
     wx.navigateTo({ url: '/pages/address/edit' })
   },
+  // 选择模式下切换到管理模式（编辑/删除），再点一次回到选择
+  toggleMode: function () {
+    this.setData({ selectMode: !this.data.selectMode })
+    if (this.data.selectMode) wx.showToast({ title: '选择模式：点地址完成下单', icon: 'none' })
+  },
   goEdit: function (e) {
     wx.navigateTo({ url: '/pages/address/edit?id=' + e.currentTarget.dataset.id })
   },

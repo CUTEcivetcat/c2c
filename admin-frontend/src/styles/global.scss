@@ -1,0 +1,66 @@
+// ========================================
+// C2C 管理后台 — 全局微交互（uiverse 风格）
+// ========================================
+
+// 品牌色
+$primary: #ff6b35;
+
+// 骨架 shimmer
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton-block,
+.skeleton-line {
+  position: relative;
+  overflow: hidden;
+  background: #eef1f5;
+  border-radius: 6px;
+  &::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+}
+.skeleton-line { height: 14px; margin-bottom: 10px; }
+
+// 主按钮光晕
+.el-button--primary {
+  box-shadow: 0 4px 14px rgba($primary, 0.25);
+  &:hover { box-shadow: 0 6px 20px rgba($primary, 0.38); }
+}
+
+// 卡片悬浮（管理端列表卡片/统计卡）
+.el-card {
+  transition: all 0.25s ease;
+  &:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.10) !important; }
+}
+
+// 表格行悬浮高亮
+.el-table__body tr:hover > td.el-table__cell {
+  background: rgba($primary, 0.04) !important;
+}
+
+// 输入框聚焦发光
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 3px rgba($primary, 0.15) !important;
+}
+
+// 数字强调（Dashboard 统计）
+.stat-number {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, $primary, #ff8c5a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// 图片渐变占位
+img {
+  background: linear-gradient(120deg, #f2f4f7 25%, #e9edf2 37%, #f2f4f7 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.6s infinite;
+}

@@ -26,8 +26,12 @@ Page({
     var that = this
     this.setData({ bindLoading: true })
     request.post('/user/bind-email', { email: email, code: code }).then(function () {
-      wx.showToast({ title: '绑定成功', icon: 'success' })
-      setTimeout(function () { wx.navigateBack() }, 800)
+      // 账户信息变更 → 立即同步最新资料（loginSource/email 等），保证各页展示一致
+      getApp().refreshUserInfo(function () {
+        that.setData({ bindLoading: false })
+        wx.showToast({ title: '绑定成功', icon: 'success' })
+        setTimeout(function () { wx.navigateBack() }, 800)
+      })
     }).catch(function () { that.setData({ bindLoading: false }) })
   }
 })

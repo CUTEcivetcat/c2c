@@ -1,0 +1,61 @@
+.ue { padding: 28rpx 24rpx; background: transparent; }
+
+.avatar-card { padding: 40rpx 0; display: flex; flex-direction: column; align-items: center; gap: 20rpx; margin-bottom: 20rpx; }
+.avatar-wrap { position: relative; }
+.avatar-img { width: 160rpx; height: 160rpx; border-radius: 50%; background: var(--primary-soft); }
+.avatar-text { width: 160rpx; height: 160rpx; border-radius: 50%; background: var(--primary-soft); color: var(--primary); font-size: 60rpx; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.avatar-mask {
+  position: absolute; right: 0; bottom: 0; width: 52rpx; height: 52rpx; border-radius: 50%;
+  background: var(--primary); color: #fff; font-size: 24rpx;
+  display: flex; align-items: center; justify-content: center;
+  border: 4rpx solid #fff;
+}
+.avatar-tip { text-align: center; }
+.tip-title { display: block; font-size: 28rpx; font-weight: 600; color: var(--ink); }
+.tip-sub { display: block; font-size: 22rpx; color: var(--ink-3); margin-top: 6rpx; }
+
+.form-card { padding: 6rpx 26rpx; margin-bottom: 16rpx; }
+.field { display: flex; align-items: center; gap: 20rpx; padding: 28rpx 0; border-bottom: 1rpx solid var(--line); }
+.field:last-child { border-bottom: none; }
+.label { width: 140rpx; font-size: 28rpx; color: var(--ink-2); flex-shrink: 0; font-weight: 600; }
+.inp { flex: 1; font-size: 28rpx; color: var(--ink); }
+.inp.val { color: var(--ink); }
+.ph { color: var(--ink-3); }
+.arrow { color: var(--ink-3); font-size: 32rpx; }
+.field.col { flex-direction: column; align-items: stretch; gap: 14rpx; }
+.bio { width: 100%; height: 140rpx; font-size: 27rpx; line-height: 1.6; }
+
+.hint { text-align: center; font-size: 22rpx; color: var(--ink-3); margin-bottom: 20rpx; }
+.save-btn { width: 100%; padding: 26rpx 0; }
+
+/* 账号绑定 */
+.bind-card { padding: 8rpx 26rpx 20rpx; margin-bottom: 20rpx; }
+.bind-title { font-size: 30rpx; font-weight: 700; color: var(--ink); padding: 22rpx 0 6rpx; }
+.bind-row { display: flex; align-items: center; justify-content: space-between; padding: 24rpx 0; border-bottom: 1rpx solid var(--line); }
+.bind-row:last-child { border-bottom: none; }
+.bind-info { display: flex; flex-direction: column; gap: 6rpx; }
+.bind-label { font-size: 24rpx; color: var(--ink-3); }
+.bind-val { font-size: 30rpx; color: var(--ink); font-weight: 600; }
+.bind-val.unbound { color: var(--ink-3); font-weight: 400; }
+.bind-btn {
+  background: var(--primary); color: #fff; font-size: 25rpx;
+  padding: 12rpx 44rpx; border-radius: 999rpx; font-weight: 600;
+}
+.bind-btn:active { opacity: .85; }
+.bind-done { font-size: 24rpx; color: var(--success); }
+.bind-form { padding: 18rpx 0 8rpx; }
+.bf-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 18rpx; }
+.bf-inp {
+  flex: 1; min-width: 0; height: 72rpx; background: var(--bg);
+  border-radius: var(--radius); padding: 0 24rpx; font-size: 28rpx;
+  border: 2rpx solid var(--line); box-sizing: border-box;
+}
+.code-btn {
+  flex-shrink: 0; margin: 0; background: var(--primary-soft); color: var(--primary);
+  font-size: 24rpx; padding: 0 22rpx; height: 72rpx; line-height: 72rpx; border-radius: var(--radius);
+}
+.bind-submit {
+  flex-shrink: 0; margin: 0; background: var(--primary); color: #fff;
+  font-size: 24rpx; padding: 0 22rpx; height: 72rpx; line-height: 72rpx; border-radius: var(--radius);
+}
+.bf-tip { font-size: 22rpx; color: var(--primary); margin-bottom: 6rpx; }

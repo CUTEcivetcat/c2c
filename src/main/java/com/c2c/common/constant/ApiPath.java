@@ -129,6 +129,11 @@ public interface ApiPath {
     String ADMIN_USER_STATUS = "/admin/users/{userId}/status";
     String ADMIN_USER_ROLES = "/admin/users/roles";
     String ADMIN_USER_ROLE = "/admin/users/{userId}/role";
+    // 管理端安全：二级密码 / 次级管理员 / 删除账户
+    String ADMIN_AUTH_SECONDARY_PASSWORD = "/admin/auth/secondary-password";
+    String ADMIN_AUTH_SECONDARY_ADMINS = "/admin/auth/secondary-admins";
+    String ADMIN_AUTH_SECONDARY_ADMIN_ID = "/admin/auth/secondary-admins/{id}";
+    String ADMIN_USER_DELETE = "/admin/users/{userId}";
     String ADMIN_PRODUCTS = "/admin/products";
     String ADMIN_PRODUCT_STATUS = "/admin/products/{id}/status";
     String ADMIN_ORDERS = "/admin/orders";

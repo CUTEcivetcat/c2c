@@ -1,23 +1,71 @@
 <view class="dp fade-up" wx:if="{{o}}">
+  <!-- 状态卡 -->
   <view class="st-card">
     <text class="st-ico">📦</text>
-    <text class="st-text">{{statuses[o.status]}}</text>
+    <view class="st-main">
+      <text class="st-text">{{statuses[o.status]}}</text>
+      <text class="st-sub" wx:if="{{o.status === 0}}">请尽快完成支付，超时订单将自动关闭</text>
+      <text class="st-sub" wx:elif="{{o.status === 5 && o.cancelReason}}">取消原因：{{o.cancelReason}}</text>
+    </view>
   </view>
 
+  <!-- 商品卡 -->
+  <view class="card glass-card product-card" bindtap="goProduct">
+    <image class="p-img" wx:if="{{o.productImage}}" src="{{o.productImage}}" mode="aspectFill"/>
+    <view class="p-info">
+      <text class="p-title">{{o.productTitle}}</text>
+      <text class="p-price">¥{{o.totalAmount}}</text>
+    </view>
+    <text class="ar">›</text>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="card glass-card" wx:if="{{address}}">
+    <view class="line"><text class="l">收货信息</text></view>
+    <view class="addr-row">
+      <text class="addr-name">{{address.receiverName}}</text>
+      <text class="addr-phone">{{address.phone}}</text>
+    </view>
+    <text class="addr-detail">{{address.province}}{{address.city}}{{address.district}}{{address.detail}}</text>
+  </view>
+
+  <!-- 物流 -->
+  <view class="card glass-card" wx:if="{{o.shipCompany || o.shipNo || o.shipTime}}">
+    <view class="line"><text class="l">物流信息</text><text class="v">{{o.shipCompany || '-'}} {{o.shipNo || ''}}</text></view>
+    <view class="line" wx:if="{{o.shipTime}}"><text class="l">发货时间</text><text class="v">{{fmt(o.shipTime)}}</text></view>
+  </view>
+
+  <!-- 订单信息 -->
   <view class="card glass-card">
-    <view class="line"><text class="l">订单号</text><text class="v">{{o.orderNo}}</text></view>
-    <view class="line"><text class="l">商品</text><text class="v">{{o.productTitle}}</text></view>
-    <view class="line"><text class="l">金额</text><text class="v hot">¥{{o.totalAmount}}</text></view>
-    <view class="line" wx:if="{{o.paymentMethod}}"><text class="l">支付</text><text class="v">{{o.paymentMethod==='balance'?'余额支付':'在线支付'}}</text></view>
-    <view class="line" wx:if="{{o.shipCompany}}"><text class="l">物流</text><text class="v">{{o.shipCompany}} {{o.shipNo}}</text></view>
-    <view class="line" wx:if="{{o.escrow}}"><text class="l">平台托管</text><text class="v">¥{{o.escrow}}</text></view>
+    <view class="line"><text class="l">订单号</text><text class="v copy" bindtap="copyOrderNo">{{o.orderNo}} <text class="copy-tag">复制</text></text></view>
+    <view class="line"><text class="l">商品金额</text><text class="v">¥{{o.price}}</text></view>
+    <view class="line"><text class="l">运费</text><text class="v">¥{{o.freightAmount || 0}}</text></view>
+    <view class="line"><text class="l">实付</text><text class="v hot">¥{{o.totalAmount}}</text></view>
+    <view class="line" wx:if="{{o.paymentMethod}}"><text class="l">支付方式</text><text class="v">{{o.paymentMethod === 'balance' ? '余额支付' : '在线支付'}}</text></view>
+    <view class="line" wx:if="{{o.paymentTime}}"><text class="l">支付时间</text><text class="v">{{fmt(o.paymentTime)}}</text></view>
+    <view class="line" wx:if="{{o.receiveTime}}"><text class="l">收货时间</text><text class="v">{{fmt(o.receiveTime)}}</text></view>
+    <view class="line"><text class="l">下单时间</text><text class="v">{{fmt(o.createdAt)}}</text></view>
   </view>
 
-  <view class="actions">
-    <button wx:if="{{o.status===0}}" class="btn plain" bindtap="cancel">取消订单</button>
-    <button wx:if="{{o.status===0}}" class="btn" bindtap="pay">立即支付</button>
-    <button wx:if="{{o.status===1 && o.sellerId===meId}}" class="btn" bindtap="ship">发货</button>
-    <button wx:if="{{o.status===2 && o.buyerId===meId}}" class="btn" bindtap="receive">确认收货</button>
+  <!-- 底部操作 -->
+  <view class="footer-bar">
+    <button class="bar-btn plain" bindtap="contactOther">联系对方</button>
+    <block wx:if="{{o.status === 0}}">
+      <button class="bar-btn plain" bindtap="cancel">取消订单</button>
+      <button class="bar-btn btn-primary" bindtap="pay">立即支付</button>
+    </block>
+    <block wx:elif="{{o.status === 1}}">
+      <button class="bar-btn plain" bindtap="cancel">取消订单</button>
+      <button class="bar-btn btn-primary" wx:if="{{isSeller}}" bindtap="ship">发货</button>
+    </block>
+    <block wx:elif="{{o.status === 2}}">
+      <button class="bar-btn btn-primary" wx:if="{{isBuyer}}" bindtap="receive">确认收货</button>
+    </block>
+    <block wx:elif="{{o.status === 4}}">
+      <button class="bar-btn btn-primary" wx:if="{{!myRated}}" bindtap="goRate">评价交易</button>
+      <button class="bar-btn plain" wx:else disabled>已评价</button>
+    </block>
   </view>
 </view>
+
 <view wx:else class="empty"><text class="empty-ico">⏳</text>加载中...</view>

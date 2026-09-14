@@ -20,6 +20,14 @@
 }
 .s-btn:active { transform: scale(0.97); }
 
+/* 排序 + 筛选 */
+.tool-bar { display: flex; align-items: center; gap: 16rpx; margin: 26rpx 4rpx 20rpx; }
+.sorts { flex: 1; display: flex; gap: 12rpx; overflow-x: auto; }
+.sort { flex-shrink: 0; padding: 10rpx 24rpx; border-radius: 999rpx; background: #fff; border: 2rpx solid var(--line); font-size: 24rpx; color: var(--ink-2); }
+.sort.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.filter-btn { flex-shrink: 0; padding: 10rpx 30rpx; border-radius: 999rpx; background: #fff; border: 2rpx solid var(--line); font-size: 24rpx; color: var(--ink-2); }
+.filter-btn.active { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+
 .tags { margin-top: 40rpx; }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 18rpx 16rpx; margin-bottom: 30rpx; }
 .tag-label { font-size: 26rpx; color: var(--ink-3); width: 100%; margin-bottom: 4rpx; font-weight: 600; }
@@ -47,3 +55,16 @@
 .p-line { display: flex; align-items: baseline; justify-content: space-between; margin-top: 12rpx; }
 .p { font-size: 34rpx; font-weight: 800; color: var(--primary); }
 .loc { font-size: 22rpx; color: var(--ink-3); }
+
+/* 筛选弹层 */
+.f-group { margin-bottom: 30rpx; }
+.f-label { display: block; font-size: 27rpx; font-weight: 700; color: var(--ink); margin-bottom: 16rpx; }
+.f-chips { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.f-chip { padding: 12rpx 30rpx; border-radius: 999rpx; background: var(--bg); border: 2rpx solid var(--line); font-size: 25rpx; color: var(--ink-2); }
+.f-chip.on { background: var(--primary-soft); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+.f-price { display: flex; align-items: center; gap: 16rpx; }
+.f-input { flex: 1; background: var(--bg); border-radius: var(--radius); padding: 18rpx 24rpx; font-size: 27rpx; }
+.f-sep { color: var(--ink-3); }
+.f-actions { display: flex; gap: 18rpx; }
+.f-btn { flex: 1; padding: 22rpx 0; border-radius: 999rpx; }
+.f-btn.plain { background: #fff; color: var(--ink-2); border: 2rpx solid var(--line); }

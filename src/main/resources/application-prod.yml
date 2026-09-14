@@ -74,7 +74,12 @@ management:
         include: health,info
 
 logging:
+  # 生产默认写项目根 logs/app.log（start-backend.sh 会先 mkdir -p 并注入 APP_LOG_FILE）
   file:
-    name: ${APP_LOG_FILE:./logs/app.log}
+    name: ${APP_LOG_FILE:/softservice/c2c/logs/app.log}
   level:
     com.c2c: info
+
+app:
+  # 生产环境强制关闭验证码回显，仅短信/邮件下发
+  sms-echo-code: false

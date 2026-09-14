@@ -1,10 +1,12 @@
 .cat-page { display: flex; height: 100vh; background: transparent; padding: 0; }
 .cat-side { width: 190rpx; background: #fff; flex-shrink: 0; box-shadow: var(--shadow-sm); }
 .cat-item {
-  padding: 32rpx 22rpx; font-size: 27rpx; color: var(--ink-2);
+  padding: 26rpx 20rpx; font-size: 27rpx; color: var(--ink-2);
   position: relative; border-left: 8rpx solid transparent;
   transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 12rpx;
 }
+.cat-ico { width: 48rpx; height: 48rpx; border-radius: 14rpx; flex-shrink: 0; background: var(--primary-soft); }
 .cat-item.active {
   color: var(--primary); background: var(--primary-soft);
   border-left-color: var(--primary); font-weight: 700;

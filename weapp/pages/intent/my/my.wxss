@@ -1,0 +1,16 @@
+.im { padding: 28rpx 24rpx; background: transparent; }
+.card { padding: 24rpx; margin-bottom: 18rpx; }
+.hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16rpx; }
+.st.done { background: var(--success); color: #fff; }
+.time { font-size: 22rpx; color: var(--ink-3); }
+.bd { display: flex; gap: 20rpx; align-items: center; }
+.img { width: 110rpx; height: 110rpx; border-radius: 16rpx; background: #eef1f5; flex-shrink: 0; }
+.info { flex: 1; min-width: 0; }
+.t { font-size: 28rpx; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.p-line { display: flex; align-items: baseline; gap: 18rpx; margin-top: 10rpx; }
+.p { font-size: 30rpx; font-weight: 800; color: var(--primary); }
+.expect { font-size: 22rpx; color: var(--warning); }
+.ar { color: var(--ink-3); font-size: 30rpx; flex-shrink: 0; }
+.msg { margin-top: 16rpx; font-size: 25rpx; color: var(--ink-2); background: var(--bg); border-radius: var(--radius); padding: 16rpx 20rpx; line-height: 1.6; }
+.reply { margin-top: 12rpx; font-size: 25rpx; color: var(--success); background: rgba(7,193,96,0.08); border-radius: var(--radius); padding: 16rpx 20rpx; line-height: 1.6; }
+.ops { display: flex; justify-content: flex-end; margin-top: 16rpx; }

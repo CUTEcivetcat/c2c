@@ -1,0 +1,28 @@
+<view class="rp fade-up">
+  <view class="head-card glass-card">
+    <text class="head-title">举报商品</text>
+    <text class="head-sub">{{productTitle}}</text>
+    <text class="head-hint">平台将核实您的举报，请在提交后保持关注</text>
+  </view>
+
+  <view class="form-card glass-card">
+    <picker mode="selector" range="{{types}}" range-key="label" value="{{typeIndex}}" bindchange="onType">
+      <view class="field">
+        <text class="label">举报类型</text>
+        <text class="inp val">{{types[typeIndex].label}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </picker>
+    <view class="field col">
+      <text class="label">举报理由</text>
+      <textarea class="reason" placeholder="请描述违规情况（至少5个字）" placeholder-class="ph"
+                bindinput="onReason" value="{{reason}}" maxlength="300"/>
+    </view>
+  </view>
+
+  <view class="hint">请如实举报，恶意举报将影响您的账号信誉</view>
+
+  <button class="submit-btn btn-primary" bindtap="submit" disabled="{{submitting}}">
+    {{submitting ? '提交中...' : '提交举报'}}
+  </button>
+</view>

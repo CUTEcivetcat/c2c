@@ -4,7 +4,8 @@
     <main class="main-content" :class="mainClass">
       <router-view v-slot="{ Component }">
         <transition :name="transitionName" mode="out-in">
-          <component :is="Component" />
+          <!-- key 用完整路径：路由参数变化时强制重建组件，避免复用旧数据（如 /product/1 → /product/2） -->
+          <component :is="Component" :key="route.fullPath" />
         </transition>
       </router-view>
     </main>
@@ -17,7 +18,8 @@
     <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭） -->
     <el-dialog v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
       :close-on-click-modal="false" :close-on-press-escape="false" align-center
-      :destroy-on-close="true" :lock-scroll="false">
+      :destroy-on-close="true" :lock-scroll="false" @closed="onDialogClosed"
+      :modal="false" append-to-body>
       <template #header>
         <div class="force-dialog-head">
           <span class="fd-icon">📢</span>
@@ -39,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getAnnouncementForce } from '@/api/announcement'
@@ -64,17 +66,6 @@ const readFlagKey = 'c2c_force_read'
 const showNext = () => {
   if (!queue.value.length) {
     forceDialog.value = false
-    // 全部读完：记录已读 id 到 sessionStorage，刷新不再重复弹
-    if (shownIds.value.length) {
-      const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
-      const merged = Array.from(new Set(readIds.concat(shownIds.value)))
-      sessionStorage.setItem(readFlagKey, JSON.stringify(merged))
-    }
-    shownIds.value = []
-    current.value = null
-    nextTick(() => {
-      document.querySelectorAll('.el-overlay').forEach(el => el.remove())
-    })
     return
   }
   const item = queue.value.shift()
@@ -91,6 +82,22 @@ const showNext = () => {
   }
 }
 const nextOrClose = () => { showNext() }
+
+// 弹窗完全关闭后：记录已读 id（会话内去重）并兜底恢复页面滚动
+const onDialogClosed = () => {
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null }
+  if (shownIds.value.length) {
+    const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
+    const merged = Array.from(new Set(readIds.concat(shownIds.value)))
+    sessionStorage.setItem(readFlagKey, JSON.stringify(merged))
+  }
+  shownIds.value = []
+  current.value = null
+  // 兜底：确保弹窗关闭后页面可滚动（防 Element Plus 锁滚动残留）
+  document.body.style.overflow = ''
+  document.documentElement.style.overflow = ''
+  document.body.classList.remove('el-popup-parent--hidden')
+}
 
 // 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）
 watch(() => store.isLoggedIn(), async (loggedIn) => {

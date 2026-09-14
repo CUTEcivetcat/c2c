@@ -14,10 +14,55 @@
     </view>
   </view>
 
+  <!-- 轮播图 -->
+  <swiper class="banner" wx:if="{{banners.length}}" autoplay circular interval="4000" indicator-dots indicator-color="rgba(255,255,255,.5)" indicator-active-color="#ffffff">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <image class="banner-img" src="{{item.imageUrl}}" mode="aspectFill" binderror="onBannerError" data-index="{{index}}"/>
+    </swiper-item>
+  </swiper>
+
+  <!-- 公告横幅 -->
+  <view class="notice-bar glass-card" wx:if="{{notices.length}}" bindtap="goNotices">
+    <text class="notice-tag">公告</text>
+    <text class="notice-text">{{notices[0].title}}</text>
+    <text class="notice-ar">›</text>
+  </view>
+
+  <!-- 分类快捷入口 -->
+  <view class="cat-row glass-card" wx:if="{{categories.length}}">
+    <view class="cat-item" wx:for="{{categories}}" wx:key="id" bindtap="goCategory" data-id="{{item.id}}">
+      <view class="cat-ico">
+        <image wx:if="{{item.iconUrl}}" src="{{item.iconUrl}}" mode="aspectFill"/>
+        <image wx:elif="{{catIcon(item.name)}}" src="{{catIcon(item.name)}}" mode="aspectFill"/>
+        <text wx:else>🛍</text>
+      </view>
+      <text class="cat-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 排序栏 -->
+  <view class="sort-bar">
+    <view class="sort-item {{sort === item.key ? 'active' : ''}}"
+          wx:for="{{sortOptions}}" wx:key="key"
+          bindtap="onSort" data-key="{{item.key}}">{{item.label}}</view>
+  </view>
+
   <!-- 商品网格 -->
   <view class="grid-header">
     <text class="grid-title">热卖好物</text>
     <text class="grid-sub">{{products.length}} 件在售</text>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view class="product-grid" wx:if="{{loading && !products.length}}">
+    <view class="product-card skeleton-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+      <view class="sk-img"></view>
+      <view class="sk-body">
+        <view class="sk-line w90"></view>
+        <view class="sk-line w60"></view>
+        <view class="sk-line w40"></view>
+      </view>
+    </view>
   </view>
 
   <view class="product-grid">
@@ -28,6 +73,9 @@
              lazy-load="{{true}}"/>
       <view class="card-body">
         <text class="card-title">{{item.title}}</text>
+        <view class="card-meta">
+          <text class="card-cond" wx:if="{{item.conditionText}}">{{item.conditionText}}</text>
+        </view>
         <view class="card-bottom">
           <text class="card-price">¥{{item.price}}</text>
           <text class="card-loc">{{item.location || '同城'}}</text>
@@ -37,7 +85,7 @@
   </view>
 
   <!-- 空态 -->
-  <view class="empty" wx:if="{{!products.length}}">
+  <view class="empty" wx:if="{{!loading && !products.length}}">
     <text class="empty-ico">🛍</text>
     暂时没有商品,去发布第一个吧
   </view>

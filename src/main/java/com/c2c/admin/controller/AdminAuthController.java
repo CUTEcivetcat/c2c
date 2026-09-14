@@ -75,9 +75,31 @@ public class AdminAuthController {
             throw new BusinessException(401, "用户名或密码错误");
         }
 
-        // 签发带角色标记的 token，供 AuthTokenFilter 校验
+        // 三级权限自愈：username='admin' 恒为总管理员(admin_level=2)，
+        // 老数据/漏执行迁移 SQL 导致 admin_level 缺失或为 0 时，登录即自动升级并写库，
+        // 保证 admin 账号即使未执行 update-20260915-admin-levels.sql 也能获得全部权限。
+        boolean levelChanged = false;
+        if (admin.getAdminLevel() == null || admin.getAdminLevel() < 2) {
+            if ("admin".equals(admin.getUsername())) {
+                admin.setAdminLevel(2);
+                admin.setAdminPerms("*");
+                levelChanged = true;
+            } else if (admin.getAdminLevel() == null || admin.getAdminLevel() == 0) {
+                // 存量管理员（role=1 且非 admin）默认转为次级管理员，权限由总管理员后续分配
+                admin.setAdminLevel(1);
+                levelChanged = true;
+            }
+        }
+        if (levelChanged) {
+            userMapper.updateById(admin);
+            log.info("管理员等级自愈修复：userId={}, username={}, adminLevel={}", admin.getId(), admin.getUsername(), admin.getAdminLevel());
+        }
+
+        // 签发带角色与权限标记的 token，供 AuthTokenFilter 校验
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", "ADMIN");
+        claims.put("adminLevel", admin.getAdminLevel() == null ? 0 : admin.getAdminLevel());
+        claims.put("perms", parsePerms(admin.getAdminLevel(), admin.getAdminPerms()));
         String token = JwtUtils.createToken(admin.getId(), claims, jwtSecret, jwtExpiration);
 
         Map<String, Object> data = new HashMap<>();
@@ -87,9 +109,27 @@ public class AdminAuthController {
         userInfo.put("id", admin.getId());
         userInfo.put("username", admin.getUsername());
         userInfo.put("nickname", admin.getNickname());
+        userInfo.put("adminLevel", admin.getAdminLevel() == null ? 0 : admin.getAdminLevel());
+        userInfo.put("adminPerms", admin.getAdminLevel() != null && admin.getAdminLevel() >= 2 ? "*" : admin.getAdminPerms());
         data.put("userInfo", userInfo);
 
-        log.info("管理员登录成功：userId={}, account={}", admin.getId(), account);
+        log.info("管理员登录成功：userId={}, account={}, adminLevel={}", admin.getId(), account, admin.getAdminLevel());
         return R.ok(data);
+    }
+
+    /** 总管理员(admin_level=2)恒为全部权限；其余管理员按 adminPerms 拆分。 */
+    private java.util.List<String> parsePerms(Integer adminLevel, String adminPerms) {
+        java.util.List<String> perms = new java.util.ArrayList<>();
+        if (adminLevel != null && adminLevel >= 2) {
+            perms.add("*");
+        } else if (adminPerms != null && !adminPerms.trim().isEmpty()) {
+            for (String p : adminPerms.split(",")) {
+                String t = p.trim();
+                if (!t.isEmpty()) {
+                    perms.add(t);
+                }
+            }
+        }
+        return perms;
     }
 }

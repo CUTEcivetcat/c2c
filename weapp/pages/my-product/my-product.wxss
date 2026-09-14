@@ -6,6 +6,8 @@
 .p-id { display: flex; align-items: center; justify-content: space-between; margin-top: 12rpx; }
 .p { font-size: 32rpx; font-weight: 800; color: var(--primary); }
 .st { font-size: 22rpx; color: var(--ink-3); }
+.st.ban { color: var(--danger); }
 .ops { display: flex; gap: 14rpx; margin-top: 14rpx; }
 .op-edit { margin: 0; padding: 10rpx 36rpx; background: var(--primary-soft); color: var(--primary); font-size: 24rpx; border-radius: 999rpx; line-height: 1.4; }
 .op-off { margin: 0; padding: 10rpx 36rpx; background: #fff; color: var(--danger); border: 2rpx solid var(--danger); font-size: 24rpx; border-radius: 999rpx; line-height: 1.4; }
+.op-on { margin: 0; padding: 10rpx 36rpx; background: #fff; color: var(--success); border: 2rpx solid var(--success); font-size: 24rpx; border-radius: 999rpx; line-height: 1.4; }

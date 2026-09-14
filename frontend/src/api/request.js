@@ -18,7 +18,7 @@ request.interceptors.request.use(
   error => Promise.reject(error)
 )
 
-// 响应拦截器
+// 响应拦截器（含 GET 弱网自动重试一次：仅网络层失败重试，写请求不重试避免重复下单/支付）
 request.interceptors.response.use(
   response => {
     const { code, message, data } = response.data
@@ -35,12 +35,17 @@ request.interceptors.response.use(
   error => {
     const status = error.response?.status
     const msg = error.response?.data?.message
+    const cfg = error.config || {}
     if (status === 401) {
       // 后端返回真实 HTTP 401（AuthTokenFilter），清理本地登录态并跳登录
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
       ElMessage.error(msg || '请先登录')
       if (!window.location.pathname.startsWith('/login')) window.location.href = '/login'
+    } else if (!status && cfg.method === 'get' && !cfg._retried) {
+      // 网络层失败（无响应状态）→ GET 幂等请求重试一次
+      cfg._retried = true
+      return request(cfg)
     } else {
       ElMessage.error(msg || '网络异常，请稍后重试')
     }

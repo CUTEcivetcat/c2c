@@ -19,6 +19,18 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': { target: serverOrigin, changeOrigin: true }
       }
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          // 大依赖独立分包，提升首屏加载与缓存命中
+          manualChunks: {
+            'element-plus': ['element-plus'],
+            echarts: ['echarts'],
+            vendor: ['vue', 'vue-router', 'pinia', 'axios']
+          }
+        }
+      }
     }
   }
 })

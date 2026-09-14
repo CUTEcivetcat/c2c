@@ -1,38 +1,137 @@
 <view class="detail-page fade-up" wx:if="{{p}}">
-  <!-- 大图 -->
+  <!-- 大图轮播 -->
   <view class="gallery">
-    <image class="main-img" src="{{activeImage}}" mode="aspectFill"/>
-    <view class="thumb-row">
+    <swiper class="main-swiper" circular="{{p.images.length > 1}}" indicator-dots="{{p.images.length > 1}}" indicator-color="rgba(0,0,0,.2)" indicator-active-color="#ffffff">
+      <swiper-item wx:for="{{p.images}}" wx:key="index" bindtap="previewImage" data-url="{{item.url}}">
+        <image class="main-img" src="{{item.url}}" mode="aspectFill"/>
+      </swiper-item>
+    </swiper>
+    <scroll-view class="thumb-row" scroll-x wx:if="{{p.images.length > 1}}">
       <view wx:for="{{p.images}}" wx:key="index"
             class="thumb {{activeImage === item.url ? 'on' : ''}}"
             bindtap="changeImage" data-url="{{item.url}}">
         <image src="{{item.url}}" mode="aspectFill" class="thumb-img"/>
       </view>
-    </view>
+    </scroll-view>
   </view>
 
   <!-- 信息卡 -->
   <view class="info-card glass-card">
     <view class="price-row">
       <text class="price">¥{{p.price}}</text>
+      <text class="origin-price" wx:if="{{p.originalPrice}}">原价 ¥{{p.originalPrice}}</text>
       <text class="condition">{{p.conditionText}}</text>
     </view>
     <text class="title">{{p.title}}</text>
     <view class="meta">
       <text class="meta-item">📍 {{p.location || '同城'}}</text>
-      <text class="meta-item">👀 {{p.viewCount}} 次浏览</text>
+      <text class="meta-item">👀 {{p.viewCount}} 浏览</text>
+      <text class="meta-item">❤️ {{p.favoriteCount}} 收藏</text>
+    </view>
+    <view class="meta sub">
+      <text class="meta-item" wx:if="{{p.categoryName}}">分类：{{p.categoryName}}</text>
+      <text class="meta-item" wx:if="{{p.freightText || p.freightAmount}}">
+        运费：{{p.freightText}}{{p.freightAmount && p.freightAmount > 0 ? ' ¥' + p.freightAmount : ''}}
+      </text>
+      <text class="meta-item" wx:if="{{p.createdAt}}">发布于 {{p.createdAt}}</text>
+    </view>
+  </view>
+
+  <!-- 卖家卡片 -->
+  <view class="seller-card glass-card" bindtap="goSellerHome">
+    <view class="avatar-wrap">
+      <image wx:if="{{p.sellerAvatar}}" class="s-avatar" src="{{p.sellerAvatar}}" mode="aspectFill"/>
+      <view wx:else class="s-avatar text">{{p.sellerName ? p.sellerName[0] : '鱼'}}</view>
+    </view>
+    <view class="seller-info">
+      <text class="seller-name">{{p.sellerName || '用户' + p.sellerId}}</text>
+      <text class="seller-rep" wx:if="{{p.sellerReputation}}">⭐ 信誉 {{p.sellerReputation}}</text>
+    </view>
+    <view class="seller-ops">
+      <button class="btn-mini" catchtap="contactSeller">联系卖家</button>
+      <text class="go-ar">›</text>
     </view>
   </view>
 
   <!-- 描述 -->
   <view class="desc-card glass-card">
     <text class="desc-label">商品描述</text>
-    <text class="desc-text">{{p.description}}</text>
+    <text class="desc-text">{{p.description || '卖家很懒，什么都没写~'}}</text>
   </view>
 
-  <!-- 底部购买栏 -->
-  <view class="buy-bar">
-    <button class="buy-btn btn-primary" bindtap="buyNow" disabled="{{buying}}">{{buying ? '下单中...' : '立即购买'}}</button>
+  <!-- 评论 -->
+  <view class="comment-card glass-card">
+    <view class="comment-head">
+      <text class="desc-label">商品评论</text>
+      <text class="comment-count">{{comments.length}} 条</text>
+    </view>
+
+    <view class="comment-input-row" wx:if="{{!isOwn}}">
+      <input class="comment-input" placeholder="说点什么…" placeholder-class="ph"
+             bindinput="onCommentInput" value="{{commentText}}" confirm-type="send" bindconfirm="submitComment"/>
+      <button class="comment-send btn-mini primary" bindtap="submitComment">发送</button>
+    </view>
+
+    <view class="comment-list" wx:if="{{comments.length}}">
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <view class="c-avatar">
+          <image wx:if="{{item.avatar}}" src="{{item.avatar}}" mode="aspectFill"/>
+          <view wx:else>{{item.nickname ? item.nickname[0] : '鱼'}}</view>
+        </view>
+        <view class="c-main">
+          <view class="c-top">
+            <text class="c-name">{{item.nickname}}</text>
+            <text class="c-del" wx:if="{{item.userId == meId}}" catchtap="deleteComment" data-id="{{item.id}}">删除</text>
+          </view>
+          <text class="c-content">{{item.content}}</text>
+          <text class="c-time">{{item.createdAt}}</text>
+        </view>
+      </view>
+      <view class="no-more" wx:if="{{!hasMoreComment}}">— 没有更多评论 —</view>
+      <view class="no-more" wx:if="{{hasMoreComment}}" bindtap="loadMoreComments">加载更多</view>
+    </view>
+    <view class="empty sm" wx:if="{{!comments.length && !commentLoading}}">
+      暂无评论，来抢沙发~
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="footer-bar" wx:if="{{!isOwn}}">
+    <view class="fav-wrap" bindtap="toggleFav">
+      <text class="fav-ico {{p.isFavorited ? 'on' : ''}}">{{p.isFavorited ? '♥' : '♡'}}</text>
+      <text class="fav-txt">{{p.isFavorited ? '已收藏' : '收藏'}}</text>
+    </view>
+    <button class="bar-btn intent" bindtap="openIntent">我想要</button>
+    <button class="bar-btn buy btn-primary" bindtap="buyNow" disabled="{{buying}}">{{buying ? '下单中...' : '立即购买'}}</button>
+  </view>
+
+  <!-- 卖家本人操作栏 -->
+  <view class="footer-bar" wx:else>
+    <button class="bar-btn plain" bindtap="editProduct">编辑商品</button>
+    <button class="bar-btn plain danger" bindtap="offProduct">下架商品</button>
+  </view>
+
+  <!-- 举报入口 -->
+  <view class="report-link" bindtap="goReport">举报该商品</view>
+
+  <!-- 询价弹层 -->
+  <view class="mask" wx:if="{{intentSheet}}" bindtap="closeIntent">
+    <view class="sheet" catchtap="noop">
+      <text class="sheet-title">我想要 · 询价</text>
+      <view class="intent-field">
+        <text class="intent-label">留言</text>
+        <textarea class="intent-input" placeholder="想和卖家说点什么（必填）" placeholder-class="ph"
+                  bindinput="onIntentMsg" value="{{intentMsg}}" maxlength="200"/>
+      </view>
+      <view class="intent-field">
+        <text class="intent-label">期望价</text>
+        <input class="intent-input" type="digit" placeholder="期望价格，可空" placeholder-class="ph"
+               bindinput="onIntentPrice" value="{{intentPrice}}"/>
+      </view>
+      <button class="intent-submit btn-primary" bindtap="submitIntent" disabled="{{sending}}">
+        {{sending ? '发送中...' : '发送给卖家'}}
+      </button>
+    </view>
   </view>
 </view>
 

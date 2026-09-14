@@ -297,3 +297,55 @@ a { color: $primary; text-decoration: none; transition: $transition;
   .page-container { padding-top: 8px; }
   .hero-banner { display: none; }
 }
+
+// ========================================
+// uiverse 风格微交互增强（骨架 shimmer / 按钮光晕 / 输入聚焦 / 图片占位）
+// ========================================
+
+// 骨架屏 shimmer
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton-block,
+.skeleton-line {
+  position: relative;
+  overflow: hidden;
+  background: #eef1f5;
+  border-radius: 6px;
+  &::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.65), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+}
+.skeleton-line { height: 14px; margin-bottom: 10px; }
+.skeleton-line.w60 { width: 60%; }
+.skeleton-line.w40 { width: 40%; }
+
+// 主按钮光晕（uiverse 风格 glow）
+.el-button--primary {
+  box-shadow: 0 4px 14px rgba($primary, 0.28);
+  &:hover { box-shadow: 0 6px 20px rgba($primary, 0.4); }
+  &:active { box-shadow: 0 2px 8px rgba($primary, 0.25); transform: translateY(0); }
+}
+
+// 输入框聚焦发光
+.el-input__wrapper,
+.el-textarea__inner {
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  &.is-focus {
+    box-shadow: 0 0 0 3px rgba($primary, 0.15) !important;
+  }
+}
+
+// 图片渐变占位（加载中/加载失败避免灰块刺眼）
+img {
+  background: linear-gradient(120deg, #f2f4f7 25%, #e9edf2 37%, #f2f4f7 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.6s infinite;
+}
+
+// 空态插画感
+.el-empty__description p { color: $text-muted; }

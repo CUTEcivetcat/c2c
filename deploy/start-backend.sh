@@ -36,4 +36,12 @@ if [[ ${#JWT_SECRET} -lt 32 ]]; then
 fi
 
 cd "${APP_DIR}"
+
+# ---- 日志目录：确保存在并固定到项目根 logs/（Spring Boot 不会自动创建父目录，
+#      且相对路径 ./logs 依赖启动 cwd，systemd/宝塔 下 cwd 不同会导致日志丢失）----
+# 默认 /softservice/c2c/logs（项目根目录），与部署文档一致；可用 APP_LOG_DIR 覆盖
+LOG_DIR="${APP_LOG_DIR:-$(dirname "${APP_DIR}")/logs}"
+mkdir -p "${LOG_DIR}"
+export APP_LOG_FILE="${APP_LOG_FILE:-${LOG_DIR}/app.log}"
+
 exec "${JAVA_BIN}" "${JAVA_OPTS[@]}" -jar "${JAR_FILE}"

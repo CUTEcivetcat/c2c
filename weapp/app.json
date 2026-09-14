@@ -1,1 +1,48 @@
-{"pages":["pages/index/index","pages/publish/publish","pages/mine/mine","pages/category/category","pages/search/search","pages/product/product","pages/order/list/list","pages/order/detail/detail","pages/my-product/my-product","pages/favorite/favorite","pages/wallet/wallet","pages/address/address","pages/address/edit","pages/login/login","pages/auth/login"],"window":{"navigationBarTitleText":"闲小鱼","navigationBarBackgroundColor":"#ff6b35","navigationBarTextStyle":"white","backgroundColor":"#f5f6f8"},"tabBar":{"color":"#9ca3af","selectedColor":"#ff6b35","backgroundColor":"#ffffff","borderStyle":"black","list":[{"pagePath":"pages/index/index","text":"首页","iconPath":"images/home.png","selectedIconPath":"images/home-active.png"},{"pagePath":"pages/publish/publish","text":"发布","iconPath":"images/plus.png","selectedIconPath":"images/plus-active.png"},{"pagePath":"pages/mine/mine","text":"我的","iconPath":"images/mine.png","selectedIconPath":"images/mine-active.png"}]},"style":"v2","sitemapLocation":"sitemap.json"}
+{
+  "pages": [
+    "pages/index/index",
+    "pages/publish/publish",
+    "pages/mine/mine",
+    "pages/category/category",
+    "pages/search/search",
+    "pages/product/product",
+    "pages/order/list/list",
+    "pages/order/detail/detail",
+    "pages/order/rating/rating",
+    "pages/my-product/my-product",
+    "pages/favorite/favorite",
+    "pages/wallet/wallet",
+    "pages/address/address",
+    "pages/address/edit",
+    "pages/login/login",
+    "pages/auth/login",
+    "pages/user/home/home",
+    "pages/user/edit/edit",
+    "pages/chat/list/list",
+    "pages/chat/detail/detail",
+    "pages/intent/my/my",
+    "pages/intent/seller/seller",
+    "pages/announcement/list/list",
+    "pages/report/report"
+  ],
+  "window": {
+    "navigationBarTitleText": "闲小鱼",
+    "navigationBarBackgroundColor": "#ff6b35",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f6f8"
+  },
+  "tabBar": {
+    "color": "#9ca3af",
+    "selectedColor": "#ff6b35",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "images/home.png", "selectedIconPath": "images/home-active.png" },
+      { "pagePath": "pages/publish/publish", "text": "发布", "iconPath": "images/plus.png", "selectedIconPath": "images/plus-active.png" },
+      { "pagePath": "pages/mine/mine", "text": "我的", "iconPath": "images/mine.png", "selectedIconPath": "images/mine-active.png" }
+    ]
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

@@ -2,20 +2,64 @@
   <block wx:if="{{userInfo}}">
     <view class="profile-card glass-card">
       <view class="avatar-ring">
-        <view class="avatar">{{userInfo.nickname[0]}}</view>
+        <image wx:if="{{userInfo.avatarUrl}}" class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"/>
+        <view wx:else class="avatar">{{userInfo.nickname[0]}}</view>
       </view>
       <view class="profile-info">
         <text class="nick">{{userInfo.nickname}}</text>
-        <text class="source chip">微信登录</text>
+        <text class="source chip">{{loginSource === 'wechat' ? '微信登录' : (loginSource === 'email' ? '邮箱账号' : '手机账号')}}</text>
+      </view>
+      <view class="edit-link" bindtap="nav" data-url="/pages/user/edit/edit">编辑资料 ›</view>
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="stats glass-card">
+      <view class="stat" bindtap="nav" data-url="/pages/my-product/my-product">
+        <text class="stat-num">{{stats.products}}</text>
+        <text class="stat-label">发布</text>
+      </view>
+      <view class="stat-div"></view>
+      <view class="stat" bindtap="nav" data-url="/pages/favorite/favorite">
+        <text class="stat-num">{{stats.favorites}}</text>
+        <text class="stat-label">收藏</text>
+      </view>
+      <view class="stat-div"></view>
+      <view class="stat" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
+        <text class="stat-num">{{stats.orders}}</text>
+        <text class="stat-label">订单</text>
       </view>
     </view>
+
+    <!-- 消息 -->
+    <view class="menu-card glass-card">
+      <view class="menu-item" bindtap="nav" data-url="/pages/chat/list/list">
+        <text class="mi">💬</text><text class="mi-t">我的消息</text>
+        <view class="badge-wrap"><text class="badge-dot" wx:if="{{unread > 0}}">{{unread > 99 ? '99+' : unread}}</text></view>
+        <text class="mi-ar">›</text>
+      </view>
+    </view>
+
+    <!-- 交易 -->
     <view class="menu-card glass-card">
       <view class="menu-item" bindtap="nav" data-url="/pages/my-product/my-product">
         <text class="mi">📦</text><text class="mi-t">我的发布</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list">
-        <text class="mi">🧾</text><text class="mi-t">我的订单</text><text class="mi-ar">›</text>
+      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
+        <text class="mi">🧾</text><text class="mi-t">我买到的</text><text class="mi-ar">›</text>
       </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list?tab=sell">
+        <text class="mi">🚚</text><text class="mi-t">我卖出的</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/intent/my/my">
+        <text class="mi">💭</text><text class="mi-t">我发出的意向</text><text class="mi-ar">›</text>
+      </view>
+      <view class="menu-item" bindtap="nav" data-url="/pages/intent/seller/seller">
+        <text class="mi">📨</text><text class="mi-t">收到的意向</text><text class="mi-ar">›</text>
+      </view>
+    </view>
+
+    <!-- 资产 -->
+    <view class="menu-card glass-card">
       <view class="menu-item" bindtap="nav" data-url="/pages/favorite/favorite">
         <text class="mi">❤️</text><text class="mi-t">我的收藏</text><text class="mi-ar">›</text>
       </view>
@@ -25,10 +69,18 @@
       <view class="menu-item" bindtap="nav" data-url="/pages/address/address">
         <text class="mi">📍</text><text class="mi-t">收货地址</text><text class="mi-ar">›</text>
       </view>
+    </view>
+
+    <!-- 其他 -->
+    <view class="menu-card glass-card">
+      <view class="menu-item" bindtap="nav" data-url="/pages/announcement/list/list">
+        <text class="mi">📢</text><text class="mi-t">平台公告</text><text class="mi-ar">›</text>
+      </view>
       <view class="menu-item" bindtap="nav" data-url="/pages/login/login">
         <text class="mi">✉️</text><text class="mi-t">绑定邮箱</text><text class="mi-ar">›</text>
       </view>
     </view>
+
     <button class="logout btn-ghost" bindtap="logout">退出登录</button>
   </block>
 
@@ -43,4 +95,17 @@
       <button class="acct-btn" bindtap="goAuthLogin">手机号 / 邮箱验证码</button>
     </view>
   </block>
+
+  <!-- 强制公告弹层 -->
+  <view class="mask" wx:if="{{forceNotice}}" bindtap="dismissForce">
+    <view class="force-card" catchtap="noop">
+      <text class="force-title">{{forceNotice.title}}</text>
+      <scroll-view class="force-body" scroll-y>
+        <text class="force-content">{{forceNotice.content}}</text>
+      </scroll-view>
+      <button class="force-btn btn-primary" bindtap="dismissForce">
+        {{forceRemain > 0 ? '请阅读 ' + forceRemain + 's' : '我知道了'}}
+      </button>
+    </view>
+  </view>
 </view>

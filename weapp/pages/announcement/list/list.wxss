@@ -1,0 +1,12 @@
+.al { padding: 28rpx 24rpx; background: transparent; }
+.tabs { display: flex; padding: 10rpx; margin-bottom: 20rpx; }
+.tab { flex: 1; text-align: center; padding: 18rpx 0; font-size: 27rpx; color: var(--ink-2); border-radius: var(--radius); }
+.tab.active { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-weight: 700; box-shadow: var(--shadow-md); }
+
+.card { padding: 26rpx; margin-bottom: 18rpx; }
+.hd { display: flex; align-items: center; gap: 14rpx; }
+.type-chip { flex-shrink: 0; background: var(--primary-soft); color: var(--primary); font-size: 20rpx; padding: 4rpx 14rpx; border-radius: 999rpx; font-weight: 600; }
+.title { flex: 1; font-size: 29rpx; font-weight: 600; color: var(--ink); }
+.ar { color: var(--ink-3); font-size: 26rpx; }
+.time { display: block; font-size: 22rpx; color: var(--ink-3); margin-top: 12rpx; }
+.content { margin-top: 18rpx; font-size: 26rpx; color: var(--ink-2); line-height: 1.8; white-space: pre-wrap; background: var(--bg); border-radius: var(--radius); padding: 20rpx 22rpx; }

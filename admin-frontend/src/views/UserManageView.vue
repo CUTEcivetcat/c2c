@@ -23,9 +23,10 @@
         </template></el-table-column>
         <el-table-column label="状态" width="100"><template #default="{row}"><el-tag :type="row.status===1?'success':'danger'" size="small">{{ row.status===1?'正常':'封禁' }}</el-tag></template></el-table-column>
         <el-table-column label="注册时间" width="170"><template #default="{row}">{{ fmtTime(row.createdAt) }}</template></el-table-column>
-        <el-table-column label="操作" width="100" fixed="right"><template #default="{row}">
-          <el-button v-if="row.status===1" type="danger" size="small" :disabled="row.role===1" @click="toggle(row)">封禁</el-button>
+        <el-table-column label="操作" width="170" fixed="right"><template #default="{row}">
+          <el-button v-if="row.status===1" type="danger" size="small" :disabled="row.role===1||row.role===2" @click="toggle(row)">封禁</el-button>
           <el-button v-else type="success" size="small" @click="toggle(row)">解封</el-button>
+          <el-button type="danger" size="small" plain :disabled="row.role===1||row.role===2" @click="removeUser(row)">删除</el-button>
         </template></el-table-column>
       </el-table>
       <div style="margin-top:16px;text-align:center">
@@ -80,6 +81,30 @@ const toggle = async (row) => {
     // 失败不改 row.status，保持服务端真实状态
   } finally {
     toggling.value = false
+  }
+}
+
+// 删除账户：高危操作，需输入当前管理员的二级密码
+const removeUser = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `删除用户「${row.nickname || row.username}」将同时清除其商品、收藏、地址、评价、聊天等关联数据，且不可恢复。确定继续吗？`,
+      '删除账户确认',
+      { type: 'warning', confirmButtonText: '我已了解，继续删除', cancelButtonText: '取消' }
+    )
+  } catch (e) { return }
+  try {
+    const { value } = await ElMessageBox.prompt(
+      '请输入你的二级密码（在「安全设置」中设置），验证通过后才会执行删除：',
+      '二级密码验证',
+      { type: 'password', inputType: 'password', inputPlaceholder: '请输入二级密码', confirmButtonText: '验证并删除', cancelButtonText: '取消' }
+    )
+    if (!value) return
+    await adminApi.deleteUser(row.id, value)
+    ElMessage.success('账户已删除')
+    load()
+  } catch (e) {
+    // 用户取消或后端校验失败（拦截器已提示）
   }
 }
 onMounted(load)

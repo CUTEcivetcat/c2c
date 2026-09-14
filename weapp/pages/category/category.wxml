@@ -3,7 +3,10 @@
   <scroll-view class="cat-side" scroll-y>
     <view wx:for="{{categories}}" wx:key="id"
           class="cat-item {{activeId === index ? 'active' : ''}}"
-          bindtap="select" data-index="{{index}}">{{item.name}}</view>
+          bindtap="select" data-index="{{index}}">
+      <image wx:if="{{catIcon(item.name)}}" class="cat-ico" src="{{catIcon(item.name)}}" mode="aspectFill"/>
+      <text>{{item.name}}</text>
+    </view>
   </scroll-view>
 
   <!-- 右侧商品区 -->

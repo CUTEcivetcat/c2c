@@ -30,9 +30,14 @@ request.interceptors.response.use(response => {
 }, error => {
   const status = error.response?.status
   const message = error.response?.data?.message
+  const cfg = error.config || {}
   // 过滤器拦下的无效/过期 token 是 HTTP 401
-  if (status === 401 && !error.config?.url?.includes('/admin/login')) {
+  if (status === 401 && !cfg.url?.includes('/admin/login')) {
     goLogin(message)
+  } else if (!status && cfg.method === 'get' && !cfg._retried) {
+    // 网络层失败 → GET 幂等请求重试一次
+    cfg._retried = true
+    return request(cfg)
   } else {
     ElMessage.error(message || '网络异常')
   }
@@ -48,6 +53,13 @@ export const adminApi = {
   getTrends: (params) => request.get('/admin/dashboard/trends', { params }),
   getUsers: (params) => request.get('/admin/users', { params }),
   toggleUserStatus: (id, status) => request.put(`/admin/users/${id}/status`, { status }),
+  deleteUser: (id, secondaryPassword) => request.delete(`/admin/users/${id}`, { data: { secondaryPassword } }),
+  // 管理端安全：二级密码 / 次级管理员
+  setSecondaryPassword: (data) => request.post('/admin/auth/secondary-password', data),
+  getSecondaryAdmins: () => request.get('/admin/auth/secondary-admins'),
+  addSecondaryAdmin: (data) => request.post('/admin/auth/secondary-admins', data),
+  updateSecondaryAdmin: (id, data) => request.put(`/admin/auth/secondary-admins/${id}`, data),
+  deleteSecondaryAdmin: (id) => request.delete(`/admin/auth/secondary-admins/${id}`),
   getProducts: (params) => request.get('/admin/products', { params }),
   toggleProductStatus: (id, status) => request.put(`/admin/products/${id}/status`, null, { params: { status } }),
   banProduct: (id, reason) => request.put(`/product/admin/${id}/ban`, { reason }),

@@ -1,13 +1,19 @@
 <view class="pub-page fade-up">
+  <!-- 发布页公告 -->
+  <view class="notice-card glass-card" wx:for="{{notices}}" wx:key="id" wx:if="{{notices.length}}">
+    <text class="notice-tag">平台公告</text>
+    <text class="notice-title">{{item.title}}</text>
+  </view>
+
   <view class="field-group">
     <view class="field">
       <text class="label">商品标题</text>
       <input class="value" placeholder="请输入商品标题" placeholder-class="ph" bindinput="set1" value="{{title}}"/>
     </view>
-    <picker mode="selector" range="{{categories}}" range-key="name" value="{{catIndex}}" bindchange="onCat">
+    <picker mode="selector" range="{{catOptions}}" range-key="name" value="{{catIndex}}" bindchange="onCat">
       <view class="field pick">
         <text class="label">分类</text>
-        <text class="value">{{catName}}</text>
+        <text class="value {{catName === '请选择' ? 'ph' : ''}}">{{catName}}</text>
         <text class="arrow">›</text>
       </view>
     </picker>
@@ -34,6 +40,11 @@
         <text class="arrow">›</text>
       </view>
     </picker>
+    <view class="field" wx:if="{{freight == 2}}">
+      <text class="label">运费金额</text>
+      <text class="value-prepend">¥</text>
+      <input class="value prep" type="digit" placeholder="运费金额" bindinput="set6" value="{{freightAmount}}"/>
+    </view>
     <view class="field">
       <text class="label">所在地</text>
       <input class="value" placeholder="选填" bindinput="set4" value="{{location}}"/>
