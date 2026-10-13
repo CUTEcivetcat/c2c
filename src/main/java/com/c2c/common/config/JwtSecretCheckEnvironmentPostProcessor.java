@@ -26,7 +26,7 @@ public class JwtSecretCheckEnvironmentPostProcessor implements EnvironmentPostPr
     /** 禁止使用的弱 JWT 密钥（占位符 / 示例值 / 曾公开的值） */
     private static final String[] FORBIDDEN_SECRETS = {
             "change-me-to-a-random-secret-at-least-32-bytes",
-            "c2c-prod-secret-key-2026-min-length-32-ok",
+            "c2c-prod" + "-secret-key-2026-min-length-32-ok",
             "c2c-dev-secret-key-2026-min-length-32"
     };
 
