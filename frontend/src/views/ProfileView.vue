@@ -32,6 +32,21 @@
       </router-link>
     </div>
 
+    <!-- 我的环保贡献（参赛功能：低碳循环数据） -->
+    <div v-if="eco" class="eco-card">
+      <div class="eco-head">
+        <h3>🌱 我的环保贡献</h3>
+        <span class="eco-slogan">你的每一次闲置流转，都在为地球减碳</span>
+      </div>
+      <div class="eco-grid">
+        <div class="eco-item"><div class="eco-num">{{ eco.dealCount }}</div><div class="eco-label">成交笔数</div></div>
+        <div class="eco-item"><div class="eco-num orange">¥{{ eco.saveMoney }}</div><div class="eco-label">累计省钱</div></div>
+        <div class="eco-item"><div class="eco-num green">{{ eco.carbonReduceKg }}</div><div class="eco-label">减排量 (kg CO₂e)</div></div>
+        <div class="eco-item"><div class="eco-num blue">{{ eco.treeEquivalent }}</div><div class="eco-label">相当于植树 (棵)</div></div>
+      </div>
+      <p class="eco-note">减排量为平台估算口径（按商品分类系数），数据来自真实成交</p>
+    </div>
+
     <!-- 我的商品 -->
     <div class="my-goods-section">
       <div class="section-head">
@@ -118,11 +133,19 @@ import { useUserStore } from '@/stores/userStore'
 import { updateProfile } from '@/api/user'
 import { getMyPublished, offShelfProduct, updateStatus } from '@/api/product'
 import { createAppeal } from '@/api/review'
+import { getMyEcoStats } from '@/api/eco'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const store = useUserStore()
 const router = useRouter()
 const form = ref({ nickname: '', gender: 0 })
+
+// ============ 我的环保贡献（参赛功能） ============
+const eco = ref(null)
+onMounted(() => {
+  // 加载失败静默隐藏卡片，不阻塞页面
+  getMyEcoStats().then(r => { eco.value = r || null }).catch(() => { eco.value = null })
+})
 
 // ============ 我的商品 ============
 const list = ref([])
@@ -235,6 +258,23 @@ const save = async () => {
 }
 .menu-item:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
 .menu-ico { font-size: 20px; }
+
+/* 我的环保贡献 */
+.eco-card {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1px solid #bbf7d0; border-radius: 20px;
+  padding: 20px; margin-bottom: 20px;
+}
+.eco-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.eco-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: #14532d; }
+.eco-slogan { font-size: 12px; color: #16a34a; }
+.eco-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 480px) { .eco-grid { grid-template-columns: repeat(2, 1fr); } }
+.eco-item { background: #fff; border-radius: 12px; padding: 14px 8px; text-align: center; border: 1px solid #dcfce7; }
+.eco-num { font-size: 22px; font-weight: 800; color: #15803d; }
+.eco-num.orange { color: #e67e22; } .eco-num.green { color: #16a34a; } .eco-num.blue { color: #2563eb; }
+.eco-label { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.eco-note { margin: 10px 0 0; font-size: 11px; color: #9ca3af; }
 
 /* 我的商品 */
 .my-goods-section {

@@ -79,6 +79,27 @@
       </div>
     </div>
 
+    <!-- 低碳循环看板（参赛功能：估算口径，数据来自真实成交） -->
+    <div class="eco-section">
+      <div class="eco-head">
+        <h3>🌱 低碳循环看板</h3>
+        <span class="eco-tip">减排量为平台估算口径（按商品分类系数）</span>
+      </div>
+      <div class="eco-grid">
+        <div class="eco-card"><div class="eco-num green">{{ eco.totalCarbonReduceKg }}</div><div class="eco-label">累计减排量 (kg CO₂e)</div></div>
+        <div class="eco-card"><div class="eco-num orange">¥{{ eco.totalSaveMoney }}</div><div class="eco-label">累计省钱金额</div></div>
+        <div class="eco-card"><div class="eco-num">{{ eco.totalDealCount }}</div><div class="eco-label">累计成交笔数</div></div>
+        <div class="eco-card"><div class="eco-num blue">{{ eco.totalTreeEquivalent }}</div><div class="eco-label">相当于植树 (棵)</div></div>
+      </div>
+      <div class="eco-chart-card">
+        <div class="chart-head">
+          <h3>近 30 日减排趋势 (kg CO₂e)</h3>
+          <span style="font-size:12px;color:#909399">按已完成订单日期分组</span>
+        </div>
+        <div ref="ecoChartRef" class="chart-box" style="height:280px"></div>
+      </div>
+    </div>
+
     <!-- 快捷操作 -->
     <el-card style="border-radius:14px;margin-top:20px">
       <h3 style="margin-bottom:12px">快捷操作</h3>
@@ -101,9 +122,44 @@ import * as echarts from 'echarts'
 const stats = ref({ totalUsers: 0, totalProducts: 0, onSaleProducts: 0, todayOrders: 0 })
 const userChartRef = ref(null)
 const orderChartRef = ref(null)
+const ecoChartRef = ref(null)
 let userChart = null
 let orderChart = null
+let ecoChart = null
 let ro = null
+
+// ============ 低碳循环看板（参赛功能） ============
+const eco = ref({ totalDealCount: 0, totalSaveMoney: 0, totalCarbonReduceKg: 0, totalTreeEquivalent: 0 })
+
+const loadEco = async () => {
+  try {
+    const [overview, trend] = await Promise.all([
+      adminApi.getEcoOverview(),
+      adminApi.getEcoTrend(30)
+    ])
+    if (overview) eco.value = overview
+    if (trend && trend.dates?.length) {
+      ecoChart?.dispose(); ecoChart = null
+      nextTick(() => initEcoChart(trend))
+    }
+  } catch (e) { /* 无权限/失败时区块静默降级 */ }
+}
+
+const initEcoChart = (trend) => {
+  if (!ecoChartRef.value) return
+  ecoChart = echarts.init(ecoChartRef.value)
+  ecoChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: { type: 'category', data: trend.dates, boundaryGap: false },
+    yAxis: { type: 'value', name: 'kg CO₂e' },
+    series: [{
+      name: '减排量', type: 'line', smooth: true, data: trend.carbonReduceKg,
+      lineStyle: { color: '#16a34a', width: 3 }, itemStyle: { color: '#16a34a' },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(22,163,74,0.3)' }, { offset: 1, color: 'rgba(22,163,74,0.02)' }]) }
+    }]
+  })
+}
 
 // 用户图表独立选择
 const userRange = ref('7d')
@@ -164,12 +220,14 @@ onMounted(async () => {
       if (userTrends) initUserChart(userTrends)
       if (orderTrends) initOrderChart(orderTrends)
     })
+    loadEco()
   } catch (e) { /* */ }
 
   window.addEventListener('resize', resizeCharts)
   ro = new ResizeObserver(() => resizeCharts())
   if (userChartRef.value) ro.observe(userChartRef.value)
   if (orderChartRef.value) ro.observe(orderChartRef.value)
+  if (ecoChartRef.value) ro.observe(ecoChartRef.value)
 })
 
 onUnmounted(() => {
@@ -177,9 +235,10 @@ onUnmounted(() => {
   ro?.disconnect()
   userChart?.dispose()
   orderChart?.dispose()
+  ecoChart?.dispose()
 })
 
-const resizeCharts = () => { userChart?.resize(); orderChart?.resize() }
+const resizeCharts = () => { userChart?.resize(); orderChart?.resize(); ecoChart?.resize() }
 
 const initUserChart = (trends) => {
   const { dates, newUsers } = trends
@@ -242,4 +301,17 @@ const initOrderChart = (trends) => {
 .chart-head h3 { font-size: 14px; color: #2d3436; margin: 0; }
 .chart-range { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .chart-box { width: 100%; height: 300px }
+
+/* 低碳循环看板 */
+.eco-section { margin-bottom: 20px; }
+.eco-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.eco-head h3 { font-size: 16px; color: #14532d; margin: 0; }
+.eco-tip { font-size: 12px; color: #909399; }
+.eco-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px }
+@media (max-width: 900px) { .eco-grid { grid-template-columns: repeat(2, 1fr) } }
+.eco-card { background: linear-gradient(135deg, #f0fdf4, #ecfdf5); border: 1px solid #bbf7d0; border-radius: 14px; padding: 20px; text-align: center; }
+.eco-num { font-size: 30px; font-weight: 700; color: #15803d }
+.eco-num.green { color: #16a34a } .eco-num.orange { color: #e67e22 } .eco-num.blue { color: #2563eb }
+.eco-label { font-size: 13px; color: #909399; margin-top: 4px }
+.eco-chart-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.04) }
 </style>

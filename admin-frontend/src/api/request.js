@@ -51,6 +51,9 @@ export const adminApi = {
   adminLogin: (data) => request.post('/admin/login', data),
   getSummary: () => request.get('/admin/dashboard/summary'),
   getTrends: (params) => request.get('/admin/dashboard/trends', { params }),
+  // 低碳循环看板（数据大屏权限）
+  getEcoOverview: () => request.get('/admin/eco/overview'),
+  getEcoTrend: (days) => request.get('/admin/eco/trend', { params: { days } }),
   getUsers: (params) => request.get('/admin/users', { params }),
   toggleUserStatus: (id, status) => request.put(`/admin/users/${id}/status`, { status }),
   deleteUser: (id, secondaryPassword) => request.delete(`/admin/users/${id}`, { data: { secondaryPassword } }),

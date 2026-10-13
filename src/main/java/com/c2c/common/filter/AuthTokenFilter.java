@@ -267,6 +267,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     /** /admin/** 路径 → 模块权限码。 */
     private String permForPath(String path) {
         if (path.startsWith("/admin/dashboard")) return AdminPerm.DASHBOARD;
+        if (path.startsWith("/admin/eco")) return AdminPerm.DASHBOARD;
         if (path.startsWith("/admin/users")) return AdminPerm.USERS;
         if (path.startsWith("/admin/products")) return AdminPerm.PRODUCTS;
         if (path.startsWith("/admin/orders")) return AdminPerm.ORDERS;
