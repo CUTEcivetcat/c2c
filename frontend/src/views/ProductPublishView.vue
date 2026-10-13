@@ -39,6 +39,27 @@
                 <el-icon><Plus /></el-icon>
               </el-upload>
               <p class="upload-tip">支持 jpg/png/webp，单张最大 10MB，最多 9 张</p>
+
+              <!-- AI 智能填写（参赛功能：多模态识别 + 自动生成 + 估价） -->
+              <div v-if="images.length" class="ai-fill-bar">
+                <el-button type="primary" plain :loading="aiLoading" :disabled="aiLoading" @click="aiFill">
+                  {{ aiLoading ? 'AI 分析中…' : '✨ AI 智能填写' }}
+                </el-button>
+                <span class="ai-fill-tip">根据首图自动生成标题、描述、分类与建议售价</span>
+              </div>
+              <div v-if="aiSuggestion" class="ai-result-card">
+                <div v-if="aiSuggestion.priceMin != null && aiSuggestion.priceMax != null" class="ai-price-suggest">
+                  <span>AI 建议价：<b>¥{{ aiSuggestion.priceMin }} ~ ¥{{ aiSuggestion.priceMax }}</b></span>
+                  <el-button size="small" type="primary" link @click="applyAiPrice">采用</el-button>
+                  <el-button size="small" link @click="ignoreAiPrice">忽略</el-button>
+                </div>
+                <div v-else-if="aiSuggestion.source === 'rule'" class="ai-rule-tip">
+                  已按历史成交价给出建议区间（未匹配到分类时请手动选择）
+                </div>
+                <div v-if="aiSuggestion.categoryId == null && aiSuggestion.categoryName" class="ai-rule-tip">
+                  未匹配到分类「{{ aiSuggestion.categoryName }}」，请手动选择
+                </div>
+              </div>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" size="large" @click="submit" :loading="loading" style="width:200px;height:48px;border-radius:14px;font-size:15px">
@@ -74,6 +95,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCategories, publishProduct, updateProduct, getProductDetail } from '@/api/product'
 import { getAnnouncementPublish } from '@/api/announcement'
+import { intelligentPublish } from '@/api/ai'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
@@ -87,6 +109,33 @@ const existingImages = ref([])
 const uploadFiles = ref([])
 const form = ref({ title:'', description:'', categoryId:null, price:null, originalPrice:null, condition:2, freightType:1, location:'', images:[] })
 const uploadHeaders = { Authorization: `Bearer ${localStorage.getItem('token')}` }
+
+// ============ AI 智能填写（参赛功能） ============
+const aiLoading = ref(false)
+const aiSuggestion = ref(null)
+
+// 根据首图调用 AI：回填标题/描述/分类/成色，建议价以提示条展示由用户决定是否采用
+const aiFill = async () => {
+  const first = images.value[0]
+  if (!first) { ElMessage.warning('请先上传商品图片'); return }
+  aiLoading.value = true
+  try {
+    const res = await intelligentPublish(first, form.value.categoryId || null)
+    aiSuggestion.value = res || null
+    if (res?.title) form.value.title = res.title
+    if (res?.description) form.value.description = res.description
+    if (res?.categoryId != null) form.value.categoryId = res.categoryId
+    if (res?.condition) form.value.condition = res.condition
+  } catch (e) { /* 拦截器已提示，不阻塞手动填写 */ } finally {
+    aiLoading.value = false
+  }
+}
+const applyAiPrice = () => {
+  if (aiSuggestion.value?.priceMin != null) form.value.price = aiSuggestion.value.priceMin
+  ElMessage.success('已采用 AI 建议价，可自行调整')
+  ignoreAiPrice()
+}
+const ignoreAiPrice = () => { aiSuggestion.value = null }
 
 // 公告面板
 const publishAnn = ref([])
@@ -151,6 +200,14 @@ const submit = async () => {
 .publish-left { flex: 1; min-width: 0; }
 .publish-card { background: #fff; border-radius: 20px; padding: 32px; border: 1px solid #f0f2f5; }
 .upload-tip { font-size: 12px; color: #b2bec3; margin-top: 6px; }
+
+/* AI 智能填写 */
+.ai-fill-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.ai-fill-tip { font-size: 12px; color: #b2bec3; }
+.ai-result-card { margin-top: 10px; background: #fff8f5; border: 1px dashed #ffb74d; border-radius: 10px; padding: 10px 12px; }
+.ai-price-suggest { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: #2d3436; }
+.ai-price-suggest b { color: #ff6b35; }
+.ai-rule-tip { font-size: 12px; color: #b2bec3; margin-top: 4px; }
 :deep(.el-form-item__label) { font-weight: 600; color: #2d3436; }
 .img-preview-item { position:relative; width:100px; height:100px; border-radius:8px; overflow:hidden; display:inline-block }
 .img-preview-item img { width:100%; height:100%; object-fit:cover }

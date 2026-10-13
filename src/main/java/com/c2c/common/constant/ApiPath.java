@@ -157,4 +157,13 @@ public interface ApiPath {
     String BANNER_ADMIN_LIST = "/admin/banner/list";
     String BANNER_ADMIN = "/admin/banner";
     String BANNER_ADMIN_ID = "/admin/banner/{id}";
+
+    // ==================== AI 智能发布 /ai（需登录） ====================
+    String AI = "/ai";
+    String AI_INTELLIGENT_PUBLISH = "/ai/intelligent-publish";
+
+    // ==================== 低碳循环 /eco（用户统计需登录；/admin/eco 需管理端 DASHBOARD 权限） ====================
+    String ECO_USER_STATS = "/eco/user/stats";
+    String ADMIN_ECO_OVERVIEW = "/admin/eco/overview";
+    String ADMIN_ECO_TREND = "/admin/eco/trend";
 }
