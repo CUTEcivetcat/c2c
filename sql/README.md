@@ -1,45 +1,28 @@
 # SQL 目录说明
 
-> **新部署**只用 `init.sql` + `data.sql`；**已有库升级**用 `update-*.sql`；已并入全量脚本的历史增量在 `xz/` 归档。
+> **当前只有一套全量脚本**：历史增量（banner 表、二级密码、三级权限、扩充数据）已全部并入 `init.sql` + `data.sql`，无需再执行任何增量/归档脚本。
 
-## 一、全量脚本（全新环境 / 重灌）
+## 一、全量脚本（全新环境 / 重灌唯一入口）
 
 | 文件 | 用途 | 用法 |
 |---|---|---|
-| `init.sql` | **全量建表**：18 张表 + 全部字段（含 `secondary_pwd` 二级密码、`admin_level` 管理员等级、`admin_perms` 权限码） | `mysql -uroot -p c2c < init.sql` |
-| `data.sql` | **全量演示数据**：8 用户（admin 为总管理员 `admin_level=2`）、4 原始商品 + 26 扩充商品（覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）、30 商品图、8 收藏、3 意向、地址/订单/公告/钱包等 | `mysql -uroot -p c2c < data.sql` |
+| `init.sql` | **全量建表**：19 张表 + 全部字段（含 `secondary_pwd` 二级密码、`admin_level` 管理员等级、`admin_perms` 权限码、`banner` 轮播图表） | `mysql -uroot -p c2c < init.sql` |
+| `data.sql` | **全量演示数据**：8 用户（admin 为总管理员 `admin_level=2`）、30 商品（覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）、30 商品图、8 收藏、3 意向、3 轮播图、1 公告、订单/钱包余额等 | `mysql -uroot -p c2c < data.sql` |
 
 ```bash
 mysql -uroot -p c2c < init.sql   # ① 建表（会清空重建 c2c 库）
 mysql -uroot -p c2c < data.sql   # ② 导入演示数据
 ```
 
-## 二、增量升级脚本（已有库，按需执行）
+## 二、更新规范
 
-| 文件 | 用途 | 适用场景 |
-|---|---|---|
-| `update-20260822-banner.sql` | 轮播图表 | 2026-08 之前的库 |
-| `update-20260914-secondary-pwd.sql` | 加 `secondary_pwd` 二级密码字段 | 2026-09-14 之前的库 |
-| `update-20260915-admin-levels.sql` | 加 `admin_level` / `admin_perms` 字段 + 存量管理员等级迁移 | 2026-09-15 之前的库（**服务器更新必执行**） |
+1. 新增表/字段/数据 → **直接同步进全量脚本**（`init.sql` 加表/字段、`data.sql` 加数据），保证全新部署一步到位，不另立增量文件。
+2. 线上已有库需要平滑升级且不方便重灌时 → 临时增量脚本执行完后**并入全量脚本并删除**，避免脚本越积越多、口径混乱。
+3. 全量脚本任何修改必须自测通过（建库 → 导数 → 启动后端验证核心页面）后再交付。
 
-> ⚠️ 已通过全量脚本（init.sql/data.sql）建的库**不要再执行** `update-*.sql`，否则 ALTER 重复报错。
+## 三、关键数据约定
 
-## 三、归档 `xz/`（已并入全量脚本，备用）
-
-| 文件 | 内容 | 何时仍会用到 |
-|---|---|---|
-| `xz/data-extra.sql` | 扩充测试数据（用户 5~8、商品 5~30、图片/收藏/意向），幂等 `INSERT IGNORE` | 已有库缺扩充商品时单独补数据 |
-| `xz/repair-admin-levels.sql` | admin 等级修复（纯 UPDATE 幂等） | 已有库漏迁移、admin 无权限管理菜单时应急修复（后端登录自愈已兜底，一般不需要） |
-
-```bash
-# 已有库补扩充商品（可选）
-mysql -uroot -p c2c < sql/xz/data-extra.sql
-# 已有库应急修复 admin 等级（可选）
-mysql -uroot -p c2c < sql/xz/repair-admin-levels.sql
-```
-
-## 四、更新规范
-
-1. 新增表/字段/数据 → **同步进全量脚本**（`init.sql` 加字段、`data.sql` 加数据），保证全新部署一步到位。
-2. 已有库需要平滑升级 → 新建 `sql/update-YYYYMMDD-xxx.sql`（幂等写法），文件头注释写明用途，**保留在主目录**。
-3. 某增量文件内容**已完全并入全量脚本**后 → 移入 `sql/xz/` 归档（不删除，备查备用），并在本文件第二节登记。
+- 总管理员：`admin`（`role=1` + `admin_level=2` + `admin_perms='*'`）
+- 次级管理员：`role=1` 且 `username<>'admin'`（`admin_level=1`，权限码按需配置）
+- 审核员：`role=2`（仅用户端审核工作台，不能登录管理端口）
+- 演示登录：手机号验证码登录（测试环境验证码回显）或 admin/123456

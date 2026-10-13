@@ -10,10 +10,10 @@ USE c2c;
 INSERT INTO `user`
 (`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `admin_level`, `admin_perms`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
 VALUES
-(1, '13800000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13800000001', NULL, 0, NULL, '小王', '学生卖家，出闲置', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
-(2, '13900000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13900000001', NULL, 0, NULL, '小李', '学生买家，淘好物', 1, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
-(3, 'test@qq.com', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', NULL, 'test@qq.com', 1, NULL, '测试用户', '演示账号', 0, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
-(4, 'admin', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '18800000001', NULL, 0, NULL, '管理员', '平台管理员', 1, 1, 1, 2, '*', 5.0, NOW(), NOW(), NOW());
+(1, '13800000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13800000001', NULL, 0, NULL, '小王', '学生卖家，出闲置', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(2, '13900000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13900000001', NULL, 0, NULL, '小李', '学生买家，淘好物', 1, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
+(3, 'test@qq.com', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', NULL, 'test@qq.com', 1, NULL, '测试用户', '演示账号', 0, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(4, 'admin', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '18800000001', NULL, 0, NULL, '管理员', '平台管理员', 1, 1, 1, 2, '*', 5.0, NOW(), NOW(), NOW());
 
 -- -------------------------------------------------------------
 -- 收货地址
@@ -97,8 +97,6 @@ INSERT INTO `message`
 VALUES
 (1, 1, 2, 1, '你好，iPhone 15 Pro 还有货吗？', 1, NULL, 1, NOW()),
 (2, 1, 1, 2, '有的，可以在主校区当面看。', 1, NULL, 0, NOW());
--- 演示用户各充值 100 元
-UPDATE user SET balance = 100.00 WHERE id <= 8 AND balance = 0;
 
 SET FOREIGN_KEY_CHECKS = 1;
 -- =============================================================
@@ -117,10 +115,10 @@ USE c2c;
 INSERT INTO `user`
 (`id`, `username`, `password`, `phone`, `email`, `email_verified`, `avatar_url`, `nickname`, `bio`, `gender`, `status`, `role`, `admin_level`, `admin_perms`, `reputation_score`, `last_login_at`, `created_at`, `updated_at`)
 VALUES
-(5, '13700000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13700000001', NULL, 0, NULL, '张同学', '计算机学院，出考研复习资料', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
-(6, '13600000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13600000001', NULL, 0, NULL, '李学长', '毕业清仓，好价出数码', 1, 1, 0, 0, NULL, 4.9, NOW(), NOW(), NOW()),
-(7, '13500000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13500000001', NULL, 0, NULL, '王学姐', '学姐闲置，物美价廉', 2, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
-(8, '13400000001', '$2a$10$EsUcIYG8ER5jzxgnm27uGu./dInm5XHI8ze4xTTlfzy6sZOTUc9A2', '13400000001', NULL, 0, NULL, '赵师兄', '机电学院，宿舍神器低价出', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW());
+(5, '13700000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13700000001', NULL, 0, NULL, '张同学', '计算机学院，出考研复习资料', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW()),
+(6, '13600000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13600000001', NULL, 0, NULL, '李学长', '毕业清仓，好价出数码', 1, 1, 0, 0, NULL, 4.9, NOW(), NOW(), NOW()),
+(7, '13500000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13500000001', NULL, 0, NULL, '王学姐', '学姐闲置，物美价廉', 2, 1, 0, 0, NULL, 4.8, NOW(), NOW(), NOW()),
+(8, '13400000001', '$2a$10$R2IByS.HRupurMLmZyJrBOd.NebEO3aNTD4f/Sy8GtsF/.UjRfe1W', '13400000001', NULL, 0, NULL, '赵师兄', '机电学院，宿舍神器低价出', 1, 1, 0, 0, NULL, 5.0, NOW(), NOW(), NOW());
 
 -- -------------------------------------------------------------
 -- 补充商品（id 5~30，覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）
@@ -211,4 +209,19 @@ VALUES
 (2, 15, 1, 2, '5200可以小刀一下吗？', 5000.00, 2, '最多5100，支持面交验机', NOW(), NOW()),
 (3, 24, 3, 5, '折叠桌还在吗？', 35.00, 1, NULL, NOW(), NOW());
 
--- 新演示用户各充值 100 元余额
+-- -------------------------------------------------------------
+-- 首页轮播图（banner）
+-- -------------------------------------------------------------
+INSERT INTO `banner` (`id`, `title`, `image_url`, `link_url`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
+(1, '开学季 · 数码好物专场', '/files/demo/iphone15.jpg', '/pages/product/detail?id=24', 1, 1, NOW(), NOW()),
+(2, '宿舍收纳神器 · 二手价带走', '/files/demo/box.jpg', '/pages/product/detail?id=27', 2, 1, NOW(), NOW()),
+(3, '考研资料一站备齐', '/files/demo/cet4.jpg', '/pages/product/detail?id=13', 3, 1, NOW(), NOW());
+
+-- -------------------------------------------------------------
+-- 公告（登录弹窗 + 滚动公告）
+-- -------------------------------------------------------------
+INSERT INTO `announcement` (`id`, `title`, `content`, `type`, `status`, `pinned`, `is_force`, `min_seconds`, `scroll`, `show_on_publish`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, '欢迎使用校园二手交易平台', '亲爱的同学，欢迎来到校园二手交易平台！\n\n在这里你可以：\n1. 发布闲置，让物品继续流转；\n2. 淘到物美价廉的二手好物；\n3. 站内私信沟通，安全交易。\n\n请遵守平台规则，诚信交易，共同维护绿色低碳的校园循环经济。', 1, 1, 1, 1, 3, 1, 0, 1, NOW(), NOW());
+
+-- 全部用户（含扩充用户 5~8）各充值 100 元余额
+UPDATE `user` SET `balance` = 100.00 WHERE `id` <= 8 AND `balance` = 0;
