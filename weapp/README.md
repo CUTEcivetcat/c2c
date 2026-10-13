@@ -1,8 +1,8 @@
-# 闲小鱼 · C2C 二手交易小程序（用户端）
+# 校园二手交易平台 · 微信小程序（用户端）
 
 > 状态：**v2.0 用户端完整版** —— 已完成全面重构，覆盖后端全部用户侧能力；原「残缺版」遗留问题均已修复。
 
-C2C 二手交易平台微信小程序端，配套单体后端 `com.c2c`（Spring Boot + MyBatis-Plus + Redis）。
+校园二手交易平台微信小程序端，配套单体后端 `com.c2c`（Spring Boot + MyBatis-Plus + Redis）。
 
 ---
 
@@ -96,7 +96,7 @@ java -jar target/c2c-monolith.jar
 3. 勾选「不校验合法域名」
 4. 编译运行
 
-> 服务器地址：`app.js → globalData.serverUrl`，默认 `http://81.71.118.128/api/v1`；
+> 服务器地址：`app.js → globalData.serverUrl`，正式版默认 `http://192.168.163.135:8080/api/v1`（测试服务器）；
 > 本地联调改为 `http://127.0.0.1:8080/api/v1`。
 
 ---

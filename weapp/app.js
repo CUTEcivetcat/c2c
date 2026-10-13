@@ -10,11 +10,12 @@ App({
   },
 
   onLaunch() {
-    // 环境区分：开发版/体验版走本地后端，正式版走生产（按需修改两个地址）
+    // 环境区分：开发版/体验版走本地后端，正式版走测试服务器（按需修改两个地址）
     var env = ''
     try { env = wx.getAccountInfoSync().miniProgram.envVersion || '' } catch (e) {}
     var devServer = 'http://127.0.0.1:8080/api/v1'
-    var prodServer = 'http://81.71.118.128/api/v1'
+    // 测试服务器；历史公网服务器已下线（真实公网地址不写入仓库）
+    var prodServer = 'http://192.168.163.135:8080/api/v1'
     this.globalData.serverUrl = env === 'release' ? prodServer : devServer
     const token = wx.getStorageSync('token')
     const userInfo = wx.getStorageSync('userInfo')

@@ -6,9 +6,10 @@
 #    真实配置请复制 config/application.example.yml 为 config/application-pro.yml
 #    或 config/application-prod.yml，并填入你的真实值（已被 .gitignore 排除）。
 #
-# 环境说明：默认激活 pro profile（见下方 spring.profiles.default）。
-#   - pro  = 本地开发，连服务器公网数据库/缓存（config/application-pro.yml）
+# 环境说明：默认激活 test profile（本地开发连测试服务器 192.168.163.135）。
+#   - test = 本地/测试环境（config/application-test.yml，连 192.168.163.135）
 #   - prod = 生产服务器（SPRING_PROFILES_ACTIVE=prod + config/application-prod.yml）
+#   - pro  = 旧公网服务器（已下线，仅历史配置保留）
 #   - 部署时把对应外部配置放到 jar 同目录 config/ 下即可自动加载
 # =====================================================================
 
@@ -21,7 +22,7 @@ spring:
   application:
     name: c2c-monolith
   profiles:
-    default: pro
+    default: test
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:c2c}?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
@@ -78,6 +79,12 @@ app:
   upload-url-prefix: /files
   # 安全：是否在验证码接口响应中回显 code。仅本地开发置 true，生产必须 false（默认 false）
   sms-echo-code: ${APP_SMS_ECHO_CODE:true}
+  # AI 智能发布（参赛改造）：配置 API Key 走真实多模态大模型，留空自动降级本地规则引擎
+  ai:
+    base-url: ${AI_BASE_URL:}
+    api-key: ${AI_API_KEY:}
+    model: ${AI_MODEL:doubao-1-5-vision-pro-250828}
+    timeout: ${AI_TIMEOUT:15000}
 
 management:
   health:

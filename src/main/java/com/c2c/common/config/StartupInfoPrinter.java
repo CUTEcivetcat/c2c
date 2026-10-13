@@ -44,7 +44,7 @@ public class StartupInfoPrinter implements ApplicationRunner {
 
             log.info("");
             log.info("================================================================");
-            log.info("  闲小鱼 C2C 二手交易平台 启动完成");
+            log.info("  校园二手交易平台 启动完成");
             log.info("----------------------------------------------------------------");
             log.info("  环境 Profile : {}", profile);
             log.info("  本机访问     : {}/", localBase);
@@ -63,9 +63,10 @@ public class StartupInfoPrinter implements ApplicationRunner {
             log.info("----------------------------------------------------------------");
             if (profile.contains("prod")) {
                 log.info("  提示：当前为生产环境，请确认 config/ 外部配置已就位；");
-                log.info("        公网仅开放 80/443/221，数据库/Redis/后端监听本机。");
+                log.info("        公网仅开放 80/443 与受限 SSH 端口，数据库/Redis/后端监听本机。");
             } else {
-                log.info("  提示：本地开发模式，外部敏感配置来自 config/application-pro.yml");
+                // 外部敏感配置文件名与激活的 profile 保持一致（如 test -> application-test.yml）
+                log.info("  提示：本地开发模式，外部敏感配置来自 config/application-{}.yml", profile);
                 log.info("        （连接服务器数据库/缓存）；上传与日志走相对路径 ./uploads、./logs。");
             }
             log.info("================================================================");
