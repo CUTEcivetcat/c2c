@@ -1,4 +1,4 @@
-// 闲小鱼小程序 · WXML 绑定一致性检查
+// 校园二手交易平台小程序 · WXML 绑定一致性检查
 // 1) bindtap/catchtap/bindinput 等 handler 是否在对应 page.js 中存在（防"点击没反应"）
 // 2) data-url 跳转目标是否为已注册页面（防 navigateTo 静默失败）
 // 3) wxml 引用的 class 是否在对应 wxss 中定义（防"显示不完全"）

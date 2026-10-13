@@ -26,7 +26,7 @@
     "pages/report/report"
   ],
   "window": {
-    "navigationBarTitleText": "闲小鱼",
+    "navigationBarTitleText": "校园二手交易平台",
     "navigationBarBackgroundColor": "#ff6b35",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#f5f6f8"

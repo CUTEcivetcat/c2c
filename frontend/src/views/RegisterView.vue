@@ -2,7 +2,7 @@
   <div class="login-page">
     <div class="reset-card fade-in-up" style="width:480px">
       <h2>📝 注册账号</h2>
-      <p class="subtitle">填写信息加入闲小鱼</p>
+      <p class="subtitle">填写信息加入校园二手交易平台</p>
 
       <el-form :model="form" label-width="0" size="large" style="margin-top:20px">
         <!-- 注册方式：邮箱 或 手机号 -->

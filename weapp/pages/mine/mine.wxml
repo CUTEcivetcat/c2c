@@ -89,7 +89,7 @@
       <view class="login-ico-wrap">
         <text class="login-ico">🔄</text>
       </view>
-      <text class="login-title">闲小鱼</text>
+      <text class="login-title">校园二手交易平台</text>
       <text class="login-desc">登录后开启二手好物之旅</text>
       <button class="wx-btn" bindtap="wechatLogin">微信一键登录</button>
       <button class="acct-btn" bindtap="goAuthLogin">手机号 / 邮箱验证码</button>

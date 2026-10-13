@@ -3,7 +3,7 @@
   <view class="hero glass-card">
     <view class="hero-top">
       <view class="brand">
-        <text class="brand-name">闲小鱼</text>
+        <text class="brand-name">校园二手交易平台</text>
         <text class="brand-slogan">C2C 二手好物 · 用心换新</text>
       </view>
       <view class="chat-ico" bindtap="goSearch">⌕</view>

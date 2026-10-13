@@ -9,7 +9,7 @@
       <!-- Logo -->
       <router-link to="/" class="logo">
         <span class="logo-icon">🔄</span>
-        <span class="logo-text">闲小鱼</span>
+        <span class="logo-text">校园二手交易平台</span>
         <span class="logo-sub">二手</span>
       </router-link>
 
