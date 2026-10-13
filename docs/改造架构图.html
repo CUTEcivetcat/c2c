@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="margin:0;padding:0;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>校园二手交易平台 AI×低碳 改造架构图</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: #f5f7fa; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; color: #263238; }
+  .page-title { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .page-sub { font-size: 13px; color: #78909c; margin: 0 0 16px; }
+  .layer { border: 1.5px dashed #b0bec5; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; background: #fff; }
+  .layer-title { font-size: 14px; font-weight: 700; color: #455a64; margin: 0 0 10px; letter-spacing: 1px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  .node { border-radius: 8px; padding: 8px 12px; font-size: 13px; line-height: 1.5; }
+  .node b { display: block; font-size: 13.5px; margin-bottom: 2px; }
+  .node .tag { display: inline-block; font-size: 11px; border-radius: 3px; padding: 0 5px; margin-right: 4px; }
+  .front { background: #e3f2fd; border: 1.5px solid #90caf9; flex: 1 1 280px; }
+  .new { background: #fff3e0; border: 1.5px solid #ffb74d; flex: 1 1 300px; }
+  .exist { background: #e8f5e9; border: 1.5px solid #a5d6a7; flex: 1 1 220px; }
+  .data { background: #eceff1; border: 1.5px solid #90a4ae; flex: 1 1 220px; }
+  .tag-new { background: #ffb74d; color: #5d4037; }
+  .tag-exist { background: #a5d6a7; color: #1b5e20; }
+  .tag-data { background: #90a4ae; color: #263238; }
+  .tag-user { background: #90caf9; color: #0d47a1; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; color: #546e7a; font-size: 12px; margin: 6px 0; }
+  .flow .line { flex: 0 0 auto; font-size: 16px; }
+  .note { font-size: 12px; color: #607d8b; background: #fafafa; border: 1px solid #eee; border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #546e7a; margin-top: 4px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .lg-new::before { background: #fff3e0; border: 1px solid #ffb74d; }
+  .lg-exist::before { background: #e8f5e9; border: 1px solid #a5d6a7; }
+  .lg-front::before { background: #e3f2fd; border: 1px solid #90caf9; }
+  .lg-data::before { background: #eceff1; border: 1px solid #90a4ae; }
+</style>
+</head>
+<body style="margin:0;padding:16px;">
+  <p class="page-title">「校园二手交易平台」参赛改造架构图 —— AI 智能发布 × 低碳循环看板</p>
+  <p class="page-sub">增量改造示意：仅新增 ai / eco 两个后端模块，现有交易闭环不动</p>
+
+  <div class="legend">
+    <span class="lg-front">用户端前端（本次改 2 个页面）</span>
+    <span class="lg-new">本次新增</span>
+    <span class="lg-exist">现有模块（只读复用）</span>
+    <span class="lg-data">数据层</span>
+  </div>
+
+  <!-- 第一层：前端 -->
+  <div class="layer">
+    <p class="layer-title">① 用户端前端 Vue3（frontend / admin-frontend）</p>
+    <div class="row">
+      <div class="node front">
+        <b>ProductPublishView.vue <span class="tag tag-user">改</span></b>
+        新增「AI 智能填写」按钮：上传首图后一键回填 标题/分类/描述 + AI 建议价（¥Min~Max）提示条
+      </div>
+      <div class="node front">
+        <b>ProfileView.vue <span class="tag tag-user">改</span></b>
+        新增「我的环保贡献」卡片：成交笔数 / 累计省钱 / 减排量(kg CO₂e) / 相当于植树(棵)
+      </div>
+      <div class="node front">
+        <b>DashboardView.vue <span class="tag tag-user">改</span></b>
+        管理端新增「低碳循环看板」：累计减排/省钱/成交三卡 + 近30日减排趋势折线（ECharts）
+      </div>
+    </div>
+    <div class="flow"><span class="line">▼</span> HTTP /api/v1（登录态）<span class="line">▼</span></div>
+  </div>
+
+  <!-- 第二层：后端 -->
+  <div class="layer">
+    <p class="layer-title">② 后端 Spring Boot 2.7（新增 com.c2c.ai / com.c2c.eco）</p>
+    <div class="row">
+      <div class="node new">
+        <b>ai 模块 <span class="tag tag-new">新增</span></b>
+        POST /ai/intelligent-publish（登录）<br>
+        · 有 API Key → 多模态大模型（OpenAI 兼容 /chat/completions，提示词强制输出 JSON）<br>
+        · 无 Key / 调用失败 → 本地规则引擎兜底（分类字典 + 历史成交均价 ±20%）<br>
+        · 两路径共用「同分类已售商品均价」修正估价区间
+      </div>
+      <div class="node new">
+        <b>eco 模块 <span class="tag tag-new">新增</span></b>
+        GET /eco/user/stats（我的环保贡献）<br>
+        GET /admin/eco/overview（平台总览）<br>
+        GET /admin/eco/trend?days=30（减排趋势）<br>
+        统计口径：status=4 已完成订单；减排系数按一级分类字典（教材2.5 / 数码10 / 服饰6 / 其他5 kgCO₂e）
+      </div>
+      <div class="node exist">
+        <b>order / product 模块 <span class="tag tag-exist">不动</span></b>
+        现有交易闭环、钱包担保、审核、IM 全部保留<br>
+        eco 仅 LEFT JOIN 复用：order 表无 category_id / original_price，需 join product 取
+      </div>
+    </div>
+    <div class="note">
+      ⚠️ 鉴权要点：/admin/eco/** 走管理端鉴权，需在 AuthTokenFilter.permForPath() 加一行映射到 DASHBOARD 权限码；/ai/**、/eco/** 默认按普通用户登录鉴权，无需改白名单。
+    </div>
+  </div>
+
+  <!-- 第三层：数据 -->
+  <div class="layer">
+    <p class="layer-title">③ 数据层（不加新表）</p>
+    <div class="row">
+      <div class="node data">
+        <b>MySQL <span class="tag tag-data">只读</span></b>
+        product（status=3 已售均价 / category_id / original_price）<br>
+        order（status=4 已完成 / complete_time 趋势分组）
+      </div>
+      <div class="node data">
+        <b>Redis <span class="tag tag-data">新增用途</span></b>
+        ai:publish:{md5(imageUrl)} 缓存 24h，重复发布免调用大模型
+      </div>
+      <div class="node data">
+        <b>config/ 外部配置 <span class="tag tag-data">新增</span></b>
+        app.ai.base-url / api-key / model / timeout（占位符进 application.yml，真实 Key 走 config/ 不入仓）
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    实施顺序建议：ai 规则引擎路径（无 Key）→ eco 统计 → 前端发布页 → 个人中心 → 管理端看板 → 配真实 Key 联调 → 降级验证 → README/申报材料收尾。
+  </div>
+</body>
+</html>
