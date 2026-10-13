@@ -221,7 +221,7 @@ INSERT INTO `banner` (`id`, `title`, `image_url`, `link_url`, `sort_order`, `sta
 -- 公告（登录弹窗 + 滚动公告）
 -- -------------------------------------------------------------
 INSERT INTO `announcement` (`id`, `title`, `content`, `type`, `status`, `pinned`, `is_force`, `min_seconds`, `scroll`, `show_on_publish`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, '欢迎使用校园二手交易平台', '亲爱的同学，欢迎来到校园二手交易平台！\n\n在这里你可以：\n1. 发布闲置，让物品继续流转；\n2. 淘到物美价廉的二手好物；\n3. 站内私信沟通，安全交易。\n\n请遵守平台规则，诚信交易，共同维护绿色低碳的校园循环经济。', 1, 1, 1, 1, 3, 1, 0, 1, NOW(), NOW());
+(1, '欢迎使用青禾集市', '亲爱的同学，欢迎来到青禾集市！\n\n在这里你可以：\n1. 发布闲置，让物品继续流转；\n2. 淘到物美价廉的二手好物；\n3. 站内私信沟通，安全交易。\n\n请遵守平台规则，诚信交易，共同维护绿色低碳的校园循环经济。', 1, 1, 1, 1, 3, 1, 0, 1, NOW(), NOW());
 
 -- 全部用户（含扩充用户 5~8）各充值 100 元余额
 UPDATE `user` SET `balance` = 100.00 WHERE `id` <= 8 AND `balance` = 0;

@@ -5,7 +5,7 @@
       <div class="login-art">
         <div class="art-content">
           <span class="art-icon">🔄</span>
-          <h2>校园二手交易平台</h2>
+          <h2>青禾集市</h2>
           <p>让闲置流转起来</p>
           <div class="art-features">
             <div class="art-feat"><span>📧</span> 邮箱注册</div>

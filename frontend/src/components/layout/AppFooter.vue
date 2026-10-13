@@ -2,8 +2,8 @@
   <footer class="app-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="footer-logo">🔄 校园二手交易平台</span>
-        <span class="footer-desc">校园二手交易平台</span>
+        <span class="footer-logo">🔄 青禾集市</span>
+        <span class="footer-desc">青禾集市</span>
       </div>
       <div class="footer-links">
         <span>Vue 3</span><span class="dot">·</span>

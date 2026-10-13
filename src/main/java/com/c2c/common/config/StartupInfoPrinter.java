@@ -44,7 +44,7 @@ public class StartupInfoPrinter implements ApplicationRunner {
 
             log.info("");
             log.info("================================================================");
-            log.info("  校园二手交易平台 启动完成");
+            log.info("  青禾集市 启动完成");
             log.info("----------------------------------------------------------------");
             log.info("  环境 Profile : {}", profile);
             log.info("  本机访问     : {}/", localBase);

@@ -1,4 +1,4 @@
-// 校园二手交易平台小程序 · 静态校验脚本
+// 青禾集市小程序 · 静态校验脚本
 // 用法：node tools/check.js [weapp目录]（默认当前目录）
 // 校验项：JS 语法、JSON 合法性、app.json 页面注册完整性、页面跳转 URL 有效性
 const fs = require('fs')

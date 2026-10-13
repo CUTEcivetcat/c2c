@@ -1,7 +1,7 @@
 <view class="lp fade-up">
   <view class="brand">
     <view class="logo-ring"><text class="logo">🔄</text></view>
-    <text class="title">校园二手交易平台</text>
+    <text class="title">青禾集市</text>
     <text class="subtitle">欢迎回来，开启二手好物之旅</text>
   </view>
 

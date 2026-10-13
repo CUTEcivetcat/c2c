@@ -4,7 +4,7 @@
       <div class="sidebar-brand">
         <span class="brand-icon">🔄</span>
         <div class="brand-text" v-show="!collapsed">
-          <strong>校园二手交易平台</strong>
+          <strong>青禾集市</strong>
           <small>管理后台</small>
         </div>
       </div>
