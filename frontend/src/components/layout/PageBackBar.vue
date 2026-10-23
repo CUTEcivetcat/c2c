@@ -33,12 +33,12 @@ const goBack = () => {
   width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: 50%;
-  background: #fff; color: #2d3436;
+  background: #fff; color: var(--c2c-text);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: pointer; transition: all 0.25s; flex-shrink: 0;
 }
-.back-btn:hover { background: #ff6b35; color: #fff; transform: translateX(-2px); }
-.page-back-title { font-size: 18px; font-weight: 700; color: #2d3436; margin: 0; }
+.back-btn:hover { background: var(--c2c-primary); color: #fff; transform: translateX(-2px); }
+.page-back-title { font-size: 18px; font-weight: 700; color: var(--c2c-text); margin: 0; }
 .page-back-extra { margin-left: auto; }
 @media (max-width: 480px) {
   .page-back-bar { padding: 10px 12px 2px; }

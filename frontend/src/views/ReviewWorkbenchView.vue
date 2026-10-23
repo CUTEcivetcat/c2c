@@ -142,7 +142,7 @@
           <el-button type="primary" plain :loading="handling" @click="contactSeller(reportDetail.reporterId)">联系举报人</el-button>
         </div>
         <div v-else class="handle-row" style="justify-content:space-between">
-          <span style="color:#b2bec3;font-size:13px">该举报已处理</span>
+          <span style="color:var(--c2c-text-muted);font-size:13px">该举报已处理</span>
           <el-button type="primary" plain size="small" @click="contactSeller(reportDetail.sellerId)">联系卖家</el-button>
         </div>
       </template>
@@ -173,7 +173,7 @@
           <el-button type="primary" plain :loading="handling" @click="contactSeller(appealDetail.sellerId)">联系卖家</el-button>
         </div>
         <div v-else class="handle-row" style="justify-content:space-between">
-          <span style="color:#b2bec3;font-size:13px">该申诉已处理</span>
+          <span style="color:var(--c2c-text-muted);font-size:13px">该申诉已处理</span>
           <el-button type="primary" plain size="small" @click="contactSeller(appealDetail.sellerId)">联系卖家</el-button>
         </div>
       </template>
@@ -366,31 +366,31 @@ onMounted(() => { loadReports(); loadAppeals(); loadNicknames() })
 </script>
 
 <style scoped>
-.wb-tip { font-size: 13px; color: #636e72; background: #fff8f5; border: 1px solid #ffe4d6; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; }
+.wb-tip { font-size: 13px; color: var(--c2c-text-secondary); background: #fff8f5; border: 1px solid #ffe4d6; border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; }
 .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
 .card-list { display: flex; flex-direction: column; gap: 12px; min-height: 120px; }
-.review-card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid #f0f2f5; }
-.old-nick { color: #b2bec3; text-decoration: line-through; }
-.new-nick { color: #e55a2b; }
+.review-card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid var(--c2c-line-soft); }
+.old-nick { color: var(--c2c-text-muted); text-decoration: line-through; }
+.new-nick { color: var(--c2c-primary-dark); }
 .card-head { display: flex; gap: 12px; align-items: center; }
 .card-cover { width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0; }
 .card-title-box { flex: 1; min-width: 0; }
-.card-title { font-weight: 700; color: #2d3436; font-size: 15px; margin-bottom: 6px; word-break: break-all; }
+.card-title { font-weight: 700; color: var(--c2c-text); font-size: 15px; margin-bottom: 6px; word-break: break-all; }
 .card-sub { display: flex; gap: 6px; flex-wrap: wrap; }
-.card-body { margin-top: 10px; background: #f8f9fa; border-radius: 10px; padding: 10px 12px; }
-.line { font-size: 13px; color: #636e72; line-height: 1.7; }
-.line b { color: #2d3436; }
-.line.reason { color: #2d3436; }
-.line.remark { color: #e74c3c; }
+.card-body { margin-top: 10px; background: var(--c2c-bg); border-radius: 10px; padding: 10px 12px; }
+.line { font-size: 13px; color: var(--c2c-text-secondary); line-height: 1.7; }
+.line b { color: var(--c2c-text); }
+.line.reason { color: var(--c2c-text); }
+.line.remark { color: var(--c2c-danger); }
 .card-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-.time { font-size: 12px; color: #b2bec3; }
+.time { font-size: 12px; color: var(--c2c-text-muted); }
 .pager { text-align: center; margin-top: 16px; }
 .detail-product { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
 .dp-cover { width: 96px; height: 96px; border-radius: 12px; flex-shrink: 0; }
 .dp-info { flex: 1; min-width: 0; }
-.dp-title { font-weight: 700; color: #2d3436; font-size: 16px; word-break: break-all; }
-.dp-price { color: #e74c3c; font-size: 20px; font-weight: 800; margin: 4px 0; }
+.dp-title { font-weight: 700; color: var(--c2c-text); font-size: 16px; word-break: break-all; }
+.dp-price { color: var(--c2c-danger); font-size: 20px; font-weight: 800; margin: 4px 0; }
 .dp-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.detail-block { background: #f8f9fa; border-radius: 12px; padding: 12px 14px; }
+.detail-block { background: var(--c2c-bg); border-radius: 12px; padding: 12px 14px; }
 .handle-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: flex-end; }
 </style>

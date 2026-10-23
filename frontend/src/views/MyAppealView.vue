@@ -71,16 +71,16 @@ onMounted(load)
 
 <style scoped>
 .list { display: flex; flex-direction: column; gap: 12px; min-height: 120px; }
-.card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid #f0f2f5; }
+.card { background: #fff; border-radius: 16px; padding: 14px 16px; border: 1px solid var(--c2c-line-soft); }
 .head { display: flex; gap: 12px; align-items: center; text-decoration: none; }
 .cover { width: 64px; height: 64px; border-radius: 12px; flex-shrink: 0; }
 .title-box { flex: 1; min-width: 0; }
-.title { font-weight: 700; color: #2d3436; font-size: 15px; margin-bottom: 6px; }
+.title { font-weight: 700; color: var(--c2c-text); font-size: 15px; margin-bottom: 6px; }
 .tags { display: flex; gap: 6px; }
-.body { margin-top: 10px; background: #f8f9fa; border-radius: 10px; padding: 10px 12px; }
-.line { font-size: 13px; color: #636e72; line-height: 1.7; }
-.line.remark { color: #e74c3c; }
+.body { margin-top: 10px; background: var(--c2c-bg); border-radius: 10px; padding: 10px 12px; }
+.line { font-size: 13px; color: var(--c2c-text-secondary); line-height: 1.7; }
+.line.remark { color: var(--c2c-danger); }
 .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-.time { font-size: 12px; color: #b2bec3; }
+.time { font-size: 12px; color: var(--c2c-text-muted); }
 .pager { text-align: center; margin-top: 16px; }
 </style>

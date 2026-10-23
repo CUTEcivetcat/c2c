@@ -31,12 +31,12 @@
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 .footer-brand { display: flex; align-items: center; gap: 10px; }
-.footer-logo { font-size: 16px; font-weight: 700; color: #2d3436; }
-.footer-desc { font-size: 12px; color: #ff6b35; background: #fff5f0; padding: 2px 10px; border-radius: 8px; }
-.footer-links { font-size: 12px; color: #b2bec3; display: flex; gap: 6px; align-items: center; }
+.footer-logo { font-size: 16px; font-weight: 700; color: var(--c2c-text); }
+.footer-desc { font-size: 12px; color: var(--c2c-primary); background: #fff5f0; padding: 2px 10px; border-radius: 8px; }
+.footer-links { font-size: 12px; color: var(--c2c-text-muted); display: flex; gap: 6px; align-items: center; }
 .footer-links .dot { font-size: 16px; }
 .footer-nav { display: flex; gap: 16px; }
-.footer-nav-link { font-size: 12px; color: #b2bec3; text-decoration: none; transition: color 0.2s; }
-.footer-nav-link:hover { color: #ff6b35; }
-.footer-copy { font-size: 11px; color: #b2bec3; }
+.footer-nav-link { font-size: 12px; color: var(--c2c-text-muted); text-decoration: none; transition: color 0.2s; }
+.footer-nav-link:hover { color: var(--c2c-primary); }
+.footer-copy { font-size: 11px; color: var(--c2c-text-muted); }
 </style>

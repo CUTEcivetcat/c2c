@@ -15,7 +15,7 @@ $bg: #f8f9fa;
 $bg-card: #ffffff;
 $text: #2d3436;
 $text-secondary: #636e72;
-$text-muted: #b2bec3;
+$text-muted: #6b7684;
 $border: #dfe6e9;
 $shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
 $shadow: 0 2px 12px rgba(0,0,0,0.08);
@@ -53,6 +53,26 @@ a { color: $primary; text-decoration: none; transition: $transition;
   --el-border-radius-base: #{$radius-sm};
   --el-border-radius-round: #{$radius-xl};
 }
+
+// ====== 设计令牌（CSS 自定义属性，供 <style> 直接引用）======
+:root {
+  --c2c-primary: #ff6b35;
+  --c2c-primary-light: #ff8c5a;
+  --c2c-primary-dark: #e55a2b;
+  --c2c-text: #2d3436;
+  --c2c-text-secondary: #636e72;
+  --c2c-text-muted: #6b7684;
+  --c2c-danger: #e74c3c;
+  --c2c-accent: #00b894;
+  --c2c-warning: #fdcb6e;
+  --c2c-info: #74b9ff;
+  --c2c-bg: #f8f9fa;
+  --c2c-bg-soft: #f0f2f5;
+  --c2c-line-soft: #f0f2f5;
+  --c2c-border: #dfe6e9;
+}
+
+// 响应式断点统一为三档：480（手机）/ 768（平板）/ 1024（小桌面）
 
 .el-button--primary {
   --el-button-bg-color: #{$primary};

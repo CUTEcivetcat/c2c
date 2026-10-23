@@ -69,7 +69,7 @@
           <product-cover :src="p.images?.[0]?.url" class="card-img" />
           <span class="condition-badge">{{ conditionMap[p.condition] || '' }}</span>
           <button class="favorite-btn-mini" @click.stop="toggleFav(p)" v-if="store.isLoggedIn()">
-            <el-icon :size="16" :style="{ color: p._fav ? '#ff6b35' : '#b2bec3' }">
+            <el-icon :size="16" :style="{ color: p._fav ? 'var(--c2c-primary)' : 'var(--c2c-text-muted)' }">
               <StarFilled v-if="p._fav" /><Star v-else />
             </el-icon>
           </button>
@@ -86,7 +86,7 @@
             <span class="card-views">{{ p.viewCount }} 人看过</span>
           </div>
           <div class="card-seller">
-            <el-avatar :size="20" style="background:#ff6b35;font-size:10px">{{ p.sellerName?.charAt(0) || '?' }}</el-avatar>
+            <el-avatar :size="20" style="background:var(--c2c-primary);font-size:10px">{{ p.sellerName?.charAt(0) || '?' }}</el-avatar>
             <span>{{ p.sellerName || '匿名' }}</span>
             <span class="seller-loc" v-if="p.location">{{ p.location }}</span>
           </div>
@@ -96,7 +96,7 @@
 
     <!-- 空状态 -->
     <div class="empty-state fade-in" v-if="!loading && products.length === 0">
-      <el-icon :size="64" color="#dfe6e9"><FolderOpened /></el-icon>
+      <el-icon :size="64" color="var(--c2c-border)"><FolderOpened /></el-icon>
       <h3>{{ selectedCat ? '该分类暂无商品' : '暂无商品' }}</h3>
       <p>快来发布第一件商品吧</p>
       <router-link to="/publish" v-if="store.isLoggedIn()">
@@ -209,18 +209,18 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 .category-bar {
   display: flex; flex-wrap: wrap; gap: 8px;
   margin-bottom: 24px; padding-bottom: 20px;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--c2c-line-soft);
 }
 .cat-chip {
   padding: 8px 18px; border-radius: 20px;
   border: 1.5px solid #e4e7ed; background: #fff;
-  font-size: 13px; font-weight: 500; color: #636e72;
+  font-size: 13px; font-weight: 500; color: var(--c2c-text-secondary);
   cursor: pointer; transition: all 0.25s;
   display: flex; align-items: center; gap: 6px;
   white-space: nowrap;
 }
-.cat-chip:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
-.cat-chip.active { background: #ff6b35; color: #fff; border-color: #ff6b35; }
+.cat-chip:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff8f5; }
+.cat-chip.active { background: var(--c2c-primary); color: #fff; border-color: var(--c2c-primary); }
 .cat-icon-img { width: 20px; height: 20px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
 
 /* 首页轮播图 */
@@ -244,14 +244,14 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 .announce-banner:hover { border-color: #ffb26b; box-shadow: 0 4px 16px rgba(255,107,53,0.12); }
 .ann-icon { font-size: 16px; flex-shrink: 0; }
 .ann-label {
-  flex-shrink: 0; font-size: 11px; color: #e55a2b; font-weight: 700;
+  flex-shrink: 0; font-size: 11px; color: var(--c2c-primary-dark); font-weight: 700;
   background: #ffe8dc; padding: 1px 8px; border-radius: 8px;
 }
 .ann-text {
-  flex: 1; font-size: 13px; color: #2d3436; font-weight: 600;
+  flex: 1; font-size: 13px; color: var(--c2c-text); font-weight: 600;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.ann-more { flex-shrink: 0; font-size: 12px; color: #b2bec3; }
+.ann-more { flex-shrink: 0; font-size: 12px; color: var(--c2c-text-muted); }
 
 /* Banner */
 .hero-banner {
@@ -259,36 +259,36 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
   border-radius: 20px; padding: 40px 48px; margin-bottom: 28px;
   border: 1px solid #ffe0d0;
 }
-.hero-content h1 { font-size: 28px; font-weight: 800; color: #2d3436; margin-bottom: 8px; }
-.hero-content p { font-size: 15px; color: #636e72; margin-bottom: 20px; }
+.hero-content h1 { font-size: 28px; font-weight: 800; color: var(--c2c-text); margin-bottom: 8px; }
+.hero-content p { font-size: 15px; color: var(--c2c-text-secondary); margin-bottom: 20px; }
 .hero-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  background: #ff6b35; color: #fff; padding: 12px 28px;
+  background: var(--c2c-primary); color: #fff; padding: 12px 28px;
   border-radius: 28px; font-size: 15px; font-weight: 600;
   text-decoration: none; transition: all 0.25s;
 }
-.hero-btn:hover { background: #e55a2b; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
+.hero-btn:hover { background: var(--c2c-primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
 
 /* 工具栏 */
 .toolbar {
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
 }
-.result-count { font-size: 14px; color: #636e72; }
-.result-count strong { color: #2d3436; }
+.result-count { font-size: 14px; color: var(--c2c-text-secondary); }
+.result-count strong { color: var(--c2c-text); }
 .sort-tabs { display: flex; gap: 4px; }
 .sort-tabs button {
   padding: 6px 14px; border: none; background: transparent;
-  font-size: 13px; color: #636e72; cursor: pointer; border-radius: 6px;
+  font-size: 13px; color: var(--c2c-text-secondary); cursor: pointer; border-radius: 6px;
   transition: all 0.2s; font-weight: 500;
 }
-.sort-tabs button:hover { background: #f0f2f5; color: #2d3436; }
-.sort-tabs button.active { background: #2d3436; color: #fff; }
+.sort-tabs button:hover { background: var(--c2c-bg-soft); color: var(--c2c-text); }
+.sort-tabs button.active { background: var(--c2c-text); color: #fff; }
 
 /* 商品卡片新版 */
 .product-card-new {
   background: #fff; border-radius: 16px; overflow: hidden;
-  border: 1px solid #f0f2f5; cursor: pointer;
+  border: 1px solid var(--c2c-line-soft); cursor: pointer;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
@@ -299,7 +299,7 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 }
 .card-img-wrap {
   position: relative; overflow: hidden;
-  height: 200px; background: #f8f9fa;
+  height: 200px; background: var(--c2c-bg);
 }
 .card-img-wrap::after {
   content: ''; position: absolute; inset: 0;
@@ -329,31 +329,31 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 .favorite-btn-mini:hover { transform: scale(1.1); }
 .card-body { padding: 14px 16px; }
 .card-title {
-  font-size: 15px; font-weight: 600; color: #2d3436;
+  font-size: 15px; font-weight: 600; color: var(--c2c-text);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   margin-bottom: 4px;
 }
-.card-desc { font-size: 12px; color: #b2bec3; margin-bottom: 10px; }
+.card-desc { font-size: 12px; color: var(--c2c-text-muted); margin-bottom: 10px; }
 .card-footer { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-.price-val { font-size: 22px; font-weight: 700; color: #e74c3c; }
-.price-yuan { font-size: 13px; color: #e74c3c; margin-left: 2px; }
-.price-orig { font-size: 12px; color: #b2bec3; text-decoration: line-through; margin-left: 6px; }
-.card-views { font-size: 11px; color: #b2bec3; }
-.card-seller { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #636e72; }
-.seller-loc { margin-left: auto; color: #b2bec3; }
+.price-val { font-size: 22px; font-weight: 700; color: var(--c2c-danger); }
+.price-yuan { font-size: 13px; color: var(--c2c-danger); margin-left: 2px; }
+.price-orig { font-size: 12px; color: var(--c2c-text-muted); text-decoration: line-through; margin-left: 6px; }
+.card-views { font-size: 11px; color: var(--c2c-text-muted); }
+.card-seller { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--c2c-text-secondary); }
+.seller-loc { margin-left: auto; color: var(--c2c-text-muted); }
 
 /* 空状态 */
 .empty-state {
   text-align: center; padding: 80px 20px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
 }
-.empty-state h3 { font-size: 18px; color: #636e72; }
-.empty-state p { font-size: 14px; color: #b2bec3; margin-bottom: 8px; }
+.empty-state h3 { font-size: 18px; color: var(--c2c-text-secondary); }
+.empty-state p { font-size: 14px; color: var(--c2c-text-muted); margin-bottom: 8px; }
 
 /* 骨架屏 */
 .skeleton-card { padding: 0; background: #fff; border-radius: 16px; overflow: hidden; }
-.skeleton-img { width: 100%; height: 200px; background: linear-gradient(90deg, #f0f2f5 25%, #e4e7ed 50%, #f0f2f5 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-.skeleton-line { height: 14px; margin: 10px 16px; background: #f0f2f5; border-radius: 7px; }
+.skeleton-img { width: 100%; height: 200px; background: linear-gradient(90deg, var(--c2c-bg-soft) 25%, #e4e7ed 50%, var(--c2c-bg-soft) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+.skeleton-line { height: 14px; margin: 10px 16px; background: var(--c2c-bg-soft); border-radius: 7px; }
 .skeleton-line.w80 { width: 80%; } .skeleton-line.w60 { width: 60%; } .skeleton-line.w40 { width: 40%; }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 

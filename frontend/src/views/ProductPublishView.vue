@@ -198,34 +198,34 @@ const submit = async () => {
 .publish-page { max-width: 960px; }
 .publish-layout { display: flex; gap: 20px; align-items: flex-start; }
 .publish-left { flex: 1; min-width: 0; }
-.publish-card { background: #fff; border-radius: 20px; padding: 32px; border: 1px solid #f0f2f5; }
-.upload-tip { font-size: 12px; color: #b2bec3; margin-top: 6px; }
+.publish-card { background: #fff; border-radius: 20px; padding: 32px; border: 1px solid var(--c2c-line-soft); }
+.upload-tip { font-size: 12px; color: var(--c2c-text-muted); margin-top: 6px; }
 
 /* AI 智能填写 */
 .ai-fill-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-.ai-fill-tip { font-size: 12px; color: #b2bec3; }
+.ai-fill-tip { font-size: 12px; color: var(--c2c-text-muted); }
 .ai-result-card { margin-top: 10px; background: #fff8f5; border: 1px dashed #ffb74d; border-radius: 10px; padding: 10px 12px; }
-.ai-price-suggest { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: #2d3436; }
-.ai-price-suggest b { color: #ff6b35; }
-.ai-rule-tip { font-size: 12px; color: #b2bec3; margin-top: 4px; }
-:deep(.el-form-item__label) { font-weight: 600; color: #2d3436; }
+.ai-price-suggest { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--c2c-text); }
+.ai-price-suggest b { color: var(--c2c-primary); }
+.ai-rule-tip { font-size: 12px; color: var(--c2c-text-muted); margin-top: 4px; }
+:deep(.el-form-item__label) { font-weight: 600; color: var(--c2c-text); }
 .img-preview-item { position:relative; width:100px; height:100px; border-radius:8px; overflow:hidden; display:inline-block }
 .img-preview-item img { width:100%; height:100%; object-fit:cover }
-.img-del { position:absolute; top:2px; right:2px; color:#e74c3c; cursor:pointer; background:#fff; border-radius:50% }
+.img-del { position:absolute; top:2px; right:2px; color:var(--c2c-danger); cursor:pointer; background:#fff; border-radius:50% }
 .img-cover-tag { position:absolute; bottom:2px; left:2px; background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:1px 6px;border-radius:4px }
 
 /* 右侧公告面板 */
 .publish-right { width: 280px; flex-shrink: 0; position: sticky; top: 76px; }
-.right-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid #f0f2f5; }
-.panel-title { font-size: 15px; font-weight: 700; color: #2d3436; margin-bottom: 12px; }
+.right-panel { background: #fff; border-radius: 16px; padding: 20px; border: 1px solid var(--c2c-line-soft); }
+.panel-title { font-size: 15px; font-weight: 700; color: var(--c2c-text); margin-bottom: 12px; }
 .ann-item { border-bottom: 1px solid #f5f5f5; padding: 8px 0; }
 .ann-item:last-child { border-bottom: none; }
 .ann-item-head { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-.ann-item-title { flex: 1; font-size: 13px; color: #2d3436; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ann-item-head .el-icon { font-size: 12px; color: #b2bec3; transition: transform 0.2s; }
+.ann-item-title { flex: 1; font-size: 13px; color: var(--c2c-text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ann-item-head .el-icon { font-size: 12px; color: var(--c2c-text-muted); transition: transform 0.2s; }
 .ann-item-head .el-icon.rotated { transform: rotate(180deg); }
-.ann-item-body { margin-top: 8px; font-size: 12px; color: #636e72; line-height: 1.8; white-space: pre-wrap; word-break: break-word; background: #fafafa; border-radius: 8px; padding: 10px 12px; max-height: 200px; overflow-y: auto; }
-.panel-more { display: block; margin-top: 10px; font-size: 12px; color: #ff6b35; text-align: center; text-decoration: none; }
+.ann-item-body { margin-top: 8px; font-size: 12px; color: var(--c2c-text-secondary); line-height: 1.8; white-space: pre-wrap; word-break: break-word; background: #fafafa; border-radius: 8px; padding: 10px 12px; max-height: 200px; overflow-y: auto; }
+.panel-more { display: block; margin-top: 10px; font-size: 12px; color: var(--c2c-primary); text-align: center; text-decoration: none; }
 .panel-more:hover { text-decoration: underline; }
 
 @media (max-width: 768px) {

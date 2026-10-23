@@ -39,7 +39,7 @@
           </div>
           <div class="attr-item">
             <span class="attr-label">运费</span>
-            <span class="attr-val" :style="{color: product.freightType === 1 ? '#00b894' : '#636e72'}">
+            <span class="attr-val" :style="{color: product.freightType === 1 ? 'var(--c2c-accent)' : 'var(--c2c-text-secondary)'}">
               {{ product.freightText }}
               <span v-if="product.freightAmount > 0">(¥{{ product.freightAmount }})</span>
             </span>
@@ -92,7 +92,7 @@
         <!-- 卖家卡片 -->
         <div class="seller-card">
           <router-link :to="`/user/${product.sellerId}`" class="seller-link">
-            <el-avatar :size="44" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);font-size:18px">
+            <el-avatar :size="44" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));font-size:18px">
               {{ product.sellerName?.charAt(0) || '?' }}
             </el-avatar>
             <div class="seller-info">
@@ -134,7 +134,7 @@
 
         <div class="comment-list" v-if="comments.length">
           <div v-for="c in comments" :key="c.id" class="comment-item">
-            <el-avatar :size="36" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);flex-shrink:0">
+            <el-avatar :size="36" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));flex-shrink:0">
               {{ c.nickname?.charAt(0) || '?' }}
             </el-avatar>
             <div class="comment-body">
@@ -177,7 +177,7 @@
 
     <!-- 我想要弹窗 -->
     <el-dialog v-model="showIntentDialog" title="我想买" width="420px">
-      <p style="font-size:14px;color:#636e72;margin:0 0 16px">对「<strong>{{ product.title }}</strong>」表达购买意向，卖家会收到并回复你。</p>
+      <p style="font-size:14px;color:var(--c2c-text-secondary);margin:0 0 16px">对「<strong>{{ product.title }}</strong>」表达购买意向，卖家会收到并回复你。</p>
       <el-form label-position="top">
         <el-form-item label="期望价格（元，可选）">
           <el-input-number v-model="intentForm.expectedPrice" :min="0" :precision="2" :controls="false" placeholder="留空表示按标价" style="width:100%" />
@@ -194,7 +194,7 @@
 
     <!-- 举报弹窗 -->
     <el-dialog v-model="showReportDialog" title="举报该商品" width="440px">
-      <p style="font-size:13px;color:#b2bec3;margin:0 0 16px">举报后由审核员/管理员审核处理，我们会保护举报人信息。</p>
+      <p style="font-size:13px;color:var(--c2c-text-muted);margin:0 0 16px">举报后由审核员/管理员审核处理，我们会保护举报人信息。</p>
       <el-form label-position="top">
         <el-form-item label="举报类型">
           <el-select v-model="reportForm.reportType" style="width:100%">
@@ -218,7 +218,7 @@
 
     <!-- 整改申诉弹窗 -->
     <el-dialog v-model="showAppealDialog" title="整改申诉" width="440px">
-      <p style="font-size:13px;color:#b2bec3;margin:0 0 16px">说明你的整改情况，审核通过后商品恢复上架。同一商品最多申诉 3 次。</p>
+      <p style="font-size:13px;color:var(--c2c-text-muted);margin:0 0 16px">说明你的整改情况，审核通过后商品恢复上架。同一商品最多申诉 3 次。</p>
       <el-form label-position="top">
         <el-form-item label="整改说明">
           <el-input v-model="appealForm.appealReason" type="textarea" :rows="4" maxlength="1000" placeholder="说明整改措施，例如：已更换违规图片 / 已删除夸大描述…" />
@@ -452,7 +452,7 @@ const contactSeller = async () => {
 .detail-gallery { position: sticky; top: 80px; }
 .main-image-wrap {
   position: relative; border-radius: 20px; overflow: hidden;
-  background: #f8f9fa; aspect-ratio: 1;
+  background: var(--c2c-bg); aspect-ratio: 1;
 }
 .main-image { width: 100%; height: 100%; object-fit: contain; }
 .img-badge {
@@ -468,56 +468,56 @@ const contactSeller = async () => {
   transition: all 0.2s; opacity: 0.6;
 }
 .thumb:hover { opacity: 0.9; }
-.thumb.active { border-color: #ff6b35; opacity: 1; }
+.thumb.active { border-color: var(--c2c-primary); opacity: 1; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
 /* 详情信息 */
-.detail-title { font-size: 22px; font-weight: 700; color: #2d3436; line-height: 1.4; margin-bottom: 16px; }
+.detail-title { font-size: 22px; font-weight: 700; color: var(--c2c-text); line-height: 1.4; margin-bottom: 16px; }
 .detail-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-.detail-price { font-size: 36px; font-weight: 800; color: #e74c3c; font-family: "SF Pro Display", sans-serif; }
-.detail-unit { font-size: 16px; color: #e74c3c; }
-.detail-original { font-size: 14px; color: #b2bec3; text-decoration: line-through; margin-left: 8px; }
+.detail-price { font-size: 36px; font-weight: 800; color: var(--c2c-danger); font-family: "SF Pro Display", sans-serif; }
+.detail-unit { font-size: 16px; color: var(--c2c-danger); }
+.detail-original { font-size: 14px; color: var(--c2c-text-muted); text-decoration: line-through; margin-left: 8px; }
 .discount-tag {
   font-size: 12px; font-weight: 700; color: #fff;
-  background: #e74c3c; padding: 3px 10px; border-radius: 10px;
+  background: var(--c2c-danger); padding: 3px 10px; border-radius: 10px;
 }
 
 /* 属性 */
 .detail-attrs {
-  background: #f8f9fa; border-radius: 14px; padding: 16px 20px;
+  background: var(--c2c-bg); border-radius: 14px; padding: 16px 20px;
   display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
   margin-bottom: 24px;
 }
 .attr-item { display: flex; flex-direction: column; gap: 2px; }
-.attr-label { font-size: 12px; color: #b2bec3; }
-.attr-val { font-size: 14px; font-weight: 600; color: #2d3436; }
+.attr-label { font-size: 12px; color: var(--c2c-text-muted); }
+.attr-val { font-size: 14px; font-weight: 600; color: var(--c2c-text); }
 
 /* 操作按钮 */
 .detail-actions { display: flex; gap: 10px; margin-bottom: 20px; }
 .action-buy {
   flex: 1; height: 52px; border: none;
-  background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light));
   color: #fff; font-size: 16px; font-weight: 700;
   border-radius: 16px; cursor: pointer;
   transition: all 0.3s;
 }
 .action-buy:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,107,53,0.35); }
 .action-chat {
-  height: 52px; border: 2px solid #dfe6e9; background: #fff;
-  color: #2d3436; font-size: 14px; font-weight: 600;
+  height: 52px; border: 2px solid var(--c2c-border); background: #fff;
+  color: var(--c2c-text); font-size: 14px; font-weight: 600;
   padding: 0 20px; border-radius: 16px; cursor: pointer;
   display: flex; align-items: center; gap: 6px;
   transition: all 0.25s;
 }
-.action-chat:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
+.action-chat:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff8f5; }
 .action-fav {
-  width: 52px; height: 52px; border: 2px solid #dfe6e9;
+  width: 52px; height: 52px; border: 2px solid var(--c2c-border);
   background: #fff; border-radius: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.25s; color: #b2bec3;
+  transition: all 0.25s; color: var(--c2c-text-muted);
 }
-.action-fav:hover { border-color: #ff6b35; background: #fff8f5; }
-.action-fav.favorited { border-color: #ff6b35; color: #ff6b35; background: #fff5f0; }
+.action-fav:hover { border-color: var(--c2c-primary); background: #fff8f5; }
+.action-fav.favorited { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff5f0; }
 
 /* 举报入口 / 违规整改卡片 */
 .report-entry { margin: -8px 0 14px; text-align: right; }
@@ -526,60 +526,60 @@ const contactSeller = async () => {
   background: #fef2f0; border: 1px solid #fde0da; border-radius: 14px;
   padding: 14px 18px; margin-bottom: 18px;
 }
-.banned-tip strong { color: #e74c3c; font-size: 14px; display: block; margin-bottom: 4px; }
-.banned-tip p { margin: 0; font-size: 13px; color: #636e72; line-height: 1.6; }
-.banned-tip .banned-reason { color: #e74c3c; font-weight: 600; }
+.banned-tip strong { color: var(--c2c-danger); font-size: 14px; display: block; margin-bottom: 4px; }
+.banned-tip p { margin: 0; font-size: 13px; color: var(--c2c-text-secondary); line-height: 1.6; }
+.banned-tip .banned-reason { color: var(--c2c-danger); font-weight: 600; }
 
 /* 卖家卡片 */
 .seller-card {
-  background: #fff; border: 1px solid #f0f2f5; border-radius: 16px;
+  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 16px;
   padding: 16px 20px;
 }
 .seller-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.seller-info strong { font-size: 15px; color: #2d3436; display: block; }
+.seller-info strong { font-size: 15px; color: var(--c2c-text); display: block; }
 .seller-rep { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
-.seller-rep span { font-size: 13px; color: #ff6b35; font-weight: 600; }
+.seller-rep span { font-size: 13px; color: var(--c2c-primary); font-weight: 600; }
 
 /* 描述区 */
 .detail-section { margin-bottom: 32px; }
 .section-title {
-  font-size: 18px; font-weight: 700; color: #2d3436;
-  margin-bottom: 16px; padding-left: 14px; border-left: 4px solid #ff6b35;
+  font-size: 18px; font-weight: 700; color: var(--c2c-text);
+  margin-bottom: 16px; padding-left: 14px; border-left: 4px solid var(--c2c-primary);
 }
 .desc-content {
   background: #fff; border-radius: 16px; padding: 24px;
-  border: 1px solid #f0f2f5; font-size: 15px; line-height: 1.8;
-  color: #636e72; white-space: pre-wrap;
+  border: 1px solid var(--c2c-line-soft); font-size: 15px; line-height: 1.8;
+  color: var(--c2c-text-secondary); white-space: pre-wrap;
 }
-.desc-content.empty { color: #b2bec3; text-align: center; padding: 40px; }
+.desc-content.empty { color: var(--c2c-text-muted); text-align: center; padding: 40px; }
 
 /* 评论区 */
-.comment-box { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid #f0f2f5; }
+.comment-box { background: #fff; border-radius: 16px; padding: 24px; border: 1px solid var(--c2c-line-soft); }
 .comment-input { margin-bottom: 20px; }
 .comment-input-actions { text-align: right; margin-top: 10px; }
-.comment-login-tip { text-align: center; padding: 24px; color: #b2bec3; font-size: 14px; }
-.comment-login-tip a { color: #ff6b35; font-weight: 600; }
+.comment-login-tip { text-align: center; padding: 24px; color: var(--c2c-text-muted); font-size: 14px; }
+.comment-login-tip a { color: var(--c2c-primary); font-weight: 600; }
 .comment-list { display: flex; flex-direction: column; gap: 20px; }
 .comment-item { display: flex; gap: 12px; }
 .comment-body { flex: 1; min-width: 0; }
 .comment-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.comment-meta strong { font-size: 14px; color: #2d3436; }
-.comment-time { font-size: 12px; color: #b2bec3; }
+.comment-meta strong { font-size: 14px; color: var(--c2c-text); }
+.comment-time { font-size: 12px; color: var(--c2c-text-muted); }
 .comment-ops { margin-left: auto; }
-.comment-content { font-size: 14px; color: #2d3436; line-height: 1.7; margin-top: 4px; word-break: break-word; }
-.comment-reply { margin-top: 10px; padding-top: 12px; border-top: 1px dashed #f0f2f5; }
+.comment-content { font-size: 14px; color: var(--c2c-text); line-height: 1.7; margin-top: 4px; word-break: break-word; }
+.comment-reply { margin-top: 10px; padding-top: 12px; border-top: 1px dashed var(--c2c-line-soft); }
 .comment-reply-actions { text-align: right; margin-top: 8px; }
-.comment-empty { text-align: center; color: #b2bec3; padding: 32px; font-size: 14px; }
+.comment-empty { text-align: center; color: var(--c2c-text-muted); padding: 32px; font-size: 14px; }
 
 /* 猜你喜欢 */
 .similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 @media (max-width: 768px) { .similar-grid { grid-template-columns: repeat(2, 1fr); } }
-.similar-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #f0f2f5; cursor: pointer; transition: all 0.25s; }
+.similar-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--c2c-line-soft); cursor: pointer; transition: all 0.25s; }
 .similar-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
 .similar-img { width: 100%; height: 130px; }
 .similar-info { padding: 8px 10px; }
-.similar-title { font-size: 13px; font-weight: 600; color: #2d3436; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.similar-price { font-size: 15px; font-weight: 700; color: #ff6b35; margin-top: 2px; }
+.similar-title { font-size: 13px; font-weight: 600; color: var(--c2c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.similar-price { font-size: 15px; font-weight: 700; color: var(--c2c-primary); margin-top: 2px; }
 @media (max-width: 480px) {
   .comment-box { padding: 16px; }
 }

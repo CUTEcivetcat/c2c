@@ -2,7 +2,7 @@
   <div class="page-container" style="max-width:700px">
     <page-back-bar title="最近浏览" />
     <div class="history-head" v-if="list.length">
-      <span style="font-size:13px;color:#b2bec3">共 {{ list.length }} 件</span>
+      <span style="font-size:13px;color:var(--c2c-text-muted)">共 {{ list.length }} 件</span>
       <el-button size="small" text @click="clearAll">清空</el-button>
     </div>
     <div v-loading="loading" class="history-list">
@@ -53,14 +53,14 @@ onMounted(load)
 .history-list { display: flex; flex-direction: column; gap: 10px; }
 .history-card {
   display: flex; gap: 12px; background: #fff; border-radius: 14px;
-  padding: 12px; border: 1px solid #f0f2f5; cursor: pointer;
+  padding: 12px; border: 1px solid var(--c2c-line-soft); cursor: pointer;
   transition: all 0.25s;
 }
 .history-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
 .hc-cover { width: 90px; height: 90px; border-radius: 10px; flex-shrink: 0; }
 .hc-main { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
-.hc-title { font-size: 14px; font-weight: 600; color: #2d3436; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hc-title { font-size: 14px; font-weight: 600; color: var(--c2c-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hc-sub { display: flex; justify-content: space-between; align-items: center; }
-.hc-price { font-size: 16px; font-weight: 700; color: #ff6b35; }
-.hc-time { font-size: 12px; color: #b2bec3; }
+.hc-price { font-size: 16px; font-weight: 700; color: var(--c2c-primary); }
+.hc-time { font-size: 12px; color: var(--c2c-text-muted); }
 </style>

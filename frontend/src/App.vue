@@ -145,7 +145,7 @@ onUnmounted(() => {
   min-height: 100dvh; /* 移动端动态viewport高度 */
   display: flex;
   flex-direction: column;
-  background: #f8f9fa;
+  background: var(--c2c-bg);
 }
 .main-content {
   flex: 1;
@@ -175,9 +175,9 @@ onUnmounted(() => {
   background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.3s;
-  color: #636e72;
+  color: var(--c2c-text-secondary);
 }
-.back-top:hover { background: #ff6b35; color: #fff; transform: translateY(-2px); }
+.back-top:hover { background: var(--c2c-primary); color: #fff; transform: translateY(-2px); }
 
 /* 强制公告弹窗 */
 .force-dialog { border-radius: 16px; }
@@ -201,7 +201,7 @@ onUnmounted(() => {
 /* 卡片统一样式 */
 #app-container .el-card {
   border-radius: 16px !important;
-  border: 1px solid #f0f2f5 !important;
+  border: 1px solid var(--c2c-line-soft) !important;
   transition: all 0.25s ease !important;
 }
 #app-container .el-card:hover {
@@ -215,12 +215,12 @@ onUnmounted(() => {
   transition: all 0.2s ease !important;
 }
 #app-container .el-button--primary {
-  background: linear-gradient(135deg, #ff6b35, #ff8c5a) !important;
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light)) !important;
   border: none !important;
   color: #fff !important;
 }
 #app-container .el-button--primary:hover {
-  background: linear-gradient(135deg, #e55a2b, #ff6b35) !important;
+  background: linear-gradient(135deg, var(--c2c-primary-dark), var(--c2c-primary)) !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(255,107,53,0.3) !important;
 }
@@ -237,7 +237,7 @@ onUnmounted(() => {
   transform: translateY(-1px);
 }
 #app-container .el-button--danger {
-  background: linear-gradient(135deg, #e74c3c, #f06b5a) !important;
+  background: linear-gradient(135deg, var(--c2c-danger), #f06b5a) !important;
   border: none !important;
   color: #fff !important;
 }
@@ -262,7 +262,7 @@ onUnmounted(() => {
 }
 #app-container .el-input__wrapper:focus-within {
   box-shadow: 0 0 0 3px rgba(255,107,53,0.1) !important;
-  border-color: #ff6b35 !important;
+  border-color: var(--c2c-primary) !important;
 }
 #app-container .el-select .el-input__wrapper {
   border-radius: 12px !important;

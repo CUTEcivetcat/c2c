@@ -24,7 +24,7 @@
       </template>
     </el-dialog>
     <!-- 流水列表 -->
-    <h3 style="margin: 20px 0 12px; font-size: 16px; color: #2d3436">交易流水</h3>
+    <h3 style="margin: 20px 0 12px; font-size: 16px; color: var(--c2c-text)">交易流水</h3>
     <el-card v-for="log in logs" :key="log.id" class="log-card" shadow="hover">
       <div class="log-row">
         <div class="log-left">
@@ -82,12 +82,12 @@ const doRecharge = async () => {
 onMounted(load)
 </script>
 <style scoped>
-.balance-card { background: linear-gradient(135deg, #ff6b35, #ff8c5a); border-radius: 20px; padding: 32px; text-align: center; color: #fff; }
+.balance-card { background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light)); border-radius: 20px; padding: 32px; text-align: center; color: #fff; }
 .balance-icon { font-size: 40px; margin-bottom: 4px; }
 .balance-label { font-size: 13px; opacity: 0.85; }
 .balance-num { font-size: 42px; font-weight: 800; margin: 8px 0 16px; font-variant-numeric: tabular-nums; }
 .balance-actions { display: flex; gap: 12px; justify-content: center; }
-.balance-actions .el-button--primary { background: #fff; border-color: transparent; color: #ff6b35; font-weight: 700; }
+.balance-actions .el-button--primary { background: #fff; border-color: transparent; color: var(--c2c-primary); font-weight: 700; }
 .balance-actions .el-button--primary:hover { background: #fff5f0; }
 .balance-actions .back-btn { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.6); color: #fff; }
 .balance-actions .back-btn:hover { background: rgba(255,255,255,0.3); color: #fff; }
@@ -99,9 +99,9 @@ onMounted(load)
 .log-type.pay { background: #fff3e0; color: #e65100; }
 .log-type.refund { background: #e3f2fd; color: #1565c0; }
 .log-type.receive { background: #fce4ec; color: #c62828; }
-.log-remark { font-size: 13px; color: #2d3436; }
+.log-remark { font-size: 13px; color: var(--c2c-text); }
 .log-amount { font-size: 16px; font-weight: 700; }
 .log-amount.income { color: #2e7d32; }
 .log-amount.expense { color: #c62828; }
-.log-meta { display: flex; gap: 16px; margin-top: 4px; font-size: 11px; color: #b2bec3; }
+.log-meta { display: flex; gap: 16px; margin-top: 4px; font-size: 11px; color: var(--c2c-text-muted); }
 </style>

@@ -31,7 +31,7 @@
   min-height: calc(100vh - 60px);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%);
+  background: linear-gradient(135deg, #fff5f0 0%, var(--c2c-bg) 50%, #fff 100%);
 }
 .nf-bg { position: absolute; inset: 0; pointer-events: none; }
 .nf-dot {
@@ -48,7 +48,7 @@
 .nf-404 { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; }
 .nf-digit {
   font-size: 120px; font-weight: 900; line-height: 1;
-  background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light));
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: bounce 2s ease-in-out infinite;
@@ -56,7 +56,7 @@
 .nf-digit:last-child { animation-delay: 0.3s; }
 .nf-zero {
   width: 110px; height: 110px; border-radius: 50%;
-  background: linear-gradient(135deg, #ff6b35, #e55a2b);
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-dark));
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 12px 40px rgba(255, 107, 53, 0.35);
   animation: spin 8s linear infinite;
@@ -70,8 +70,8 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-.nf-title { font-size: 28px; font-weight: 800; color: #2d3436; margin: 16px 0 8px; }
-.nf-desc { font-size: 14px; color: #b2bec3; margin-bottom: 28px; }
+.nf-title { font-size: 28px; font-weight: 800; color: var(--c2c-text); margin: 16px 0 8px; }
+.nf-desc { font-size: 14px; color: var(--c2c-text-muted); margin-bottom: 28px; }
 .nf-actions { display: flex; gap: 12px; justify-content: center; }
 @media (max-width: 480px) {
   .nf-digit { font-size: 80px; }

@@ -76,17 +76,17 @@ onUnmounted(() => clearInterval(timer))
   background: linear-gradient(135deg, #fff3ee, #ffe8e0);
   border: 1px solid #ffd9cc; border-radius: 10px;
   padding: 10px 14px; margin-bottom: 10px;
-  font-size: 14px; color: #e55a2b;
+  font-size: 14px; color: var(--c2c-primary-dark);
 }
 .conv-card { margin-bottom: 8px; cursor: pointer; }
 .conv-row { display: flex; align-items: center; gap: 12px; }
 .conv-avatar-wrap { flex-shrink: 0; cursor: pointer; }
-.conv-avatar { background: linear-gradient(135deg, #ff6b35, #ff8c5a); font-size: 16px; }
+.conv-avatar { background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light)); font-size: 16px; }
 .conv-main { flex: 1; min-width: 0; }
 .conv-title { display: flex; justify-content: space-between; align-items: center; }
 .conv-name { cursor: pointer; transition: color 0.2s; }
-.conv-name:hover { color: #ff6b35; }
-.conv-time { color: #b2bec3; font-size: 12px; margin-left: 12px; flex-shrink: 0; }
+.conv-name:hover { color: var(--c2c-primary); }
+.conv-time { color: var(--c2c-text-muted); font-size: 12px; margin-left: 12px; flex-shrink: 0; }
 .conv-sub { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
 .conv-product { color: #909399; font-size: 12px; flex-shrink: 0; }
 .conv-preview {

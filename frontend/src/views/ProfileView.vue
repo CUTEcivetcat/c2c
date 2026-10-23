@@ -3,7 +3,7 @@
     <page-back-bar title="个人中心" />
     <!-- 头像卡片 -->
     <div class="profile-header-card">
-      <el-avatar :size="72" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);font-size:30px;font-weight:700">
+      <el-avatar :size="72" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));font-size:30px;font-weight:700">
         {{ store.userInfo?.nickname?.charAt(0) || 'U' }}
       </el-avatar>
       <h3>{{ store.userInfo?.nickname || '未设置昵称' }}</h3>
@@ -89,7 +89,7 @@
 
     <!-- 整改申诉弹窗（违规下架商品） -->
     <el-dialog v-model="appealDialog" title="整改申诉" width="440px">
-      <p style="font-size:13px;color:#b2bec3;margin:0 0 16px">说明你的整改情况，审核通过后商品恢复上架。同一商品最多申诉 3 次。</p>
+      <p style="font-size:13px;color:var(--c2c-text-muted);margin:0 0 16px">说明你的整改情况，审核通过后商品恢复上架。同一商品最多申诉 3 次。</p>
       <el-form label-position="top">
         <el-form-item label="整改说明">
           <el-input v-model="appealReason" type="textarea" :rows="4" maxlength="1000" placeholder="说明整改措施，例如：已更换违规图片 / 已删除夸大描述…" />
@@ -234,29 +234,29 @@ const save = async () => {
 <style scoped>
 .profile-header-card {
   background: #fff; border-radius: 20px; padding: 32px;
-  text-align: center; border: 1px solid #f0f2f5; margin-bottom: 20px;
+  text-align: center; border: 1px solid var(--c2c-line-soft); margin-bottom: 20px;
 }
-.profile-header-card h3 { font-size: 20px; font-weight: 700; margin: 12px 0 6px; color: #2d3436; }
+.profile-header-card h3 { font-size: 20px; font-weight: 700; margin: 12px 0 6px; color: var(--c2c-text); }
 .rep-badge { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.rep-badge span { font-size: 14px; font-weight: 600; color: #ff6b35; }
-.profile-form-card { background: #fff; border-radius: 20px; padding: 28px; border: 1px solid #f0f2f5; }
+.rep-badge span { font-size: 14px; font-weight: 600; color: var(--c2c-primary); }
+.profile-form-card { background: #fff; border-radius: 20px; padding: 28px; border: 1px solid var(--c2c-line-soft); }
 .nickname-pending {
-  margin-top: 6px; font-size: 12px; color: #e55a2b;
+  margin-top: 6px; font-size: 12px; color: var(--c2c-primary-dark);
   display: flex; align-items: center; gap: 4px;
   background: #fff5f0; border-radius: 8px; padding: 6px 10px;
 }
-.nickname-tip { margin-top: 6px; font-size: 12px; color: #b2bec3; }
+.nickname-tip { margin-top: 6px; font-size: 12px; color: var(--c2c-text-muted); }
 .profile-menu {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
   margin-bottom: 20px;
 }
 .menu-item {
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: #fff; border: 1px solid #f0f2f5; border-radius: 14px;
-  padding: 18px 10px; text-decoration: none; color: #2d3436;
+  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 14px;
+  padding: 18px 10px; text-decoration: none; color: var(--c2c-text);
   font-size: 14px; font-weight: 600; transition: all 0.2s;
 }
-.menu-item:hover { border-color: #ff6b35; color: #ff6b35; background: #fff8f5; }
+.menu-item:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff8f5; }
 .menu-ico { font-size: 20px; }
 
 /* 我的环保贡献 */
@@ -279,34 +279,34 @@ const save = async () => {
 /* 我的商品 */
 .my-goods-section {
   background: #fff; border-radius: 20px; padding: 20px;
-  border: 1px solid #f0f2f5; margin-bottom: 20px;
+  border: 1px solid var(--c2c-line-soft); margin-bottom: 20px;
 }
 .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.section-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: #2d3436; }
+.section-head h3 { margin: 0; font-size: 16px; font-weight: 700; color: var(--c2c-text); }
 .publish-link {
-  font-size: 13px; font-weight: 600; color: #ff6b35; text-decoration: none;
+  font-size: 13px; font-weight: 600; color: var(--c2c-primary); text-decoration: none;
   background: #fff5f0; border-radius: 8px; padding: 6px 12px; transition: all 0.2s;
 }
 .publish-link:hover { background: #ffe9de; }
 .goods-list { display: flex; flex-direction: column; gap: 12px; min-height: 80px; }
 .goods-card {
   display: flex; gap: 12px; padding: 12px;
-  background: #fafbfc; border: 1px solid #f0f2f5; border-radius: 14px;
+  background: #fafbfc; border: 1px solid var(--c2c-line-soft); border-radius: 14px;
 }
 .goods-cover-wrap { flex-shrink: 0; }
 .goods-cover { width: 72px; height: 72px; border-radius: 10px; display: block; }
 .cover-err {
   width: 72px; height: 72px; border-radius: 10px; display: flex;
   align-items: center; justify-content: center;
-  background: #f0f2f5; color: #b2bec3; font-size: 12px;
+  background: var(--c2c-bg-soft); color: var(--c2c-text-muted); font-size: 12px;
 }
 .goods-main { flex: 1; min-width: 0; }
 .goods-title { display: flex; align-items: center; gap: 8px; }
 .title-text {
-  font-size: 14px; font-weight: 600; color: #2d3436;
+  font-size: 14px; font-weight: 600; color: var(--c2c-text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.goods-price { margin-top: 4px; font-size: 15px; font-weight: 700; color: #e55a2b; }
+.goods-price { margin-top: 4px; font-size: 15px; font-weight: 700; color: var(--c2c-primary-dark); }
 .banned-reason {
   margin-top: 6px; padding: 6px 10px; border-radius: 8px;
   background: #fdf0f0; border: 1px solid #fbd5d5;

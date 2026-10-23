@@ -10,7 +10,7 @@
           <div style="flex:1">
             <div class="checkout-title">{{ checkoutProduct.title }}</div>
             <div class="price-highlight" style="margin:8px 0">¥{{ checkoutProduct.price }}</div>
-            <div style="font-size:13px;color:#b2bec3">{{ checkoutProduct.conditionText }}</div>
+            <div style="font-size:13px;color:var(--c2c-text-muted)">{{ checkoutProduct.conditionText }}</div>
           </div>
         </div>
       </div>
@@ -29,7 +29,7 @@
           </div>
         </div>
         <div v-else style="padding:8px 0;font-size:13px;color:#909399">
-          还没有收货地址，<router-link to="/address" style="color:#ff6b35">去添加 →</router-link>
+          还没有收货地址，<router-link to="/address" style="color:var(--c2c-primary)">去添加 →</router-link>
         </div>
       </div>
 
@@ -160,41 +160,41 @@ const doCancel = async () => {
 
 <style scoped>
 .order-detail { animation: fadeInUp 0.4s ease-out; }
-.steps-card { background: #fff; border-radius: 20px; padding: 28px 32px; border: 1px solid #f0f2f5; margin-bottom: 20px; }
-.info-card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #f0f2f5; margin-bottom: 20px; }
-.info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f8f9fa; }
+.steps-card { background: #fff; border-radius: 20px; padding: 28px 32px; border: 1px solid var(--c2c-line-soft); margin-bottom: 20px; }
+.info-card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid var(--c2c-line-soft); margin-bottom: 20px; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--c2c-bg); }
 .info-row:last-child { border-bottom: none; }
-.info-label { font-size: 14px; color: #b2bec3; }
-.info-value { font-size: 15px; font-weight: 600; color: #2d3436; }
-.price-highlight { font-size: 20px; color: #e74c3c; }
+.info-label { font-size: 14px; color: var(--c2c-text-muted); }
+.info-value { font-size: 15px; font-weight: 600; color: var(--c2c-text); }
+.price-highlight { font-size: 20px; color: var(--c2c-danger); }
 .action-bar { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn-primary {
-  flex: 1; height: 48px; border: none; background: linear-gradient(135deg,#ff6b35,#ff8c5a);
+  flex: 1; height: 48px; border: none; background: linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));
   color: #fff; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
   transition: all 0.3s;
 }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.3); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-success {
-  flex: 1; height: 48px; border: none; background: #00b894; color: #fff;
+  flex: 1; height: 48px; border: none; background: var(--c2c-accent); color: #fff;
   font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
 }
 .btn-outline {
-  flex: 1; height: 48px; border: 2px solid #ff6b35; background: #fff;
-  color: #ff6b35; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
+  flex: 1; height: 48px; border: 2px solid var(--c2c-primary); background: #fff;
+  color: var(--c2c-primary); font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
 }
 .btn-danger-text {
-  padding: 12px 20px; border: none; background: none; color: #e74c3c;
+  padding: 12px 20px; border: none; background: none; color: var(--c2c-danger);
   font-size: 14px; cursor: pointer; font-weight: 500;
 }
 /* 确认下单页 */
-.checkout-img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; background: #f8f9fa }
-.checkout-title { font-size: 15px; font-weight: 600; color: #2d3436 }
-.section-title { font-size: 15px; font-weight: 600; color: #2d3436; margin-bottom: 12px }
+.checkout-img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; background: var(--c2c-bg) }
+.checkout-title { font-size: 15px; font-weight: 600; color: var(--c2c-text) }
+.section-title { font-size: 15px; font-weight: 600; color: var(--c2c-text); margin-bottom: 12px }
 .address-option { border: 1px solid #eef0f3; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s }
-.address-option:hover { border-color: #ff8c5a }
-.address-option.active { border-color: #ff6b35; background: #fff7f3 }
-.address-line { font-size: 14px; color: #2d3436 }
+.address-option:hover { border-color: var(--c2c-primary-light) }
+.address-option.active { border-color: var(--c2c-primary); background: #fff7f3 }
+.address-line { font-size: 14px; color: var(--c2c-text) }
 .address-line.sub { font-size: 13px; color: #909399; margin-top: 4px }
 @media (max-width: 480px) { .steps-card { padding: 16px; } .info-card { padding: 14px; } .btn-primary, .btn-success, .btn-outline { height: 42px; font-size: 14px; } }
 </style>

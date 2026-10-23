@@ -56,10 +56,10 @@ onMounted(load)
 .announcement-list { display: flex; flex-direction: column; gap: 12px; }
 .ann-card { border-radius: 14px; }
 .ann-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.ann-title { font-size: 15px; color: #2d3436; }
-.ann-time { margin-left: auto; font-size: 12px; color: #b2bec3; }
+.ann-title { font-size: 15px; color: var(--c2c-text); }
+.ann-time { margin-left: auto; font-size: 12px; color: var(--c2c-text-muted); }
 .ann-content {
-  margin-top: 10px; font-size: 13px; color: #636e72; line-height: 1.8;
+  margin-top: 10px; font-size: 13px; color: var(--c2c-text-secondary); line-height: 1.8;
   white-space: pre-wrap; word-break: break-word;
   background: #fafafa; border-radius: 10px; padding: 12px 14px;
 }

@@ -138,18 +138,18 @@ const close = async (it) => {
 <style scoped>
 .intent-list { display: flex; flex-direction: column; gap: 14px; }
 .intent-card {
-  display: flex; gap: 14px; background: #fff; border: 1px solid #f0f2f5;
+  display: flex; gap: 14px; background: #fff; border: 1px solid var(--c2c-line-soft);
   border-radius: 16px; padding: 16px; cursor: pointer; transition: all 0.2s;
 }
 .intent-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.06); transform: translateY(-1px); }
-.intent-img { width: 88px; height: 88px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #f8f9fa; }
+.intent-img { width: 88px; height: 88px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: var(--c2c-bg); }
 .intent-main { flex: 1; min-width: 0; }
-.intent-title { font-size: 15px; font-weight: 600; color: #2d3436; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.intent-title { font-size: 15px; font-weight: 600; color: var(--c2c-text); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .intent-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-.intent-meta span { font-size: 13px; color: #636e72; }
-.intent-msg { font-size: 13px; color: #636e72; margin-top: 2px; word-break: break-word; }
-.intent-reply { font-size: 13px; color: #ff6b35; margin-top: 4px; word-break: break-word; }
-.intent-time { font-size: 12px; color: #b2bec3; margin-top: 6px; }
+.intent-meta span { font-size: 13px; color: var(--c2c-text-secondary); }
+.intent-msg { font-size: 13px; color: var(--c2c-text-secondary); margin-top: 2px; word-break: break-word; }
+.intent-reply { font-size: 13px; color: var(--c2c-primary); margin-top: 4px; word-break: break-word; }
+.intent-time { font-size: 12px; color: var(--c2c-text-muted); margin-top: 6px; }
 .intent-actions { display: flex; flex-direction: column; gap: 8px; justify-content: center; flex-shrink: 0; }
 @media (max-width: 480px) {
   .intent-img { width: 68px; height: 68px; }

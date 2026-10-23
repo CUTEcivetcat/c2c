@@ -164,7 +164,7 @@ const goAdmin = () => {
 .login-page {
   min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%);
+  background: linear-gradient(135deg, #fff5f0 0%, var(--c2c-bg) 50%, #fff 100%);
   background-size: 200% 200%;
   animation: loginGradient 8s ease infinite;
 }
@@ -181,7 +181,7 @@ const goAdmin = () => {
 }
 .login-art {
   flex: 0 0 360px;
-  background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 50%, #e55a2b 100%);
+  background: linear-gradient(135deg, var(--c2c-primary) 0%, var(--c2c-primary-light) 50%, var(--c2c-primary-dark) 100%);
   background-size: 200% 200%;
   animation: loginArtGrad 6s ease infinite;
   display: flex; align-items: center; justify-content: center; padding: 48px;
@@ -220,46 +220,46 @@ const goAdmin = () => {
 .art-feat span { font-size: 20px; }
 
 .login-form-wrap { flex: 1; padding: 40px; display: flex; flex-direction: column; }
-.login-form-wrap h3 { font-size: 22px; font-weight: 700; color: #2d3436; }
-.form-subtitle { font-size: 13px; color: #b2bec3; margin: 6px 0 16px; }
-.auto-reg-tip { color: #00b894; font-weight: 600; }
+.login-form-wrap h3 { font-size: 22px; font-weight: 700; color: var(--c2c-text); }
+.form-subtitle { font-size: 13px; color: var(--c2c-text-muted); margin: 6px 0 16px; }
+.auto-reg-tip { color: var(--c2c-accent); font-weight: 600; }
 
 /* 模式切换 */
-.mode-switch { display: flex; background: #f0f2f5; border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+.mode-switch { display: flex; background: var(--c2c-bg-soft); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
 .mode-switch button {
   flex: 1; padding: 10px; border: none; background: transparent;
-  font-size: 14px; font-weight: 600; color: #636e72; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--c2c-text-secondary); cursor: pointer;
   border-radius: 10px; transition: all 0.2s;
 }
-.mode-switch button.active { background: #fff; color: #ff6b35; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.mode-switch button.active { background: #fff; color: var(--c2c-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
 /* 输入组 */
 .input-group {
-  display: flex; align-items: center; background: #f8f9fa; border-radius: 14px;
+  display: flex; align-items: center; background: var(--c2c-bg); border-radius: 14px;
   padding: 0 16px; height: 50px; margin-bottom: 14px;
   border: 2px solid transparent; transition: all 0.25s;
 }
-.input-group:focus-within { background: #fff; border-color: #ff6b35; box-shadow: 0 0 0 4px rgba(255,107,53,0.08); }
-.input-prefix { font-size: 18px; color: #b2bec3; margin-right: 10px; flex-shrink: 0; }
-.modern-input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: #2d3436; }
-.modern-input::placeholder { color: #b2bec3; }
-.input-hint { font-size: 12px; color: #ff6b35; font-weight: 600; white-space: nowrap; }
-.input-suffix { border: none; background: none; cursor: pointer; color: #b2bec3; font-size: 16px; padding: 4px; }
+.input-group:focus-within { background: #fff; border-color: var(--c2c-primary); box-shadow: 0 0 0 4px rgba(255,107,53,0.08); }
+.input-prefix { font-size: 18px; color: var(--c2c-text-muted); margin-right: 10px; flex-shrink: 0; }
+.modern-input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: var(--c2c-text); }
+.modern-input::placeholder { color: var(--c2c-text-muted); }
+.input-hint { font-size: 12px; color: var(--c2c-primary); font-weight: 600; white-space: nowrap; }
+.input-suffix { border: none; background: none; cursor: pointer; color: var(--c2c-text-muted); font-size: 16px; padding: 4px; }
 
 .sms-btn {
-  border: none; background: #fff5f0; color: #ff6b35;
+  border: none; background: #fff5f0; color: var(--c2c-primary);
   padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
   cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
 }
-.sms-btn:hover:not(:disabled) { background: #ff6b35; color: #fff; }
+.sms-btn:hover:not(:disabled) { background: var(--c2c-primary); color: #fff; }
 .sms-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.pwd-hints { font-size: 12px; color: #b2bec3; margin: -6px 0 12px 4px; display: flex; align-items: center; gap: 4px; }
-.pwd-hints .el-icon { font-size: 14px; color: #fdcb6e; }
+.pwd-hints { font-size: 12px; color: var(--c2c-text-muted); margin: -6px 0 12px 4px; display: flex; align-items: center; gap: 4px; }
+.pwd-hints .el-icon { font-size: 14px; color: var(--c2c-warning); }
 
 .submit-btn {
   width: 100%; height: 50px; border: none;
-  background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light));
   color: #fff; font-size: 16px; font-weight: 700; border-radius: 14px;
   cursor: pointer; margin-top: 6px; transition: all 0.3s;
   display: flex; align-items: center; justify-content: center;
@@ -270,13 +270,13 @@ const goAdmin = () => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .form-footer { display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; }
-.form-footer a { color: #ff6b35; font-weight: 500; }
+.form-footer a { color: var(--c2c-primary); font-weight: 500; }
 
 /* 管理员入口 */
 .admin-entry {
   margin-top: 20px; padding-top: 14px; border-top: 1px dashed #eee;
   display: flex; align-items: center; justify-content: center; gap: 4px;
-  font-size: 13px; color: #b2bec3; cursor: pointer; transition: all 0.2s;
+  font-size: 13px; color: var(--c2c-text-muted); cursor: pointer; transition: all 0.2s;
 }
-.admin-entry:hover { color: #ff6b35; }
+.admin-entry:hover { color: var(--c2c-primary); }
 </style>

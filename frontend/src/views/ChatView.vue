@@ -4,7 +4,7 @@
     <div class="chat-topbar">
       <button class="back-btn" @click="$router.back()"><el-icon><ArrowLeft /></el-icon></button>
       <div class="topbar-partner" @click="goPartner">
-        <el-avatar :size="36" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);font-size:14px">{{ partnerName?.charAt(0) || '?' }}</el-avatar>
+        <el-avatar :size="36" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));font-size:14px">{{ partnerName?.charAt(0) || '?' }}</el-avatar>
         <strong>{{ partnerName || '聊天' }}</strong>
       </div>
     </div>
@@ -35,11 +35,11 @@
             </div>
           </div>
           <el-avatar v-if="item.m.senderId === myId" :size="34" class="msg-avatar"
-            style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);font-size:13px;flex-shrink:0">{{ item.avatarText }}</el-avatar>
+            style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));font-size:13px;flex-shrink:0">{{ item.avatarText }}</el-avatar>
         </div>
       </template>
       <div v-if="messages.length === 0" class="chat-empty">
-        <el-icon :size="48" color="#dfe6e9"><ChatDotRound /></el-icon>
+        <el-icon :size="48" color="var(--c2c-border)"><ChatDotRound /></el-icon>
         <p>发送第一条消息开始聊天吧</p>
       </div>
     </div>
@@ -213,10 +213,10 @@ const messageItems = computed(() => {
 .chat-page-layout { display: flex; flex-direction: column; height: 100vh; background: #f5f6f8; max-width: 700px; margin: 0 auto; }
 .chat-topbar {
   display: flex; align-items: center; gap: 12px; padding: 0 16px;
-  height: 56px; background: #fff; border-bottom: 1px solid #f0f2f5;
+  height: 56px; background: #fff; border-bottom: 1px solid var(--c2c-line-soft);
   position: sticky; top: 0; z-index: 10;
 }
-.back-btn { border: none; background: none; cursor: pointer; font-size: 20px; color: #636e72; padding: 4px; }
+.back-btn { border: none; background: none; cursor: pointer; font-size: 20px; color: var(--c2c-text-secondary); padding: 4px; }
 .topbar-partner { display: flex; align-items: center; gap: 10px; cursor: pointer; transition: opacity 0.2s; }
 .topbar-partner:hover { opacity: 0.8; }
 
@@ -239,7 +239,7 @@ const messageItems = computed(() => {
 }
 .msg-other .msg-bubble { border-top-left-radius: 5px; }
 .msg-mine .msg-bubble {
-  background: linear-gradient(135deg, #ff6b35, #ff8c5a); color: #fff;
+  background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light)); color: #fff;
   border-top-right-radius: 5px;
 }
 .msg-text { white-space: pre-wrap; }
@@ -249,35 +249,35 @@ const messageItems = computed(() => {
 .msg-read.ok { color: rgba(255,255,255,0.6); }
 .msg-other .msg-meta { justify-content: flex-start; }
 
-.chat-empty { text-align: center; padding: 60px 20px; color: #b2bec3; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.chat-empty { text-align: center; padding: 60px 20px; color: var(--c2c-text-muted); display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
 /* 系统通知 */
 .sys-msg { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 12px 0; }
 .sys-bubble {
   max-width: 90%; text-align: center;
-  background: #eef1f5; color: #636e72;
+  background: #eef1f5; color: var(--c2c-text-secondary);
   border-radius: 12px; padding: 8px 16px;
   font-size: 12px; line-height: 1.6; word-break: break-word;
 }
-.sys-time { font-size: 10px; color: #b2bec3; }
+.sys-time { font-size: 10px; color: var(--c2c-text-muted); }
 
 /* 输入栏 */
 .chat-input-bar {
   display: flex; gap: 8px; padding: 12px 16px;
-  background: #fff; border-top: 1px solid #f0f2f5;
+  background: #fff; border-top: 1px solid var(--c2c-line-soft);
 }
 .chat-input {
-  flex: 1; border: 2px solid #f0f2f5; border-radius: 24px;
+  flex: 1; border: 2px solid var(--c2c-line-soft); border-radius: 24px;
   padding: 10px 18px; font-size: 14px; outline: none;
   transition: border-color 0.2s;
 }
-.chat-input:focus { border-color: #ff6b35; }
+.chat-input:focus { border-color: var(--c2c-primary); }
 .send-btn {
   width: 44px; height: 44px; border-radius: 50%; border: none;
-  background: #ff6b35; color: #fff; cursor: pointer;
+  background: var(--c2c-primary); color: #fff; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
-.send-btn:hover { background: #e55a2b; transform: scale(1.05); }
-.send-btn:disabled { background: #dfe6e9; cursor: not-allowed; transform: none; }
+.send-btn:hover { background: var(--c2c-primary-dark); transform: scale(1.05); }
+.send-btn:disabled { background: var(--c2c-border); cursor: not-allowed; transform: none; }
 </style>

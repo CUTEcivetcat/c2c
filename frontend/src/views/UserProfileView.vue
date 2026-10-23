@@ -4,7 +4,7 @@
 
     <!-- 用户信息卡片 -->
     <div class="user-card" v-if="user.id">
-      <el-avatar :size="72" style="background:linear-gradient(135deg,#ff6b35,#ff8c5a);font-size:28px;font-weight:700">
+      <el-avatar :size="72" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));font-size:28px;font-weight:700">
         {{ user.nickname?.charAt(0) || '?' }}
       </el-avatar>
       <div class="user-meta">
@@ -87,54 +87,54 @@ const contact = async () => {
 
 <style scoped>
 .user-card {
-  background: #fff; border: 1px solid #f0f2f5; border-radius: 20px;
+  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 20px;
   padding: 28px 24px; display: flex; align-items: flex-start; gap: 18px;
   margin-bottom: 24px; flex-wrap: wrap;
 }
 .user-meta { flex: 1; min-width: 200px; }
-.user-meta h2 { font-size: 22px; font-weight: 700; color: #2d3436; margin: 0 0 6px; }
+.user-meta h2 { font-size: 22px; font-weight: 700; color: var(--c2c-text); margin: 0 0 6px; }
 .rep-row { display: flex; align-items: center; gap: 8px; }
-.rep-row span { font-size: 14px; font-weight: 600; color: #ff6b35; }
-.user-bio { font-size: 14px; color: #636e72; margin: 10px 0 4px; line-height: 1.7; }
-.user-join { font-size: 12px; color: #b2bec3; }
+.rep-row span { font-size: 14px; font-weight: 600; color: var(--c2c-primary); }
+.user-bio { font-size: 14px; color: var(--c2c-text-secondary); margin: 10px 0 4px; line-height: 1.7; }
+.user-join { font-size: 12px; color: var(--c2c-text-muted); }
 .user-actions { display: flex; gap: 10px; align-items: center; }
 .btn-primary {
   padding: 10px 22px; border: none; border-radius: 12px; cursor: pointer;
-  background: linear-gradient(135deg,#ff6b35,#ff8c5a); color: #fff;
+  background: linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light)); color: #fff;
   font-size: 14px; font-weight: 600; transition: all 0.25s;
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,107,53,0.3); }
 .btn-outline {
-  padding: 10px 22px; border: 2px solid #ff6b35; border-radius: 12px; cursor: pointer;
-  background: #fff; color: #ff6b35; font-size: 14px; font-weight: 600;
+  padding: 10px 22px; border: 2px solid var(--c2c-primary); border-radius: 12px; cursor: pointer;
+  background: #fff; color: var(--c2c-primary); font-size: 14px; font-weight: 600;
   text-decoration: none; display: inline-block; transition: all 0.25s;
 }
 .btn-outline:hover { background: #fff5f0; }
 
 .section-title {
-  font-size: 17px; font-weight: 700; color: #2d3436; margin: 8px 0 14px;
-  padding-left: 12px; border-left: 4px solid #ff6b35;
+  font-size: 17px; font-weight: 700; color: var(--c2c-text); margin: 8px 0 14px;
+  padding-left: 12px; border-left: 4px solid var(--c2c-primary);
 }
 .product-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 14px;
 }
 .product-card {
-  background: #fff; border: 1px solid #f0f2f5; border-radius: 14px; overflow: hidden;
+  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 14px; overflow: hidden;
   cursor: pointer; transition: all 0.25s;
 }
 .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-.thumb { aspect-ratio: 4/3; background: #f8f9fa; }
+.thumb { aspect-ratio: 4/3; background: var(--c2c-bg); }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .card-body { padding: 10px 12px 12px; }
 .card-title {
-  font-size: 13px; color: #2d3436; font-weight: 600;
+  font-size: 13px; color: var(--c2c-text); font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
   -webkit-line-clamp: 1; -webkit-box-orient: vertical; margin-bottom: 6px;
 }
 .card-footer { display: flex; justify-content: space-between; align-items: center; }
-.price { font-size: 16px; font-weight: 700; color: #e74c3c; }
-.cond { font-size: 11px; color: #b2bec3; }
+.price { font-size: 16px; font-weight: 700; color: var(--c2c-danger); }
+.cond { font-size: 11px; color: var(--c2c-text-muted); }
 
 @media (max-width: 480px) {
   .user-card { flex-direction: column; align-items: center; text-align: center; }

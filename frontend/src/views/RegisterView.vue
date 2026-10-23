@@ -109,26 +109,26 @@ const doRegister = async () => {
 </script>
 
 <style scoped>
-.login-page { min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%); }
+.login-page { min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, #fff5f0 0%, var(--c2c-bg) 50%, #fff 100%); }
 .reset-card { background: #fff; border-radius: 24px; padding: 32px 36px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
 .reset-card h2 { font-size: 22px; text-align: center; }
-.subtitle { text-align: center; color: #b2bec3; font-size: 13px; margin: 4px 0 0; }
+.subtitle { text-align: center; color: var(--c2c-text-muted); font-size: 13px; margin: 4px 0 0; }
 .input-group {
-  display: flex; align-items: center; background: #f8f9fa; border-radius: 14px;
+  display: flex; align-items: center; background: var(--c2c-bg); border-radius: 14px;
   padding: 0 16px; height: 48px; margin-bottom: 12px;
   border: 2px solid transparent; transition: all 0.25s;
 }
-.input-group:focus-within { background: #fff; border-color: #ff6b35; }
-.input-prefix { font-size: 18px; color: #b2bec3; margin-right: 10px; }
+.input-group:focus-within { background: #fff; border-color: var(--c2c-primary); }
+.input-prefix { font-size: 18px; color: var(--c2c-text-muted); margin-right: 10px; }
 .modern-input { flex: 1; border: none; outline: none; background: transparent; font-size: 14px; }
-.modern-input::placeholder { color: #b2bec3; font-size: 13px; }
-.input-suffix { border: none; background: none; cursor: pointer; color: #b2bec3; }
-.sms-btn { border: none; background: #fff5f0; color: #ff6b35; padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-.sms-btn:hover:not(:disabled) { background: #ff6b35; color: #fff; }
+.modern-input::placeholder { color: var(--c2c-text-muted); font-size: 13px; }
+.input-suffix { border: none; background: none; cursor: pointer; color: var(--c2c-text-muted); }
+.sms-btn { border: none; background: #fff5f0; color: var(--c2c-primary); padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.sms-btn:hover:not(:disabled) { background: var(--c2c-primary); color: #fff; }
 .sms-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.pwd-hints { font-size: 12px; color: #b2bec3; margin: -6px 0 12px 4px; display: flex; align-items: center; gap: 4px; }
+.pwd-hints { font-size: 12px; color: var(--c2c-text-muted); margin: -6px 0 12px 4px; display: flex; align-items: center; gap: 4px; }
 .submit-btn {
-  width: 100%; height: 48px; border: none; background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  width: 100%; height: 48px; border: none; background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light));
   color: #fff; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
   margin-top: 8px; transition: all 0.3s;
 }

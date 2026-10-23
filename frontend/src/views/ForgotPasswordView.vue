@@ -45,7 +45,7 @@
 
       <!-- Step 3: 完成 -->
       <div v-if="step === 2" style="text-align:center;padding:20px">
-        <el-icon :size="56" color="#00b894"><SuccessFilled /></el-icon>
+        <el-icon :size="56" color="var(--c2c-accent)"><SuccessFilled /></el-icon>
         <p style="font-size:18px;font-weight:600;margin:12px 0">密码重置成功</p>
         <el-button type="primary" size="large" round @click="$router.push('/login')">去登录</el-button>
       </div>
@@ -109,40 +109,40 @@ const doReset = async () => {
 </script>
 
 <style scoped>
-.login-page { min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, #fff5f0 0%, #f8f9fa 50%, #fff 100%); }
+.login-page { min-height: calc(100vh - 60px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; background: linear-gradient(135deg, #fff5f0 0%, var(--c2c-bg) 50%, #fff 100%); }
 .reset-card { background: #fff; border-radius: 24px; padding: 40px; width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
 .reset-card h2 { font-size: 22px; text-align: center; }
-.subtitle { text-align: center; color: #b2bec3; font-size: 13px; margin: 4px 0 0; }
+.subtitle { text-align: center; color: var(--c2c-text-muted); font-size: 13px; margin: 4px 0 0; }
 .input-group {
-  display: flex; align-items: center; background: #f8f9fa; border-radius: 14px;
+  display: flex; align-items: center; background: var(--c2c-bg); border-radius: 14px;
   padding: 0 16px; height: 50px; margin-bottom: 14px;
   border: 2px solid transparent; transition: all 0.25s;
 }
-.input-group:focus-within { background: #fff; border-color: #ff6b35; }
-.input-prefix { font-size: 18px; color: #b2bec3; margin-right: 10px; }
+.input-group:focus-within { background: #fff; border-color: var(--c2c-primary); }
+.input-prefix { font-size: 18px; color: var(--c2c-text-muted); margin-right: 10px; }
 .modern-input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; }
-.modern-input::placeholder { color: #b2bec3; }
-.input-suffix { border: none; background: none; cursor: pointer; color: #b2bec3; }
+.modern-input::placeholder { color: var(--c2c-text-muted); }
+.input-suffix { border: none; background: none; cursor: pointer; color: var(--c2c-text-muted); }
 .sms-btn {
-  border: none; background: #fff5f0; color: #ff6b35;
+  border: none; background: #fff5f0; color: var(--c2c-primary);
   padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
   cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
 }
-.sms-btn:hover:not(:disabled) { background: #ff6b35; color: #fff; }
+.sms-btn:hover:not(:disabled) { background: var(--c2c-primary); color: #fff; }
 .sms-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .submit-btn {
-  width: 100%; height: 48px; border: none; background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  width: 100%; height: 48px; border: none; background: linear-gradient(135deg, var(--c2c-primary), var(--c2c-primary-light));
   color: #fff; font-size: 15px; font-weight: 700; border-radius: 14px; cursor: pointer;
   margin-top: 8px; transition: all 0.3s;
 }
 .submit-btn:hover:not(:disabled) { transform: translateY(-2px); }
 .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .pwd-strength { display: flex; align-items: center; gap: 10px; margin: -6px 0 16px 4px; }
-.strength-bar { flex: 1; height: 4px; background: #f0f2f5; border-radius: 2px; }
+.strength-bar { flex: 1; height: 4px; background: var(--c2c-bg-soft); border-radius: 2px; }
 .strength-bar .fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
-.fill.level-1 { width: 33%; background: #e74c3c; }
-.fill.level-2 { width: 66%; background: #fdcb6e; }
-.fill.level-3 { width: 100%; background: #00b894; }
-.pwd-strength span { font-size: 12px; color: #636e72; }
+.fill.level-1 { width: 33%; background: var(--c2c-danger); }
+.fill.level-2 { width: 66%; background: var(--c2c-warning); }
+.fill.level-3 { width: 100%; background: var(--c2c-accent); }
+.pwd-strength span { font-size: 12px; color: var(--c2c-text-secondary); }
 </style>
 @media (max-width: 480px) { .reset-card { width: 100% !important; padding: 24px 16px !important; margin: 0 8px; } }
