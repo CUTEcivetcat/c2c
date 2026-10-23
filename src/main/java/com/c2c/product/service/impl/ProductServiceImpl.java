@@ -204,12 +204,16 @@ public class ProductServiceImpl implements ProductService {
             String cached = redisTemplate.opsForValue().get(cacheKey);
             if (cached != null) {
                 try {
-                    Page<ProductVO> p = new Page<>(1, size, 0);
-                    p.setRecords(objectMapper.readValue(cached,
-                            new com.fasterxml.jackson.core.type.TypeReference<List<ProductVO>>() {}));
-                    return p;
+                    // 缓存内容为 {total, records}；total 必须一并缓存，否则命中缓存时分页总数会变 0
+                    com.fasterxml.jackson.databind.JsonNode node = objectMapper.readTree(cached);
+                    if (node != null && node.isObject() && node.has("records")) {
+                        Page<ProductVO> p = new Page<>(1, size, node.path("total").asLong(0));
+                        p.setRecords(objectMapper.convertValue(node.get("records"),
+                                new com.fasterxml.jackson.core.type.TypeReference<List<ProductVO>>() {}));
+                        return p;
+                    }
                 } catch (Exception ignored) {
-                    // 缓存解析失败则回退到数据库查询
+                    // 缓存解析失败、或为旧格式（纯 records 数组）→ 回退到数据库查询
                 }
             }
         }
@@ -253,8 +257,10 @@ public class ProductServiceImpl implements ProductService {
         // 写入首页缓存
         if (cacheKey != null) {
             try {
-                redisTemplate.opsForValue().set(cacheKey,
-                        objectMapper.writeValueAsString(voPage.getRecords()), 60, TimeUnit.SECONDS);
+                com.fasterxml.jackson.databind.node.ObjectNode payload = objectMapper.createObjectNode();
+                payload.put("total", voPage.getTotal());
+                payload.set("records", objectMapper.valueToTree(voPage.getRecords()));
+                redisTemplate.opsForValue().set(cacheKey, payload.toString(), 60, TimeUnit.SECONDS);
             } catch (Exception ignored) {
                 // 缓存失败不影响查询结果
             }
