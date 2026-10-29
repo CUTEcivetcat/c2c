@@ -6,6 +6,8 @@ import com.c2c.common.constant.ApiPath;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.common.result.R;
 import com.c2c.common.utils.JwtUtils;
+import com.c2c.system.constant.SysConfigKey;
+import com.c2c.system.service.SysConfigService;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 管理员认证：管理员登录接口。
@@ -35,7 +39,13 @@ import java.util.Map;
 public class AdminAuthController {
 
     private final UserMapper userMapper;
+    private final SysConfigService sysConfigService;
+    private final StringRedisTemplate redisTemplate;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    /** 登录失败锁定 Redis 键前缀 */
+    private static final String FAIL_KEY_PREFIX = "adminlogin:fail:";
+    private static final String LOCK_KEY_PREFIX = "adminlogin:lock:";
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -55,6 +65,8 @@ public class AdminAuthController {
             throw new BusinessException("账号或密码不能为空");
         }
 
+        checkLoginLock(account);
+
         // 仅允许 role=1 的管理员账号登录，按手机号/邮箱/用户名匹配
         User admin = userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getRole, 1)
@@ -64,6 +76,7 @@ public class AdminAuthController {
 
         if (admin == null) {
             log.warn("管理员登录失败：账号不存在，account={}", account);
+            failLoginLock(account);
             throw new BusinessException(401, "用户名或密码错误");
         }
         if (admin.getStatus() != null && admin.getStatus() == 0) {
@@ -72,8 +85,11 @@ public class AdminAuthController {
         }
         if (!passwordEncoder.matches(password, admin.getPassword())) {
             log.warn("管理员登录失败：密码错误，account={}", account);
+            failLoginLock(account);
             throw new BusinessException(401, "用户名或密码错误");
         }
+
+        clearLoginLock(account);
 
         // 三级权限自愈：username='admin' 恒为总管理员(admin_level=2)，
         // 老数据/漏执行迁移 SQL 导致 admin_level 缺失或为 0 时，登录即自动升级并写库，
@@ -131,5 +147,43 @@ public class AdminAuthController {
             }
         }
         return perms;
+    }
+
+    // ==================== 登录失败锁定（开关由 sys_config 控制） ====================
+
+    private boolean lockEnabled() {
+        return sysConfigService.getBool(SysConfigKey.ADMIN_LOGIN_LOCK_ENABLED, true);
+    }
+
+    private void checkLoginLock(String account) {
+        if (!lockEnabled()) {
+            return;
+        }
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(LOCK_KEY_PREFIX + account))) {
+            throw new BusinessException("登录失败次数过多，账号已锁定，请稍后再试");
+        }
+    }
+
+    private void failLoginLock(String account) {
+        if (!lockEnabled()) {
+            return;
+        }
+        int maxAttempts = sysConfigService.getInt(SysConfigKey.ADMIN_LOGIN_LOCK_MAX_ATTEMPTS, 5);
+        int lockMinutes = sysConfigService.getInt(SysConfigKey.ADMIN_LOGIN_LOCK_LOCK_MINUTES, 15);
+        String failKey = FAIL_KEY_PREFIX + account;
+        Long fails = redisTemplate.opsForValue().increment(failKey);
+        if (fails != null && fails == 1L) {
+            redisTemplate.expire(failKey, 60, TimeUnit.MINUTES);
+        }
+        if (fails != null && fails >= maxAttempts) {
+            redisTemplate.opsForValue().set(LOCK_KEY_PREFIX + account, "1", lockMinutes, TimeUnit.MINUTES);
+            redisTemplate.delete(failKey);
+            log.warn("管理员登录连续失败 {} 次，锁定 {} 分钟：account={}", maxAttempts, lockMinutes, account);
+            throw new BusinessException("登录失败" + maxAttempts + "次，账号已锁定" + lockMinutes + "分钟");
+        }
+    }
+
+    private void clearLoginLock(String account) {
+        redisTemplate.delete(FAIL_KEY_PREFIX + account);
     }
 }

@@ -58,7 +58,7 @@ c2c/
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
 ├── blog/                         # 博客前端（Vite 5175）
 ├── weapp/                        # 微信小程序（完整功能：登录/发布/订单/钱包等）
-├── sql/                          # init.sql 全量建表(18张) / data.sql 全量演示数据
+├── sql/                          # init.sql 全量建表(20张) / data.sql 全量演示数据
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
 ├── deploy/                       # 部署脚本与示例配置（脱敏）
@@ -75,16 +75,11 @@ c2c/
 ### 1. 数据库
 ```sql
 -- 全新部署：建库 + 建表 + 演示数据（init 会清空重建 c2c 库）
-source sql/init.sql;      -- 全量建表（18 张表 + 字段注释）
+source sql/init.sql;      -- 全量建表（20 张表 + 字段注释）
 source sql/data.sql;      -- 全量演示数据（8 用户含 admin 总管理员 + 30 商品覆盖全部分类）
 
--- 已有数据的库升级（按需，勿与全量重复执行）：
-source sql/update-20260914-secondary-pwd.sql;  -- 二级密码字段
-source sql/update-20260915-admin-levels.sql;   -- 管理员等级 + 权限码字段（三级权限体系）
--- 可选：补扩充商品 / 修复 admin 等级（已并入全量，归档在 xz/）
-source sql/xz/data-extra.sql;
-source sql/xz/repair-admin-levels.sql;
--- SQL 目录规范详见 sql/README.md
+-- 注意：历史增量脚本（二级密码、管理员等级等）已全部并入全量脚本并删除，
+-- 全新部署只需上面两步；SQL 目录规范详见 sql/README.md
 ```
 
 ### 2. 后端
@@ -177,7 +172,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ## 📊 数据库表结构
 
-共 18 张表，210 个字段。
+共 20 张表，221 个字段。
 
 ### 关系图（E-R图）
 
@@ -214,6 +209,7 @@ flowchart LR
     N[NICKNAME_AUDIT 昵称审核]
     B[BANNER 轮播图]
     CAT[CATEGORY 分类]
+    CFG[SYS_CONFIG 系统配置]
   end
 ```
 
@@ -520,6 +516,9 @@ flowchart LR
 |`gender`|tinyint(4)|性别 0保密1男2女|Y|0|
 |`status`|tinyint(4)|状态 1正常0封禁|Y|1|
 |`role`|tinyint(4)|角色 0普通1管理员2审核|Y|0|
+|`secondary_pwd`|varchar(255)|二级密码(BCrypt加密)，删除账户等高危操作二次校验|Y||
+|`admin_level`|tinyint(4)|管理员等级 0非管理员 1次级·子级管理员 2总管理员admin|N|0|
+|`admin_perms`|varchar(500)|管理员权限码(逗号分隔)；admin_level=2 视为全部权限|Y||
 |`login_source`|varchar(20)|注册来源 浏览email/wechat/phone|Y|email|
 |`reputation_score`|decimal(3,1)|信誉分 0~5|Y|5.0|
 |`balance`|decimal(10,2)|账户余额|N|0.00|

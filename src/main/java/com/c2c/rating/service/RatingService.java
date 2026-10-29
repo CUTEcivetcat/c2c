@@ -3,6 +3,8 @@ package com.c2c.rating.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.exception.BusinessException;
+import com.c2c.order.entity.Order;
+import com.c2c.order.mapper.OrderMapper;
 import com.c2c.rating.entity.Rating;
 import com.c2c.rating.feign.UserFeignClient;
 import com.c2c.rating.mapper.RatingMapper;
@@ -27,8 +29,9 @@ public class RatingService {
 
     private final RatingMapper ratingMapper;
     private final UserFeignClient userFeignClient;
+    private final OrderMapper orderMapper;
 
-    /** 提交评价（校验评分范围与重复评价，并重算被评用户信誉分） */
+    /** 提交评价（校验订单参与/完成状态与评价方向，并重算被评用户信誉分） */
     @Transactional
     public void submit(Rating rating, Long userId) {
         rating.setRaterId(userId);
@@ -45,6 +48,8 @@ public class RatingService {
             throw new BusinessException("评价角色无效（1=买家 2=卖家）");
         }
 
+        validateOrderParticipation(rating, userId);
+
         Rating exist = ratingMapper.selectOne(new LambdaQueryWrapper<Rating>()
                 .eq(Rating::getOrderId, rating.getOrderId())
                 .eq(Rating::getRaterId, userId));
@@ -54,6 +59,32 @@ public class RatingService {
 
         ratingMapper.insert(rating);
         recalcReputation(rating.getRatedUserId());
+    }
+
+    /**
+     * 订单参与校验：评价人必须是订单买家或卖家、订单必须已完成、评价角色与被评人必须与订单一致。
+     * 防止对任意订单/任意用户刷评价、未完成订单提前评价。
+     */
+    private void validateOrderParticipation(Rating rating, Long userId) {
+        Order order = orderMapper.selectById(rating.getOrderId());
+        if (order == null) {
+            throw new BusinessException("订单不存在");
+        }
+        boolean isBuyer = order.getBuyerId().equals(userId);
+        boolean isSeller = order.getSellerId().equals(userId);
+        if (!isBuyer && !isSeller) {
+            throw new BusinessException("您不是该订单的买卖双方，无权评价");
+        }
+        if (order.getStatus() == null || order.getStatus() != 4) {
+            throw new BusinessException("订单未完成，暂不能评价");
+        }
+        Long expectedRatedUserId = rating.getRole() == 1 ? order.getSellerId() : order.getBuyerId();
+        if ((rating.getRole() == 1 && !isBuyer) || (rating.getRole() == 2 && !isSeller)) {
+            throw new BusinessException("评价角色与订单身份不符（1=买家评卖家 2=卖家评买家）");
+        }
+        if (!expectedRatedUserId.equals(rating.getRatedUserId())) {
+            throw new BusinessException("被评价用户与该订单不匹配");
+        }
     }
 
     /** 分页查询某用户收到的全部评价 */

@@ -225,3 +225,12 @@ INSERT INTO `announcement` (`id`, `title`, `content`, `type`, `status`, `pinned`
 
 -- 全部用户（含扩充用户 5~8）各充值 100 元余额
 UPDATE `user` SET `balance` = 100.00 WHERE `id` <= 8 AND `balance` = 0;
+
+-- -------------------------------------------------------------
+-- 系统运行配置（管理端「系统设置」面板可调；默认值均为安全取向）
+-- -------------------------------------------------------------
+INSERT INTO `sys_config` (`config_key`, `config_value`, `remark`) VALUES
+('sys.sms-echo-code', 'false', '验证码是否在接口响应中回显（仅本地/演示环境允许开启，生产必须关闭）'),
+('security.admin-login-lock.enabled', 'true', '管理员登录失败锁定开关'),
+('security.admin-login-lock.max-attempts', '5', '管理员登录连续失败次数上限（达到后锁定）'),
+('security.admin-login-lock.lock-minutes', '15', '管理员登录锁定时长（分钟）');

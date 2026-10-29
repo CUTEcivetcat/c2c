@@ -18,6 +18,9 @@
         <el-tooltip :content="'权限管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="isTop" to="/permissions" class="nav-item"><el-icon><Lock /></el-icon><span v-show="!collapsed">权限管理</span></router-link>
         </el-tooltip>
+        <el-tooltip :content="'系统设置'" placement="right" :disabled="!collapsed">
+        <router-link v-if="isTop" to="/config" class="nav-item"><el-icon><Setting /></el-icon><span v-show="!collapsed">系统设置</span></router-link>
+        </el-tooltip>
         <el-tooltip :content="'安全设置'" placement="right" :disabled="!collapsed">
         <router-link to="/security" class="nav-item"><el-icon><Key /></el-icon><span v-show="!collapsed">安全设置</span></router-link>
         </el-tooltip>

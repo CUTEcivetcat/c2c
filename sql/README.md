@@ -6,8 +6,8 @@
 
 | 文件 | 用途 | 用法 |
 |---|---|---|
-| `init.sql` | **全量建表**：19 张表 + 全部字段（含 `secondary_pwd` 二级密码、`admin_level` 管理员等级、`admin_perms` 权限码、`banner` 轮播图表） | `mysql -uroot -p c2c < init.sql` |
-| `data.sql` | **全量演示数据**：8 用户（admin 为总管理员 `admin_level=2`）、30 商品（覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）、30 商品图、8 收藏、3 意向、3 轮播图、1 公告、订单/钱包余额等 | `mysql -uroot -p c2c < data.sql` |
+| `init.sql` | **全量建表**：20 张表 + 全部字段（含 `secondary_pwd` 二级密码、`admin_level` 管理员等级、`admin_perms` 权限码、`banner` 轮播图表、`sys_config` 系统运行配置表） | `mysql -uroot -p c2c < init.sql` |
+| `data.sql` | **全量演示数据**：8 用户（admin 为总管理员 `admin_level=2`）、30 商品（覆盖教材/英语/笔记本电脑/苹果手机/宿舍用品全部分类）、30 商品图、8 收藏、3 意向、3 轮播图、1 公告、订单/钱包余额，以及 4 项系统默认配置（验证码回显关闭、管理员登录锁定 5 次/15 分钟） | `mysql -uroot -p c2c < data.sql` |
 
 ```bash
 mysql -uroot -p c2c < init.sql   # ① 建表（会清空重建 c2c 库）

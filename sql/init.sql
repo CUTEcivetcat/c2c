@@ -261,9 +261,9 @@ CREATE TABLE `admin_log` (
   KEY `idx_target` (`target_type`, `target_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ==================== 新增表 4 张 ====================
+-- ==================== 扩展表 4 张 ====================
 
-CREATE TABLE IF NOT EXISTS `banner` (
+CREATE TABLE `banner` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `title` VARCHAR(100) DEFAULT NULL COMMENT '标题',
   `image_url` VARCHAR(500) NOT NULL COMMENT '图片地址',
@@ -274,7 +274,7 @@ CREATE TABLE IF NOT EXISTS `banner` (
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='首页轮播图';
 
-CREATE TABLE IF NOT EXISTS `announcement` (
+CREATE TABLE `announcement` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `title` VARCHAR(200) NOT NULL,
   `content` TEXT NOT NULL,
@@ -292,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `announcement` (
   KEY `idx_force` (`status`, `is_force`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `nickname_audit` (
+CREATE TABLE `nickname_audit` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
   `old_nickname` VARCHAR(50) DEFAULT NULL,
@@ -306,7 +306,7 @@ CREATE TABLE IF NOT EXISTS `nickname_audit` (
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `wallet_log` (
+CREATE TABLE `wallet_log` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
   `type` VARCHAR(20) NOT NULL,
@@ -319,5 +319,17 @@ CREATE TABLE IF NOT EXISTS `wallet_log` (
   KEY `idx_user` (`user_id`),
   KEY `idx_order` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 系统运行配置：管理端「系统设置」面板可动态调整的安全开关等（运行时经 Redis 缓存读取）
+CREATE TABLE `sys_config` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `config_key` VARCHAR(100) NOT NULL COMMENT '配置键',
+  `config_value` VARCHAR(500) NOT NULL COMMENT '配置值',
+  `remark` VARCHAR(500) DEFAULT NULL COMMENT '配置说明',
+  `updated_by` BIGINT DEFAULT NULL COMMENT '最后修改人ID',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY `uk_config_key` (`config_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统运行配置（后台控制面板可动态调整）';
 
 SET FOREIGN_KEY_CHECKS = 1;

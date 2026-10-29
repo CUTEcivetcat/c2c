@@ -88,6 +88,9 @@ export const adminApi = {
   // 昵称审核
   getNicknameAudits: (params) => request.get('/review/nickname/list', { params }),
   handleNicknameAudit: (id, data) => request.post(`/review/nickname/${id}/handle`, data),
+  // 系统设置（运行时可调开关，仅总管理员）
+  getConfigs: () => request.get('/admin/config'),
+  updateConfig: (data) => request.put('/admin/config', data),
   // 轮播图管理
   getBanners: () => request.get('/admin/banner/list'),
   createBanner: (data) => request.post('/admin/banner', data),

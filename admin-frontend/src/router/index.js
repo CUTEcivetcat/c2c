@@ -11,6 +11,8 @@ const routes = [
   { path: '/products', name: 'Products', component: () => import('@/views/ProductManageView.vue'), meta: { requiresAuth: true, perm: 'products' } },
   { path: '/orders', name: 'Orders', component: () => import('@/views/OrderManageView.vue'), meta: { requiresAuth: true, perm: 'orders' } },
   { path: '/permissions', name: 'Permissions', component: () => import('@/views/UserRoleManageView.vue'), meta: { requiresAuth: true, requiresTop: true } },
+  // 系统设置：运行时可调的系统开关（验证码回显、管理员登录锁定等），仅总管理员
+  { path: '/config', name: 'SystemConfig', component: () => import('@/views/SystemConfigView.vue'), meta: { requiresAuth: true, requiresTop: true } },
   { path: '/review', name: 'Review', component: () => import('@/views/ReviewManageView.vue'), meta: { requiresAuth: true, perm: 'review' } },
   { path: '/announcement', name: 'Announcement', component: () => import('@/views/AnnouncementManageView.vue'), meta: { requiresAuth: true, perm: 'announcement' } },
   { path: '/banner', name: 'Banner', component: () => import('@/views/BannerManageView.vue'), meta: { requiresAuth: true, perm: 'banner' } }

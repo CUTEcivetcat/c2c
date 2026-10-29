@@ -166,4 +166,7 @@ public interface ApiPath {
     String ECO_USER_STATS = "/eco/user/stats";
     String ADMIN_ECO_OVERVIEW = "/admin/eco/overview";
     String ADMIN_ECO_TREND = "/admin/eco/trend";
+
+    // ==================== 系统运行配置 /admin/config（仅总管理员） ====================
+    String ADMIN_CONFIG = "/admin/config";
 }

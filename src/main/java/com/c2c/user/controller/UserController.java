@@ -32,10 +32,14 @@ public class UserController {
     private final UserService userService;
     private final StringRedisTemplate redisTemplate;
     private final UserMapper userMapper;
+    private final com.c2c.system.service.SysConfigService sysConfigService;
 
-    /** 是否在响应中回显验证码（仅本地开发置 true，生产必须 false） */
+    /**
+     * 是否在响应中回显验证码的兜底默认值（仅本地开发置 true，生产必须 false）。
+     * 运行时以管理端「系统设置」中的 sys.sms-echo-code 配置为准（Redis 读穿缓存）。
+     */
     @org.springframework.beans.factory.annotation.Value("${app.sms-echo-code:false}")
-    private boolean smsEchoCode;
+    private boolean smsEchoCodeDefault;
 
     // ==================== 验证码 ====================
 
@@ -50,7 +54,8 @@ public class UserController {
     public R<Map<String, String>> sendSms(@Parameter(description = "手机号或邮箱") @RequestParam("account") String account) {
         String code = userService.sendVerificationCodeAndReturn(account);
         Map<String, String> result = com.c2c.common.utils.MapUtils.of("type", account.contains("@") ? "email" : "sms");
-        if (smsEchoCode) {
+        boolean echoCode = sysConfigService.getBool(com.c2c.system.constant.SysConfigKey.SMS_ECHO_CODE, smsEchoCodeDefault);
+        if (echoCode) {
             result.put("code", code);
         }
         return R.ok(result);
