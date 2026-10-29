@@ -106,6 +106,10 @@ page {
 .btn-mini.danger { color: var(--danger); border-color: var(--danger); }
 .btn-mini:active { opacity: 0.8; }
 
+/* ===== 触摸反馈（可点 view 统一按压态，配合 hover-class="hover-fade" 使用） ===== */
+.hover-fade { transition: opacity 0.15s ease, transform 0.15s ease; }
+.hover-fade-hover { opacity: 0.72; }
+
 /* ===== 输入框 ===== */
 .input {
   background: #fff;

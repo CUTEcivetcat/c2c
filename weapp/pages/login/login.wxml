@@ -12,5 +12,5 @@
     <input class="inp" placeholder="请输入验证码" placeholder-class="ph" bindinput="onCode" value="{{code}}"/>
     <button class="code-btn" bindtap="sendCode">{{codeBtnText}}</button>
   </view>
-  <button class="submit-btn btn-primary" bindtap="bindEmail" disabled="{{bindLoading}}">{{bindLoading ? '绑定中...' : '确认绑定'}}</button>
+  <button class="submit-btn btn-primary" bindtap="bindEmail" disabled="{{bindLoading}}" loading="{{bindLoading}}">{{bindLoading ? '绑定中...' : '确认绑定'}}</button>
 </view>

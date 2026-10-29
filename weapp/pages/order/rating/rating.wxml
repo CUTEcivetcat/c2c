@@ -32,7 +32,7 @@
               bindinput="onComment" value="{{comment}}" maxlength="500"/>
   </view>
 
-  <button class="submit-btn btn-primary" bindtap="submit" disabled="{{submitting}}">
+  <button class="submit-btn btn-primary" bindtap="submit" disabled="{{submitting}}" loading="{{submitting}}">
     {{submitting ? '提交中...' : '提交评价'}}
   </button>
 </view>

@@ -51,15 +51,15 @@
   <view class="footer-bar">
     <button class="bar-btn plain" bindtap="contactOther">联系对方</button>
     <block wx:if="{{o.status === 0}}">
-      <button class="bar-btn plain" bindtap="cancel">取消订单</button>
-      <button class="bar-btn btn-primary" bindtap="pay">立即支付</button>
+      <button class="bar-btn plain" bindtap="cancel" disabled="{{acting}}" loading="{{acting}}">取消订单</button>
+      <button class="bar-btn btn-primary" bindtap="pay" disabled="{{acting}}" loading="{{acting}}">立即支付</button>
     </block>
     <block wx:elif="{{o.status === 1}}">
-      <button class="bar-btn plain" bindtap="cancel">取消订单</button>
-      <button class="bar-btn btn-primary" wx:if="{{isSeller}}" bindtap="ship">发货</button>
+      <button class="bar-btn plain" bindtap="cancel" disabled="{{acting}}" loading="{{acting}}">取消订单</button>
+      <button class="bar-btn btn-primary" wx:if="{{isSeller}}" bindtap="ship" disabled="{{acting}}" loading="{{acting}}">发货</button>
     </block>
     <block wx:elif="{{o.status === 2}}">
-      <button class="bar-btn btn-primary" wx:if="{{isBuyer}}" bindtap="receive">确认收货</button>
+      <button class="bar-btn btn-primary" wx:if="{{isBuyer}}" bindtap="receive" disabled="{{acting}}" loading="{{acting}}">确认收货</button>
     </block>
     <block wx:elif="{{o.status === 4}}">
       <button class="bar-btn btn-primary" wx:if="{{!myRated}}" bindtap="goRate">评价交易</button>

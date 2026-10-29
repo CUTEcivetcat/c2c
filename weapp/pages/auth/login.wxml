@@ -13,7 +13,7 @@
 
   <view class="panel" wx:if="{{tab==0}}">
     <text class="panel-desc">使用微信账号快速登录</text>
-    <button class="btn-primary wechat-btn" bindtap="wechatLogin" disabled="{{loading}}">
+    <button class="btn-primary wechat-btn" bindtap="wechatLogin" disabled="{{loading}}" loading="{{loading}}">
       {{loading ? '登录中...' : '微信一键登录'}}
     </button>
   </view>
@@ -26,7 +26,7 @@
       <input class="inp" placeholder="请输入验证码" placeholder-class="ph" bindinput="onCode" value="{{code}}"/>
       <button class="code-btn" bindtap="sendCode" disabled="{{countdown>0}}">{{codeBtnText}}</button>
     </view>
-    <button class="btn-primary submit-btn" bindtap="loginByCode" disabled="{{loading}}">
+    <button class="btn-primary submit-btn" bindtap="loginByCode" disabled="{{loading}}" loading="{{loading}}">
       {{loading ? '登录中...' : '验证码登录'}}
     </button>
   </view>
@@ -38,7 +38,7 @@
     <view class="field">
       <input class="inp" password placeholder="请输入密码" placeholder-class="ph" bindinput="onPassword" value="{{password}}"/>
     </view>
-    <button class="btn-primary submit-btn" bindtap="loginByPassword" disabled="{{loading}}">
+    <button class="btn-primary submit-btn" bindtap="loginByPassword" disabled="{{loading}}" loading="{{loading}}">
       {{loading ? '登录中...' : '账号密码登录'}}
     </button>
     <text class="hint">未注册账号：验证码登录会自动注册</text>

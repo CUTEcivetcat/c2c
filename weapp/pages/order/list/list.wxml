@@ -1,19 +1,20 @@
 <view class="op fade-up">
   <!-- 买卖切换 -->
   <view class="tabs glass-card">
-    <view class="tab {{tab==='buy'?'active':''}}" bindtap="switchTab" data-t="buy">我买到的</view>
-    <view class="tab {{tab==='sell'?'active':''}}" bindtap="switchTab" data-t="sell">我卖出的</view>
+    <view class="tab hover-fade {{tab==='buy'?'active':''}}" hover-class="hover-fade-hover" bindtap="switchTab" data-t="buy">我买到的</view>
+    <view class="tab hover-fade {{tab==='sell'?'active':''}}" hover-class="hover-fade-hover" bindtap="switchTab" data-t="sell">我卖出的</view>
   </view>
 
   <!-- 状态筛选 -->
   <scroll-view class="status-bar" scroll-x wx:if="{{orders.length || status}}">
-    <view class="st {{status === item.key ? 'active' : ''}}"
+    <view class="st hover-fade {{status === item.key ? 'active' : ''}}"
           wx:for="{{statusTabs}}" wx:key="key"
+          hover-class="hover-fade-hover"
           bindtap="switchStatus" data-k="{{item.key}}">{{item.label}}</view>
   </scroll-view>
 
   <!-- 订单卡片 -->
-  <view class="card glass-card" wx:for="{{orders}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
+  <view class="card glass-card hover-fade" hover-class="hover-fade-hover" wx:for="{{orders}}" wx:key="id" bindtap="go" data-id="{{item.id}}">
     <view class="hd">
       <text class="no">{{item.orderNo}}</text>
       <text class="st chip">{{statusText(item.status)}}</text>

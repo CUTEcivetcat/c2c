@@ -9,6 +9,7 @@ Page({
     o: null,
     address: null,
     meId: '',
+    acting: false,
     isBuyer: false,
     isSeller: false,
     otherId: '',
@@ -68,64 +69,80 @@ Page({
 
   fmt: function (t) { return util.formatDateTime(t) },
 
-  // ==================== 操作 ====================
+  // ==================== 操作（统一 acting 防重入，按钮联动 loading） ====================
   pay: function () {
     var that = this
+    if (this.data.acting) return
     wx.showModal({
       title: '余额支付',
       content: '确认使用余额支付 ¥' + (this.data.o ? this.data.o.totalAmount : 0) + ' ？',
       success: function (r) {
         if (!r.confirm) return
+        that.setData({ acting: true })
         api.payOrder(that.id).then(function () {
           wx.showToast({ title: '支付成功', icon: 'success' })
           that.load()
-        }).catch(function () {})
+        }).catch(function () {}).then(function () {
+          that.setData({ acting: false })
+        })
       }
     })
   },
 
   ship: function () {
     var that = this
+    if (this.data.acting) return
     wx.showModal({
       title: '发货',
       editable: true,
       placeholderText: '物流单号(可空)',
       success: function (r) {
         if (!r.confirm) return
+        that.setData({ acting: true })
         api.shipOrder(that.id, { shipCompany: '快递', shipNo: (r.content || '').trim() }).then(function () {
           wx.showToast({ title: '已发货', icon: 'success' })
           that.load()
-        }).catch(function () {})
+        }).catch(function () {}).then(function () {
+          that.setData({ acting: false })
+        })
       }
     })
   },
 
   receive: function () {
     var that = this
+    if (this.data.acting) return
     wx.showModal({
       title: '确认收货',
       content: '确认已收到商品？',
       success: function (r) {
         if (!r.confirm) return
+        that.setData({ acting: true })
         api.receiveOrder(that.id).then(function () {
           wx.showToast({ title: '已收货', icon: 'success' })
           that.load()
-        }).catch(function () {})
+        }).catch(function () {}).then(function () {
+          that.setData({ acting: false })
+        })
       }
     })
   },
 
   cancel: function () {
     var that = this
+    if (this.data.acting) return
     wx.showModal({
       title: '取消订单',
       content: '确定取消该订单？',
       success: function (r) {
         if (!r.confirm) return
+        that.setData({ acting: true })
         api.cancelOrder(that.id, '用户取消').then(function () {
           wx.showToast({ title: '已取消', icon: 'success' })
           that.load()
-        }).catch(function () {})
+        }).catch(function () {}).then(function () {
+          that.setData({ acting: false })
+        })
       }
     })
   },

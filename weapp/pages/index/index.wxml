@@ -22,7 +22,7 @@
   </swiper>
 
   <!-- 公告横幅 -->
-  <view class="notice-bar glass-card" wx:if="{{notices.length}}" bindtap="goNotices">
+  <view class="notice-bar glass-card hover-fade" hover-class="hover-fade-hover" wx:if="{{notices.length}}" bindtap="goNotices">
     <text class="notice-tag">公告</text>
     <text class="notice-text">{{notices[0].title}}</text>
     <text class="notice-ar">›</text>
@@ -30,7 +30,7 @@
 
   <!-- 分类快捷入口 -->
   <view class="cat-row glass-card" wx:if="{{categories.length}}">
-    <view class="cat-item" wx:for="{{categories}}" wx:key="id" bindtap="goCategory" data-id="{{item.id}}">
+    <view class="cat-item hover-fade" hover-class="hover-fade-hover" wx:for="{{categories}}" wx:key="id" bindtap="goCategory" data-id="{{item.id}}">
       <view class="cat-ico">
         <image wx:if="{{item.iconUrl}}" src="{{item.iconUrl}}" mode="aspectFill"/>
         <image wx:elif="{{catIcon(item.name)}}" src="{{catIcon(item.name)}}" mode="aspectFill"/>
@@ -42,8 +42,9 @@
 
   <!-- 排序栏 -->
   <view class="sort-bar">
-    <view class="sort-item {{sort === item.key ? 'active' : ''}}"
+    <view class="sort-item hover-fade {{sort === item.key ? 'active' : ''}}"
           wx:for="{{sortOptions}}" wx:key="key"
+          hover-class="hover-fade-hover"
           bindtap="onSort" data-key="{{item.key}}">{{item.label}}</view>
   </view>
 

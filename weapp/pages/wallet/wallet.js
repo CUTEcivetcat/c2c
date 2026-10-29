@@ -8,7 +8,8 @@ Page({
     logs: [],
     showRecharge: false,
     amount: 100,
-    loading: true
+    loading: true,
+    recharging: false
   },
 
   onShow: function () {
@@ -46,14 +47,18 @@ Page({
   onAmount: function (e) { this.setData({ amount: e.detail.value }) },
   recharge: function () {
     var t = this
+    if (this.data.recharging) return
     var amount = Number(this.data.amount)
     if (!amount || amount <= 0) { wx.showToast({ title: '请输入正确金额', icon: 'none' }); return }
     if (amount > 99999) { wx.showToast({ title: '单次上限99999元', icon: 'none' }); return }
+    t.setData({ recharging: true })
     api.walletRecharge(amount).then(function () {
       t.setData({ showRecharge: false })
       t.load()
       wx.showToast({ title: '充值成功', icon: 'success' })
-    }).catch(function () {})
+    }).catch(function () {}).then(function () {
+      t.setData({ recharging: false })
+    })
   },
 
   type: function (t) {

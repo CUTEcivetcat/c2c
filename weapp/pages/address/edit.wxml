@@ -35,5 +35,5 @@
            value="{{postalCode}}" data-k="postalCode" bindinput="onInput"/>
   </view>
 
-  <button class="save-btn btn-primary" bindtap="save" disabled="{{saving}}">{{saving ? '保存中...' : '保 存'}}</button>
+  <button class="save-btn btn-primary" bindtap="save" disabled="{{saving}}" loading="{{saving}}">{{saving ? '保存中...' : '保 存'}}</button>
 </view>

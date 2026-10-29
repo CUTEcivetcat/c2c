@@ -1,5 +1,5 @@
 <view class="cl fade-up">
-  <view class="conv glass-card" wx:for="{{conversations}}" wx:key="id"
+  <view class="conv glass-card hover-fade" hover-class="hover-fade-hover" wx:for="{{conversations}}" wx:key="id"
         bindtap="goChat" data-c="{{item}}">
     <view class="avatar-wrap">
       <image wx:if="{{item._otherAvatar}}" class="avatar-img" src="{{item._otherAvatar}}" mode="aspectFill"/>

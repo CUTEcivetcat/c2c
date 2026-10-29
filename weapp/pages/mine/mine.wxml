@@ -14,17 +14,17 @@
 
     <!-- 数据统计 -->
     <view class="stats glass-card">
-      <view class="stat" bindtap="nav" data-url="/pages/my-product/my-product">
+      <view class="stat hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/my-product/my-product">
         <text class="stat-num">{{stats.products}}</text>
         <text class="stat-label">发布</text>
       </view>
       <view class="stat-div"></view>
-      <view class="stat" bindtap="nav" data-url="/pages/favorite/favorite">
+      <view class="stat hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/favorite/favorite">
         <text class="stat-num">{{stats.favorites}}</text>
         <text class="stat-label">收藏</text>
       </view>
       <view class="stat-div"></view>
-      <view class="stat" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
+      <view class="stat hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
         <text class="stat-num">{{stats.orders}}</text>
         <text class="stat-label">订单</text>
       </view>
@@ -32,7 +32,7 @@
 
     <!-- 消息 -->
     <view class="menu-card glass-card">
-      <view class="menu-item" bindtap="nav" data-url="/pages/chat/list/list">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/chat/list/list">
         <text class="mi">💬</text><text class="mi-t">我的消息</text>
         <view class="badge-wrap"><text class="badge-dot" wx:if="{{unread > 0}}">{{unread > 99 ? '99+' : unread}}</text></view>
         <text class="mi-ar">›</text>
@@ -41,42 +41,42 @@
 
     <!-- 交易 -->
     <view class="menu-card glass-card">
-      <view class="menu-item" bindtap="nav" data-url="/pages/my-product/my-product">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/my-product/my-product">
         <text class="mi">📦</text><text class="mi-t">我的发布</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/order/list/list?tab=buy">
         <text class="mi">🧾</text><text class="mi-t">我买到的</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/order/list/list?tab=sell">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/order/list/list?tab=sell">
         <text class="mi">🚚</text><text class="mi-t">我卖出的</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/intent/my/my">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/intent/my/my">
         <text class="mi">💭</text><text class="mi-t">我发出的意向</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/intent/seller/seller">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/intent/seller/seller">
         <text class="mi">📨</text><text class="mi-t">收到的意向</text><text class="mi-ar">›</text>
       </view>
     </view>
 
     <!-- 资产 -->
     <view class="menu-card glass-card">
-      <view class="menu-item" bindtap="nav" data-url="/pages/favorite/favorite">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/favorite/favorite">
         <text class="mi">❤️</text><text class="mi-t">我的收藏</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/wallet/wallet">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/wallet/wallet">
         <text class="mi">💳</text><text class="mi-t">我的钱包</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/address/address">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/address/address">
         <text class="mi">📍</text><text class="mi-t">收货地址</text><text class="mi-ar">›</text>
       </view>
     </view>
 
     <!-- 其他 -->
     <view class="menu-card glass-card">
-      <view class="menu-item" bindtap="nav" data-url="/pages/announcement/list/list">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/announcement/list/list">
         <text class="mi">📢</text><text class="mi-t">平台公告</text><text class="mi-ar">›</text>
       </view>
-      <view class="menu-item" bindtap="nav" data-url="/pages/login/login">
+      <view class="menu-item hover-fade" hover-class="hover-fade-hover" bindtap="nav" data-url="/pages/login/login">
         <text class="mi">✉️</text><text class="mi-t">绑定邮箱</text><text class="mi-ar">›</text>
       </view>
     </view>

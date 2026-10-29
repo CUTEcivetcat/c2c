@@ -74,7 +74,7 @@
     </view>
   </view>
 
-  <button class="submit btn-primary" bindtap="submit" disabled="{{uploading}}">
+  <button class="submit btn-primary" bindtap="submit" disabled="{{uploading}}" loading="{{uploading}}">
     {{uploading ? '上传中...' : (editingId ? '保存修改' : '发布商品')}}
   </button>
 </view>

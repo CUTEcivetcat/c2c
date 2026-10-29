@@ -20,6 +20,6 @@
     <input class="chat-input" placeholder="输入消息…" placeholder-class="ph"
            value="{{input}}" bindinput="onInput" bindconfirm="send" confirm-type="send"
            adjust-position="{{true}}"/>
-    <button class="send-btn" bindtap="send" disabled="{{sending || !input.trim()}}">发送</button>
+    <button class="send-btn" bindtap="send" disabled="{{sending || !input.trim()}}" loading="{{sending}}">发送</button>
   </view>
 </view>

@@ -23,7 +23,7 @@
     <view class="sheet" catchtap="noop">
       <text class="sheet-title">充值金额</text>
       <input class="amt-input" type="digit" value="{{amount}}" bindinput="onAmount"/>
-      <button class="confirm" bindtap="recharge">确认充值</button>
+      <button class="confirm" bindtap="recharge" disabled="{{recharging}}" loading="{{recharging}}">{{recharging ? '充值中...' : '确认充值'}}</button>
     </view>
   </view>
 </view>

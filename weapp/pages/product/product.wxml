@@ -102,7 +102,7 @@
       <text class="fav-txt">{{p.isFavorited ? '已收藏' : '收藏'}}</text>
     </view>
     <button class="bar-btn intent" bindtap="openIntent">我想要</button>
-    <button class="bar-btn buy btn-primary" bindtap="buyNow" disabled="{{buying}}">{{buying ? '下单中...' : '立即购买'}}</button>
+    <button class="bar-btn buy btn-primary" bindtap="buyNow" disabled="{{buying}}" loading="{{buying}}">{{buying ? '下单中...' : '立即购买'}}</button>
   </view>
 
   <!-- 卖家本人操作栏 -->
@@ -128,7 +128,7 @@
         <input class="intent-input" type="digit" placeholder="期望价格，可空" placeholder-class="ph"
                bindinput="onIntentPrice" value="{{intentPrice}}"/>
       </view>
-      <button class="intent-submit btn-primary" bindtap="submitIntent" disabled="{{sending}}">
+      <button class="intent-submit btn-primary" bindtap="submitIntent" disabled="{{sending}}" loading="{{sending}}">
         {{sending ? '发送中...' : '发送给卖家'}}
       </button>
     </view>
