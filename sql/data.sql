@@ -214,8 +214,8 @@ VALUES
 -- 首页轮播图（banner）
 -- -------------------------------------------------------------
 INSERT INTO `banner` (`id`, `title`, `image_url`, `link_url`, `sort_order`, `status`, `created_at`, `updated_at`) VALUES
-(1, '开学季 · 数码好物专场', '/files/demo/iphone15.jpg', '/pages/product/detail?id=24', 1, 1, NOW(), NOW()),
-(2, '宿舍收纳神器 · 二手价带走', '/files/demo/box.jpg', '/pages/product/detail?id=27', 2, 1, NOW(), NOW()),
+(1, '开学季 · 数码好物专场', '/files/demo/banner-digital.png', '/pages/product/detail?id=24', 1, 1, NOW(), NOW()),
+(2, '宿舍收纳神器 · 二手价带走', '/files/demo/banner-storage.png', '/pages/product/detail?id=27', 2, 1, NOW(), NOW()),
 (3, '考研资料一站备齐', '/files/demo/cet4.jpg', '/pages/product/detail?id=13', 3, 1, NOW(), NOW());
 
 -- -------------------------------------------------------------

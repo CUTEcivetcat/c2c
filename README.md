@@ -89,6 +89,7 @@ source sql/data.sql;      -- 全量演示数据（8 用户含 admin 总管理员
 cp config/application.example.yml config/application-pro.yml
 
 mkdir logs        # Windows 先手动建日志目录（Spring Boot 不会自动创建父目录）
+cp -r assets/banners/. uploads/demo/   # 演示轮播图/商品图资源复制到上传目录（刷新首页可见）
 mvn clean package -DskipTests
 java -jar target/c2c-monolith.jar
 # 默认激活 pro profile（读取 config/application-pro.yml）；本地开发也可 --spring.profiles.active=test
