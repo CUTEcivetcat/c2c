@@ -25,4 +25,4 @@ mysql -uroot -p c2c < data.sql   # ② 导入演示数据
 - 总管理员：`admin`（`role=1` + `admin_level=2` + `admin_perms='*'`）
 - 次级管理员：`role=1` 且 `username<>'admin'`（`admin_level=1`，权限码按需配置）
 - 审核员：`role=2`（仅用户端审核工作台，不能登录管理端口）
-- 演示登录：手机号验证码登录（测试环境验证码回显）或 admin/123456
+- 演示登录：手机号验证码登录（测试环境验证码回显）或 演示账号统一密码 `ww123456`（含 admin，见 data.sql 头部注释）
