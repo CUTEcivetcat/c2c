@@ -1,10 +1,11 @@
-${AnsiColor.BRIGHT_BLACK}        ··  Strawberry · gitee.com/wzh030205  ··  Strawberry · gitee.com/wzh030205  ··${AnsiColor.BRIGHT_RED}
-   ██████╗ ████████╗  ██████╗
-  ██╔════╝ ╚══██╔══╝ ██╔════╝
-  ██║         ██║    ██║          🌾 ${AnsiColor.BRIGHT_YELLOW}青 禾 集 市${AnsiColor.BRIGHT_RED}
-  ██║         ██║    ██║             ${AnsiColor.BRIGHT_GREEN}QINGHE MARKET · C2C 校园二手交易平台${AnsiColor.BRIGHT_RED}
-  ╚██████╗    ██║    ╚██████╗         ${AnsiColor.DEFAULT}让闲置流转起来${AnsiColor.BRIGHT_RED}
-   ╚═════╝    ╚═╝     ╚═════╝
-${AnsiColor.DEFAULT}        Spring Boot ${spring-boot.version} · v${spring.application.version:1.0.0}
-${AnsiColor.BRIGHT_BLACK}        ··  Strawberry · gitee.com/wzh030205  ··  Strawberry · gitee.com/wzh030205  ··
+${AnsiColor.BRIGHT_BLACK}   ·· Strawberry · gitee.com/wzh030205 ··  Strawberry · gitee.com/wzh030205 ··${AnsiColor.BRIGHT_RED}
+███████╗ ████████╗ ██████╗   ███╗ ██╗   ██╗ ██████╗ ████████╗ ██████╗ ██████╗ ██╗   ██╗
+██╔════╝ ╚══██╔══╝ ██╔══██╗ █████╗ ██║   ██║ ██╔══██╗ ██╔════╝ ██╔══██╗ ██╔══██╗ ╚██╗ ██╔╝
+╚█████╗     ██║    ██████╔╝ ██╔══██╗ ██║ █ ██║ ██████╔╝ █████╗  ██████╔╝ ██████╔╝  ╚████╔╝
+ ╚═══██╗    ██║    ██╔══██╗ ███████║ ██║███╗██║ ██╔══██╗ ██╔══╝  ██╔══██╗ ██╔══██╗   ╚██╔╝
+██████╔╝    ██║    ██║  ██║ ██╔══██║ ╚███╔███╔╝ ██████╔╝ ███████╗ ██║  ██║ ██║  ██║    ██║
+╚═════╝     ╚═╝    ╚═╝  ╚═╝ ╚═╝  ╚═╝  ╚══╝╚══╝  ╚══════╝ ╚══════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝    ╚═╝
+${AnsiColor.BRIGHT_YELLOW}        🌾 青 禾 集 市 · QINGHE MARKET · C2C 校园二手交易平台
+${AnsiColor.DEFAULT}        让闲置流转起来 · Spring Boot ${spring-boot.version} · v${spring.application.version:1.0.0}
+${AnsiColor.BRIGHT_BLACK}        https://gitee.com/wzh030205
 ${AnsiColor.DEFAULT}
