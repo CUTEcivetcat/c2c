@@ -66,7 +66,7 @@
         @click="$router.push(`/product/${p.id}`)"
       >
         <div class="card-img-wrap">
-          <product-cover :src="p.images?.[0]?.url" class="card-img" />
+          <product-cover :src="p.images?.[0]?.url" :title="p.title" class="card-img" />
           <span class="condition-badge">{{ conditionMap[p.condition] || '' }}</span>
           <button class="favorite-btn-mini" @click.stop="toggleFav(p)" v-if="store.isLoggedIn()">
             <el-icon :size="16" :style="{ color: p._fav ? 'var(--c2c-primary)' : 'var(--c2c-text-muted)' }">

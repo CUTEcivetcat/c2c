@@ -3,7 +3,7 @@ package com.c2c.order.task;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.c2c.common.enums.ProductStatus;
 import com.c2c.order.entity.Order;
-import com.c2c.order.feign.ProductFeignClient;
+import com.c2c.order.delegate.ProductDelegate;
 import com.c2c.order.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class OrderTimeoutTask {
     private static final int TIMEOUT_MINUTES = 30;
 
     private final OrderMapper orderMapper;
-    private final ProductFeignClient productFeignClient;
+    private final ProductDelegate productDelegate;
 
     @Scheduled(fixedDelay = 60_000, initialDelay = 60_000)
     @Transactional
@@ -55,7 +55,7 @@ public class OrderTimeoutTask {
                 // 状态已被并发修改（如用户刚好完成支付），跳过
                 continue;
             }
-            productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+            productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
             log.info("timeout order cancelled: orderId={}, orderNo={}", order.getId(), order.getOrderNo());
         }
     }

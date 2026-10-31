@@ -1,4 +1,4 @@
-package com.c2c.order.feign;
+package com.c2c.order.delegate;
 
 import com.c2c.product.dto.ProductVO;
 import com.c2c.product.entity.Product;
@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用商品模块的 Feign 客户端：供订单模块获取商品详情、更新商品状态（单体模式下基于 Service/Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供订单模块获取商品详情、更新商品状态。
  */
-@Component("orderProductFeignClient")
+@Component("orderProductDelegate")
 @RequiredArgsConstructor
-public class ProductFeignClient {
+public class ProductDelegate {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
@@ -51,4 +51,3 @@ public class ProductFeignClient {
         return map;
     }
 }
-

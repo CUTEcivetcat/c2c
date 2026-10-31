@@ -9,7 +9,7 @@ import com.c2c.product.dto.CommentCreateDTO;
 import com.c2c.product.dto.CommentVO;
 import com.c2c.product.entity.Product;
 import com.c2c.product.entity.ProductComment;
-import com.c2c.product.feign.UserFeignClient;
+import com.c2c.product.delegate.UserDelegate;
 import com.c2c.product.mapper.ProductCommentMapper;
 import com.c2c.product.mapper.ProductMapper;
 import com.c2c.product.service.ProductCommentService;
@@ -34,7 +34,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
 
     private final ProductCommentMapper commentMapper;
     private final ProductMapper productMapper;
-    private final UserFeignClient userFeignClient;
+    private final UserDelegate userDelegate;
 
     @Override
     public Page<CommentVO> listByProduct(Long productId, int page, int size) {
@@ -99,7 +99,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         String nickname = "";
         String avatar = "";
         try {
-            Map<String, Object> userInfo = userFeignClient.getUserPublicInfo(c.getUserId());
+            Map<String, Object> userInfo = userDelegate.getUserPublicInfo(c.getUserId());
             if (userInfo != null && userInfo.get("data") instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> data = (Map<String, Object>) userInfo.get("data");

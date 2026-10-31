@@ -1,4 +1,4 @@
-package com.c2c.admin.feign;
+package com.c2c.admin.delegate;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用商品模块的 Feign 客户端：供管理后台查询商品列表、修改商品状态、统计商品数量（单体模式下基于 Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供管理后台查询商品列表、修改商品状态、统计商品数量。
  */
-@Component("adminProductFeignClient")
+@Component("adminProductDelegate")
 @RequiredArgsConstructor
-public class ProductFeignClient {
+public class ProductDelegate {
     private final ProductMapper productMapper;
 
     /** 分页查询商品列表，可按关键字、状态过滤，按创建时间倒序。 */
@@ -65,4 +65,3 @@ public class ProductFeignClient {
         return map;
     }
 }
-

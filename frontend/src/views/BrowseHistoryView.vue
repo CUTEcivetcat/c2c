@@ -7,7 +7,7 @@
     </div>
     <div v-loading="loading" class="history-list">
       <div v-for="p in list" :key="p.id" class="history-card" @click="$router.push(`/product/${p.id}`)">
-        <product-cover :src="p.images?.[0]?.url" class="hc-cover" />
+        <product-cover :src="p.images?.[0]?.url" :title="p.title" class="hc-cover" />
         <div class="hc-main">
           <div class="hc-title">{{ p.title }}</div>
           <div class="hc-sub">

@@ -6,7 +6,7 @@ import com.c2c.common.exception.BusinessException;
 import com.c2c.order.entity.Order;
 import com.c2c.order.mapper.OrderMapper;
 import com.c2c.rating.entity.Rating;
-import com.c2c.rating.feign.UserFeignClient;
+import com.c2c.rating.delegate.UserDelegate;
 import com.c2c.rating.mapper.RatingMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class RatingService {
 
     private final RatingMapper ratingMapper;
-    private final UserFeignClient userFeignClient;
+    private final UserDelegate userDelegate;
     private final OrderMapper orderMapper;
 
     /** 提交评价（校验订单参与/完成状态与评价方向，并重算被评用户信誉分） */
@@ -114,7 +114,7 @@ public class RatingService {
                 .orElse(5.0);
         BigDecimal score = BigDecimal.valueOf(Math.min(5.0, Math.max(1.0, avg)))
                 .setScale(1, RoundingMode.HALF_UP);
-        userFeignClient.updateReputation(ratedUserId,
+        userDelegate.updateReputation(ratedUserId,
                 com.c2c.common.utils.MapUtils.of("reputationScore", score));
     }
 }

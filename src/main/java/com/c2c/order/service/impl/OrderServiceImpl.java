@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.enums.ProductStatus;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.order.entity.Order;
-import com.c2c.order.feign.ProductFeignClient;
-import com.c2c.order.feign.UserFeignClient;
+import com.c2c.order.delegate.ProductDelegate;
+import com.c2c.order.delegate.UserDelegate;
 import com.c2c.order.mapper.OrderMapper;
 import com.c2c.order.mq.OrderEventPublisher;
 import com.c2c.order.service.OrderService;
@@ -46,8 +46,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private final OrderMapper orderMapper;
-    private final ProductFeignClient productFeignClient;
-    private final UserFeignClient userFeignClient;
+    private final ProductDelegate productDelegate;
+    private final UserDelegate userDelegate;
     private final OrderEventPublisher eventPublisher;
     private final WalletService walletService;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Map<String, Object> create(Long productId, Long addressId, Long buyerId) {
         synchronized (lockFor("product:" + productId)) {
-            Map<String, Object> productResp = productFeignClient.getProduct(productId, buyerId);
+            Map<String, Object> productResp = productDelegate.getProduct(productId, buyerId);
             @SuppressWarnings("unchecked")
             Map<String, Object> product = (Map<String, Object>) productResp.get("data");
             if (product == null) {
@@ -73,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("商品当前不可购买");
             }
 
-            Map<String, Object> addrResp = userFeignClient.getAddress(addressId, buyerId);
+            Map<String, Object> addrResp = userDelegate.getAddress(addressId, buyerId);
             @SuppressWarnings("unchecked")
             Map<String, Object> address = (Map<String, Object>) addrResp.get("data");
             if (address == null) {
@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(0);
             orderMapper.insert(order);
 
-            productFeignClient.updateStatus(productId, ProductStatus.RESERVED.getCode());
+            productDelegate.updateStatus(productId, ProductStatus.RESERVED.getCode());
             eventPublisher.publishOrderCreated(order.getId(), orderNo);
             eventPublisher.publishOrderTimeout(order.getId());
 
@@ -219,7 +219,7 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.updateById(order);
 
         // 交易完成，商品标记已售
-        productFeignClient.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
+        productDelegate.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
         log.info("order received and completed: orderId={}", orderId);
     }
 
@@ -258,7 +258,7 @@ public class OrderServiceImpl implements OrderService {
                     "订单退款 #" + order.getOrderNo());
         }
         // 未支付/已支付未发货的订单取消后，商品恢复在售
-        productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+        productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
         log.info("order cancelled: orderId={}, statusBefore={}", orderId, statusBefore);
     }
 

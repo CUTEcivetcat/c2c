@@ -1,8 +1,8 @@
 package com.c2c.admin.controller;
 
-import com.c2c.admin.feign.OrderFeignClient;
-import com.c2c.admin.feign.ProductFeignClient;
-import com.c2c.admin.feign.UserFeignClient;
+import com.c2c.admin.delegate.OrderDelegate;
+import com.c2c.admin.delegate.ProductDelegate;
+import com.c2c.admin.delegate.UserDelegate;
 import com.c2c.admin.mapper.DashboardMapper;
 import com.c2c.announcement.mapper.AnnouncementMapper;
 import com.c2c.common.constant.ApiPath;
@@ -33,9 +33,9 @@ import java.util.stream.Collectors;
 @Tag(name = "管理端看板", description = "用户/商品/订单统计汇总与趋势（仅管理员）")
 public class DashboardController {
 
-    private final UserFeignClient userFeignClient;
-    private final ProductFeignClient productFeignClient;
-    private final OrderFeignClient orderFeignClient;
+    private final UserDelegate userDelegate;
+    private final ProductDelegate productDelegate;
+    private final OrderDelegate orderDelegate;
     private final DashboardMapper dashboardMapper;
     private final AnnouncementMapper announcementMapper;
     private final WalletLogMapper walletLogMapper;
@@ -43,9 +43,9 @@ public class DashboardController {
     @Operation(summary = "首页统计汇总", description = "用户总数 / 商品总数 / 在售数 / 今日订单数")
     @GetMapping(ApiPath.ADMIN_DASHBOARD_SUMMARY)
     public R<Map<String, Object>> summary() {
-        Map<String, Object> userCount = userFeignClient.countUsers();
-        Map<String, Object> productCount = productFeignClient.countProducts();
-        Map<String, Object> orderCount = orderFeignClient.countToday();
+        Map<String, Object> userCount = userDelegate.countUsers();
+        Map<String, Object> productCount = productDelegate.countProducts();
+        Map<String, Object> orderCount = orderDelegate.countToday();
 
         Map<String, Object> userData = getData(userCount);
         Map<String, Object> productData = getData(productCount);
@@ -68,7 +68,7 @@ public class DashboardController {
     public R<Map<String, Object>> users(@Parameter(description = "搜索关键字") @RequestParam(required = false) String keyword,
                                         @Parameter(description = "页码，从 1 开始") @RequestParam(defaultValue = "1") int page,
                                         @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
-        Map<String, Object> resp = userFeignClient.getUserList(keyword, page, size);
+        Map<String, Object> resp = userDelegate.getUserList(keyword, page, size);
         return R.ok(getData(resp));
     }
 
@@ -76,7 +76,7 @@ public class DashboardController {
     @PutMapping(ApiPath.ADMIN_USER_STATUS)
     public R<Void> toggleUserStatus(@Parameter(description = "用户 ID") @PathVariable Long userId,
                                     @RequestBody Map<String, Integer> body) {
-        userFeignClient.updateUserStatus(userId, body);
+        userDelegate.updateUserStatus(userId, body);
         return R.ok();
     }
 
@@ -86,7 +86,7 @@ public class DashboardController {
                                            @Parameter(description = "状态筛选") @RequestParam(required = false) Integer status,
                                            @Parameter(description = "页码，从 1 开始") @RequestParam(defaultValue = "1") int page,
                                            @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
-        Map<String, Object> resp = productFeignClient.getProductList(keyword, status, page, size);
+        Map<String, Object> resp = productDelegate.getProductList(keyword, status, page, size);
         return R.ok(getData(resp));
     }
 
@@ -94,7 +94,7 @@ public class DashboardController {
     @PutMapping(ApiPath.ADMIN_PRODUCT_STATUS)
     public R<Void> toggleProductStatus(@Parameter(description = "商品 ID") @PathVariable Long id,
                                        @Parameter(description = "目标状态") @RequestParam Integer status) {
-        productFeignClient.updateStatus(id, status);
+        productDelegate.updateStatus(id, status);
         return R.ok();
     }
 
@@ -103,7 +103,7 @@ public class DashboardController {
     public R<Map<String, Object>> orders(@Parameter(description = "状态筛选") @RequestParam(required = false) Integer status,
                                          @Parameter(description = "页码，从 1 开始") @RequestParam(defaultValue = "1") int page,
                                          @Parameter(description = "每页条数") @RequestParam(defaultValue = "20") int size) {
-        Map<String, Object> resp = orderFeignClient.getOrderList(status, page, size);
+        Map<String, Object> resp = orderDelegate.getOrderList(status, page, size);
         return R.ok(getData(resp));
     }
 

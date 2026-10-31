@@ -3,8 +3,8 @@ package com.c2c.order;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.common.infra.TestLog;
 import com.c2c.order.entity.Order;
-import com.c2c.order.feign.ProductFeignClient;
-import com.c2c.order.feign.UserFeignClient;
+import com.c2c.order.delegate.ProductDelegate;
+import com.c2c.order.delegate.UserDelegate;
 import com.c2c.order.mapper.OrderMapper;
 import com.c2c.order.mq.OrderEventPublisher;
 import com.c2c.order.service.impl.OrderServiceImpl;
@@ -33,9 +33,9 @@ class OrderServiceImplTest {
     @Mock
     private OrderMapper orderMapper;
     @Mock
-    private ProductFeignClient productFeignClient;
+    private ProductDelegate productDelegate;
     @Mock
-    private UserFeignClient userFeignClient;
+    private UserDelegate userDelegate;
     @Mock
     private OrderEventPublisher eventPublisher;
     @Mock
@@ -72,7 +72,7 @@ class OrderServiceImplTest {
         assertEquals(new BigDecimal("100.00"), order.getEscrow(), "托管金应等于订单总额");
         verify(orderMapper).updateById(order);
         verify(walletService, never()).receive(any(), any(), any(), any());
-        verify(productFeignClient, never()).updateStatus(any(), any());
+        verify(productDelegate, never()).updateStatus(any(), any());
     }
 
     @Test
@@ -119,7 +119,7 @@ class OrderServiceImplTest {
         verify(walletService).receive(eq(1L), eq(new BigDecimal("100.00")), eq(1L), contains("订单收款"));
         assertEquals(4, order.getStatus(), "收货后应为 4 已完成");
         assertNull(order.getEscrow());
-        verify(productFeignClient).updateStatus(9L, 3); // ProductStatus.SOLD=3
+        verify(productDelegate).updateStatus(9L, 3); // ProductStatus.SOLD=3
     }
 
     @Test
@@ -133,7 +133,7 @@ class OrderServiceImplTest {
 
         verify(walletService, never()).refund(any(), any(), any(), any());
         verify(orderMapper).update(isNull(), any());
-        verify(productFeignClient).updateStatus(9L, 1);
+        verify(productDelegate).updateStatus(9L, 1);
     }
 
     @Test
@@ -148,7 +148,7 @@ class OrderServiceImplTest {
 
         verify(orderMapper).update(isNull(), any());
         verify(walletService).refund(eq(2L), eq(new BigDecimal("100.00")), eq(1L), contains("订单退款"));
-        verify(productFeignClient).updateStatus(9L, 1);
+        verify(productDelegate).updateStatus(9L, 1);
     }
 
     @Test
@@ -161,7 +161,7 @@ class OrderServiceImplTest {
         assertThrows(BusinessException.class, () -> orderService.cancel(1L, 2L, "取消"));
 
         verify(walletService, never()).refund(any(), any(), any(), any());
-        verify(productFeignClient, never()).updateStatus(any(), any());
+        verify(productDelegate, never()).updateStatus(any(), any());
     }
 
     @Test

@@ -68,6 +68,9 @@ public interface ApiPath {
     String UPLOAD_IMAGE = "/upload/image";
     String UPLOAD_IMAGES = "/upload/images";
 
+    /** 商品占位图（公开 GET）：按文字生成 SVG，无图商品的默认封面 */
+    String PLACEHOLDER = "/placeholder.svg";
+
     // ==================== 订单 /order ====================
     String ORDER = "/order";
     String ORDER_ID = "/order/{id}";

@@ -68,8 +68,9 @@ c2c/
 ## 🏃 快速开始（本地开发）
 
 ### 环境要求
-- JDK 8+、Maven 3.6+
-- MySQL 8、Redis（本地或远程均可）
+- JDK **8 或 17**（⚠️ 勿用 JDK 21+：Lombok 1.18.30 不支持，编译会报"找不到符号"）
+- Maven 3.6+
+- MySQL 8（或 MariaDB 10.3+）、Redis（本地或远程均可）
 - Node.js 16+、npm
 
 ### 1. 数据库
@@ -87,8 +88,10 @@ source sql/data.sql;      -- 全量演示数据（8 用户含 admin 总管理员
 # 复制配置模板并填入你的真实值（数据库/Redis/邮箱授权码/JWT密钥）
 cp config/application.example.yml config/application-pro.yml
 
+mkdir logs        # Windows 先手动建日志目录（Spring Boot 不会自动创建父目录）
 mvn clean package -DskipTests
 java -jar target/c2c-monolith.jar
+# 默认激活 pro profile（读取 config/application-pro.yml）；本地开发也可 --spring.profiles.active=test
 # 启动后访问 http://localhost:8080/api/v1/swagger-ui/index.html 查看接口文档
 ```
 

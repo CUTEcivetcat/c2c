@@ -1,4 +1,4 @@
-package com.c2c.rating.feign;
+package com.c2c.rating.delegate;
 
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用用户模块的 Feign 客户端：供评分模块回写用户信誉分（单体模式下基于 Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供评分模块回写用户信誉分。
  */
-@Component("ratingUserFeignClient")
+@Component("ratingUserDelegate")
 @RequiredArgsConstructor
-public class UserFeignClient {
+public class UserDelegate {
     private final UserMapper userMapper;
 
     /** 更新用户信誉分（评分产生后回写）。 */
@@ -31,4 +31,3 @@ public class UserFeignClient {
         return map;
     }
 }
-

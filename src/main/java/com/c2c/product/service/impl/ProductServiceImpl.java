@@ -13,7 +13,7 @@ import com.c2c.product.dto.ProductVO;
 import com.c2c.product.entity.Category;
 import com.c2c.product.entity.Product;
 import com.c2c.product.entity.ProductImage;
-import com.c2c.product.feign.UserFeignClient;
+import com.c2c.product.delegate.UserDelegate;
 import com.c2c.product.mapper.CategoryMapper;
 import com.c2c.product.mapper.ProductImageMapper;
 import com.c2c.product.mapper.ProductMapper;
@@ -43,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ProductImageMapper imageMapper;
     private final CategoryMapper categoryMapper;
-    private final UserFeignClient userFeignClient;
+    private final UserDelegate userDelegate;
     private final StringRedisTemplate redisTemplate;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
@@ -350,7 +350,7 @@ public class ProductServiceImpl implements ProductService {
         String sellerAvatar = "";
         BigDecimal sellerReputation = BigDecimal.valueOf(5.0);
         try {
-            Map<String, Object> userInfo = userFeignClient.getUserPublicInfo(product.getSellerId());
+            Map<String, Object> userInfo = userDelegate.getUserPublicInfo(product.getSellerId());
             if (userInfo != null && userInfo.get("data") != null) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> data = (Map<String, Object>) userInfo.get("data");

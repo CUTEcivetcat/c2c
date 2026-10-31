@@ -5,7 +5,7 @@ import com.c2c.common.infra.TestLog;
 import com.c2c.order.entity.Order;
 import com.c2c.order.mapper.OrderMapper;
 import com.c2c.rating.entity.Rating;
-import com.c2c.rating.feign.UserFeignClient;
+import com.c2c.rating.delegate.UserDelegate;
 import com.c2c.rating.mapper.RatingMapper;
 import com.c2c.rating.service.RatingService;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class RatingServiceTest {
     @Mock
     private RatingMapper ratingMapper;
     @Mock
-    private UserFeignClient userFeignClient;
+    private UserDelegate userDelegate;
     @Mock
     private OrderMapper orderMapper;
 
@@ -75,7 +75,7 @@ class RatingServiceTest {
         ratingService.submit(rating(2L, 1, 1L), 2L);
 
         verify(ratingMapper).insert(any(Rating.class));
-        verify(userFeignClient).updateReputation(eq(1L), any());
+        verify(userDelegate).updateReputation(eq(1L), any());
     }
 
     @Test

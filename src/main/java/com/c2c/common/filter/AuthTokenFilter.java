@@ -67,7 +67,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/announcement/latest", // 首页最新公告横幅（游客可看）
             "/announcement/force",   // 强制弹窗公告（登录后前端调用）
             "/announcement/publish", // 发布页展示公告
-            "/banner/list"           // 首页轮播图
+            "/banner/list",           // 首页轮播图
+            "/placeholder.svg"        // 商品占位图（游客浏览列表也需要）
     );
 
     @Override

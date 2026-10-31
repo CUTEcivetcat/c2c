@@ -1,4 +1,4 @@
-package com.c2c.order.feign;
+package com.c2c.order.delegate;
 
 import com.c2c.user.entity.UserAddress;
 import com.c2c.user.mapper.UserAddressMapper;
@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用用户模块的 Feign 客户端：供订单模块获取用户收货地址（单体模式下基于 Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供订单模块获取用户收货地址。
  */
-@Component("orderUserFeignClient")
+@Component("orderUserDelegate")
 @RequiredArgsConstructor
-public class UserFeignClient {
+public class UserDelegate {
     private final UserAddressMapper userAddressMapper;
 
     /** 获取用户收货地址，并校验地址归属当前用户。 */
@@ -43,4 +43,3 @@ public class UserFeignClient {
         return map;
     }
 }
-

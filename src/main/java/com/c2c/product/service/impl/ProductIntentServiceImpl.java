@@ -11,7 +11,7 @@ import com.c2c.product.dto.IntentVO;
 import com.c2c.product.entity.Product;
 import com.c2c.product.entity.ProductImage;
 import com.c2c.product.entity.ProductIntent;
-import com.c2c.product.feign.UserFeignClient;
+import com.c2c.product.delegate.UserDelegate;
 import com.c2c.product.mapper.ProductImageMapper;
 import com.c2c.product.mapper.ProductIntentMapper;
 import com.c2c.product.mapper.ProductMapper;
@@ -40,7 +40,7 @@ public class ProductIntentServiceImpl implements ProductIntentService {
     private final ProductIntentMapper intentMapper;
     private final ProductMapper productMapper;
     private final ProductImageMapper imageMapper;
-    private final UserFeignClient userFeignClient;
+    private final UserDelegate userDelegate;
 
     @Override
     public Long create(Long productId, IntentCreateDTO dto, Long buyerId) {
@@ -155,7 +155,7 @@ public class ProductIntentServiceImpl implements ProductIntentService {
         String nickname = "";
         String avatar = "";
         try {
-            Map<String, Object> userInfo = userFeignClient.getUserPublicInfo(intent.getBuyerId());
+            Map<String, Object> userInfo = userDelegate.getUserPublicInfo(intent.getBuyerId());
             if (userInfo != null && userInfo.get("data") instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> data = (Map<String, Object>) userInfo.get("data");

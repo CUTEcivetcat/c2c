@@ -1,4 +1,4 @@
-package com.c2c.admin.feign;
+package com.c2c.admin.delegate;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用订单模块的 Feign 客户端：供管理后台查询订单列表、统计今日下单数（单体模式下基于 Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供管理后台查询订单列表、统计今日下单数。
  */
-@Component("adminOrderFeignClient")
+@Component("adminOrderDelegate")
 @RequiredArgsConstructor
-public class OrderFeignClient {
+public class OrderDelegate {
     private final OrderMapper orderMapper;
 
     /** 分页查询订单列表，可按状态过滤，按创建时间倒序。 */
@@ -53,4 +53,3 @@ public class OrderFeignClient {
         return map;
     }
 }
-

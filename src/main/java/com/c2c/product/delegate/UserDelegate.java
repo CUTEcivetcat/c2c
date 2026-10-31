@@ -1,4 +1,4 @@
-package com.c2c.product.feign;
+package com.c2c.product.delegate;
 
 import com.c2c.user.dto.UserVO;
 import com.c2c.user.service.UserService;
@@ -9,11 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用用户模块的 Feign 客户端：供商品模块获取卖家等用户公开信息（单体模式下基于 Service 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供商品模块获取卖家等用户公开信息。
  */
-@Component("productUserFeignClient")
+@Component("productUserDelegate")
 @RequiredArgsConstructor
-public class UserFeignClient {
+public class UserDelegate {
     private final UserService userService;
 
     /** 获取用户公开信息（昵称、头像、信誉分等）。 */
@@ -38,4 +38,3 @@ public class UserFeignClient {
         return map;
     }
 }
-

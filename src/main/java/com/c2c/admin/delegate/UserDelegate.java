@@ -1,4 +1,4 @@
-package com.c2c.admin.feign;
+package com.c2c.admin.delegate;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 调用用户模块的 Feign 客户端：供管理后台查询用户列表、修改状态与信誉分、统计用户数（单体模式下基于 Service/Mapper 直接实现）。
+ * 跨模块委派组件（单体模式直调）：供管理后台查询用户列表、修改状态与信誉分、统计用户数。
  */
-@Component("adminUserFeignClient")
+@Component("adminUserDelegate")
 @RequiredArgsConstructor
-public class UserFeignClient {
+public class UserDelegate {
     private final UserService userService;
     private final UserMapper userMapper;
     private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
@@ -95,4 +95,3 @@ public class UserFeignClient {
         return map;
     }
 }
-

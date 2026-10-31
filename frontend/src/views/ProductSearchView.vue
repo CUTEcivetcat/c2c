@@ -38,7 +38,7 @@
     <div v-loading="loading" class="product-grid">
       <skeleton-card v-if="loading" :count="8" />
       <el-card v-for="p in products" :key="p.id" class="product-card" shadow="hover" @click="$router.push(`/product/${p.id}`)">
-        <product-cover :src="p.images?.[0]?.url" class="product-img" />
+        <product-cover :src="p.images?.[0]?.url" :title="p.title" class="product-img" />
         <div class="product-info">
           <h3>{{ p.title }}</h3>
           <div class="price">¥{{ p.price }}</div>
