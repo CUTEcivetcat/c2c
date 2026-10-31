@@ -87,6 +87,7 @@ class AdminAuthLoginLockTest {
 
     @Test
     void fiveFailures_lockAccount() {
+        TestLog.log("[测试] 连续失败5次 → 第5次提示锁定15分钟，写锁定键并清除失败计数");
         when(redisTemplate.hasKey("adminlogin:lock:admin")).thenReturn(false);
         when(valueOperations.increment("adminlogin:fail:admin")).thenReturn(1L, 2L, 3L, 4L, 5L);
 
@@ -104,6 +105,7 @@ class AdminAuthLoginLockTest {
 
     @Test
     void lockedAccount_rejectedEvenWithRightPassword() {
+        TestLog.log("[测试] 锁定期间：即使密码正确也直接拒绝（在查库之前拦截）");
         when(redisTemplate.hasKey("adminlogin:lock:admin")).thenReturn(true);
 
         java.util.Map<String, String> body = new HashMap<>();
@@ -116,6 +118,7 @@ class AdminAuthLoginLockTest {
 
     @Test
     void lockDisabled_noRestriction() {
+        TestLog.log("[测试] 锁定开关关闭：失败不计数不锁定，连错6次也只是普通密码错误");
         when(sysConfigService.getBool(eq("security.admin-login-lock.enabled"), eq(true))).thenReturn(false);
         when(redisTemplate.hasKey(anyString())).thenReturn(false);
 
@@ -130,6 +133,7 @@ class AdminAuthLoginLockTest {
 
     @Test
     void correctPassword_clearsFailCount() {
+        TestLog.log("[测试] 密码正确：登录成功并清除历史失败计数");
         when(redisTemplate.hasKey("adminlogin:lock:admin")).thenReturn(false);
 
         java.util.Map<String, String> body = new HashMap<>();

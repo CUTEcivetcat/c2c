@@ -19,18 +19,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AnnouncementServiceTest {
 
-    @org.junit.jupiter.api.BeforeAll
-    static void header() {
-        com.c2c.common.infra.TestLog.log("[测试类] 公告服务：发布校验 / 编辑保存扩展字段");
-    }
-
     @Mock
     private AnnouncementMapper announcementMapper;
     @InjectMocks
     private AnnouncementService announcementService;
 
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        com.c2c.common.infra.TestLog.log("[测试类] 公告服务：发布校验 / 编辑保存扩展字段");
+    }
+
     @Test
     void create_emptyTitle_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 发布校验：空白标题应被拒绝");
         Announcement a = new Announcement();
         a.setTitle(" ");
         a.setContent("内容");
@@ -39,6 +40,7 @@ class AnnouncementServiceTest {
 
     @Test
     void create_emptyContent_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 发布校验：空白内容应被拒绝");
         Announcement a = new Announcement();
         a.setTitle("标题");
         a.setContent("");
@@ -47,6 +49,7 @@ class AnnouncementServiceTest {
 
     @Test
     void create_success_setsDefaults() {
+        com.c2c.common.infra.TestLog.log("[测试] 正常发布：写入后默认 type=1/status=1/不置顶");
         Announcement a = new Announcement();
         a.setTitle("公告");
         a.setContent("内容");
@@ -62,6 +65,7 @@ class AnnouncementServiceTest {
 
     @Test
     void update_savesExtendedFields() {
+        com.c2c.common.infra.TestLog.log("[测试] 编辑保存：强制弹窗/停留秒/滚动/发布页展示/置顶 等扩展字段全部落库");
         // 已有公告（模拟数据库中的记录）
         Announcement exist = new Announcement();
         exist.setId(1L);
@@ -88,6 +92,7 @@ class AnnouncementServiceTest {
 
     @Test
     void update_notFound_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 编辑校验：公告不存在(99)时应抛异常");
         when(announcementMapper.selectById(99L)).thenReturn(null);
         assertThrows(BusinessException.class, () -> announcementService.update(99L, new Announcement()));
     }
