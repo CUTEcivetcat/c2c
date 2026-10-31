@@ -21,6 +21,7 @@ import java.util.Map;
 public class UserFeignClient {
     private final UserService userService;
     private final UserMapper userMapper;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     /** 获取用户公开信息。 */
     public Map<String, Object> getUserPublicInfo(Long userId) {
@@ -68,7 +69,12 @@ public class UserFeignClient {
         User user = userMapper.selectById(userId);
         if (user != null && body.containsKey("status")) {
             user.setStatus(body.get("status"));
+            // 封禁/解封使该用户已签发的全部令牌立即失效（递增令牌版本）
+            int tv = (user.getTokenVersion() == null ? 0 : user.getTokenVersion()) + 1;
+            user.setTokenVersion(tv);
             userMapper.updateById(user);
+            redisTemplate.opsForValue().set("user:tv:" + userId, String.valueOf(tv));
+            redisTemplate.delete("refresh:token:" + userId);
         }
         return ok(null);
     }

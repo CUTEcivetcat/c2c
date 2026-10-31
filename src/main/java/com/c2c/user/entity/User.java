@@ -74,6 +74,9 @@ public class User {
     /** 管理员权限码（逗号分隔，模块级）；admin_level=2 视为全部权限 */
     private String adminPerms;
 
+    /** 令牌版本：改密/封禁/角色权限变更时递增，使已签发的全部 token 立即失效 */
+    private Integer tokenVersion;
+
     /** 信誉分（0~5） */
     private BigDecimal reputationScore;
 

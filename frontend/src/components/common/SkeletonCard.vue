@@ -27,7 +27,7 @@ defineProps({
 .sk-line { height: 14px; border-radius: 8px; background: var(--c2c-bg-soft); }
 .sk-animate {
   position: relative; overflow: hidden;
-  background: linear-gradient(90deg, var(--c2c-bg-soft) 25%, #e4e7ed 37%, var(--c2c-bg-soft) 63%);
+  background: linear-gradient(90deg, #e6e9ee 25%, #d4dae2 37%, #e6e9ee 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }

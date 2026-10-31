@@ -172,7 +172,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ## 📊 数据库表结构
 
-共 20 张表，221 个字段。
+共 20 张表，222 个字段。
 
 ### 关系图（E-R图）
 
@@ -519,6 +519,7 @@ flowchart LR
 |`secondary_pwd`|varchar(255)|二级密码(BCrypt加密)，删除账户等高危操作二次校验|Y||
 |`admin_level`|tinyint(4)|管理员等级 0非管理员 1次级·子级管理员 2总管理员admin|N|0|
 |`admin_perms`|varchar(500)|管理员权限码(逗号分隔)；admin_level=2 视为全部权限|Y||
+|`token_version`|int(11)|令牌版本：改密/封禁/角色权限变更时递增，旧token全部失效|N|0|
 |`login_source`|varchar(20)|注册来源 浏览email/wechat/phone|Y|email|
 |`reputation_score`|decimal(3,1)|信誉分 0~5|Y|5.0|
 |`balance`|decimal(10,2)|账户余额|N|0.00|

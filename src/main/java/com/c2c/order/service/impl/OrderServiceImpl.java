@@ -21,9 +21,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 订单服务实现类
@@ -35,13 +35,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private static final Map<String, Object> LOCKS = new ConcurrentHashMap<>();
+    /** 条纹锁：固定 64 把，替代无限增长的 ConcurrentHashMap（防内存膨胀） */
+    private static final Object[] LOCKS = new Object[64];
+    private static final java.security.SecureRandom ORDER_NO_RANDOM = new java.security.SecureRandom();
+
+    static {
+        for (int i = 0; i < LOCKS.length; i++) {
+            LOCKS[i] = new Object();
+        }
+    }
 
     private final OrderMapper orderMapper;
     private final ProductFeignClient productFeignClient;
     private final UserFeignClient userFeignClient;
     private final OrderEventPublisher eventPublisher;
     private final WalletService walletService;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -253,13 +262,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Object lockFor(String key) {
-        return LOCKS.computeIfAbsent(key, k -> new Object());
+        return LOCKS[Math.floorMod(key.hashCode(), LOCKS.length)];
     }
 
+    /** 订单号：时间戳(14位) + 8位安全随机后缀；生成后查重（order_no 有唯一索引兜底），冲突重试 3 次 */
     private String generateOrderNo() {
         String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String suffix = String.format("%06d", (int) (Math.random() * 1000000));
-        return date + suffix;
+        for (int i = 0; i < 3; i++) {
+            String suffix = String.format("%08d", ORDER_NO_RANDOM.nextInt(100_000_000));
+            String orderNo = date + suffix;
+            Long exists = orderMapper.selectCount(new LambdaQueryWrapper<Order>().eq(Order::getOrderNo, orderNo));
+            if (exists == 0) {
+                return orderNo;
+            }
+            log.warn("订单号冲突，重试生成: orderNo={}", orderNo);
+        }
+        // 极低概率：退回纳秒后缀保证可用（唯一索引仍兜底）
+        return date + System.nanoTime() % 1_000_000_000L;
     }
 
     private String firstImageUrl(Object images) {
@@ -277,14 +296,19 @@ public class OrderServiceImpl implements OrderService {
         return "";
     }
 
+    /** 地址快照：对象序列化生成（自动转义引号等特殊字符，避免手工拼 JSON 破坏格式） */
     private String buildAddressSnapshot(Map<String, Object> address) {
-        return "{"
-                + "\"receiverName\":\"" + address.getOrDefault("receiverName", "") + "\","
-                + "\"phone\":\"" + address.getOrDefault("phone", "") + "\","
-                + "\"province\":\"" + address.getOrDefault("province", "") + "\","
-                + "\"city\":\"" + address.getOrDefault("city", "") + "\","
-                + "\"district\":\"" + address.getOrDefault("district", "") + "\","
-                + "\"detail\":\"" + address.getOrDefault("detail", "") + "\""
-                + "}";
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("receiverName", address.getOrDefault("receiverName", ""));
+        snapshot.put("phone", address.getOrDefault("phone", ""));
+        snapshot.put("province", address.getOrDefault("province", ""));
+        snapshot.put("city", address.getOrDefault("city", ""));
+        snapshot.put("district", address.getOrDefault("district", ""));
+        snapshot.put("detail", address.getOrDefault("detail", ""));
+        try {
+            return objectMapper.writeValueAsString(snapshot);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new BusinessException("地址快照生成失败");
+        }
     }
 }

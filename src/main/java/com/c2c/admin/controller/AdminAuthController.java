@@ -116,7 +116,10 @@ public class AdminAuthController {
         claims.put("role", "ADMIN");
         claims.put("adminLevel", admin.getAdminLevel() == null ? 0 : admin.getAdminLevel());
         claims.put("perms", parsePerms(admin.getAdminLevel(), admin.getAdminPerms()));
+        claims.put("tv", admin.getTokenVersion() == null ? 0 : admin.getTokenVersion());
         String token = JwtUtils.createToken(admin.getId(), claims, jwtSecret, jwtExpiration);
+        redisTemplate.opsForValue().set("user:tv:" + admin.getId(),
+                String.valueOf(admin.getTokenVersion() == null ? 0 : admin.getTokenVersion()));
 
         Map<String, Object> data = new HashMap<>();
         data.put("token", token);

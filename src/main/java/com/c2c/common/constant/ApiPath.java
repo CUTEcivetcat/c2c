@@ -21,6 +21,7 @@ public interface ApiPath {
     String USER_BIND_PHONE = "/user/bind-phone";
     String USER_BIND_EMAIL = "/user/bind-email";
     String USER_LOGOUT = "/user/logout";
+    String USER_REFRESH = "/user/refresh";
     String USER_PROFILE = "/user/profile";
     String USER_PROFILE_ID = "/user/profile/{userId}";
     String USER_ADMIN_LIST = "/user/admin/list";

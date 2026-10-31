@@ -39,6 +39,9 @@ public interface UserService {
     /** 退出登录 */
     void logout(String token);
 
+    /** 用刷新令牌换发新的登录令牌（旋转刷新令牌，旧刷新令牌即刻失效） */
+    com.c2c.user.dto.LoginVO refresh(String refreshToken);
+
     /** 个人信息 */
     UserVO getProfile(Long userId);
 

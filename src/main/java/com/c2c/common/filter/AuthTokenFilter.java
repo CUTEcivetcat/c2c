@@ -30,6 +30,7 @@ import java.util.List;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final StringRedisTemplate redisTemplate;
+    private final com.c2c.user.mapper.UserMapper userMapper;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -44,6 +45,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/user/register",
             "/user/sms/send",
             "/user/reset-password",
+            "/user/refresh",
             "/product/category",
             "/product/list",
             "/admin/login",
@@ -98,6 +100,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     unauthorized(response, "无管理员权限");
                     return;
                 }
+                // 刷新令牌禁止访问业务接口；令牌版本比对（改密/封禁/权限变更后旧令牌立即失效）
+                if (isRefreshToken(claims)) {
+                    unauthorized(response, "刷新令牌不能访问业务接口");
+                    return;
+                }
+                Long userId = Long.valueOf(claims.getSubject());
+                if (isTokenVersionStale(claims, userId)) {
+                    unauthorized(response, "登录状态已失效，请重新登录");
+                    return;
+                }
                 // 三级权限校验：admin_level=2 总管理员全放行；次级/子级管理员按 token 内的 adminPerms 校验模块权限
                 Integer adminLevel = claims.get("adminLevel", Integer.class);
                 if (adminLevel == null || adminLevel < 2) {
@@ -106,7 +118,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
-                Long userId = Long.valueOf(claims.getSubject());
                 chain.doFilter(new UserHeaderRequestWrapper(request, userId), response);
                 return;
             } catch (Exception e) {
@@ -138,7 +149,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                     unauthorized(response, "无审核权限");
                     return;
                 }
+                if (isRefreshToken(claims)) {
+                    unauthorized(response, "刷新令牌不能访问业务接口");
+                    return;
+                }
                 Long userId = Long.valueOf(claims.getSubject());
+                if (isTokenVersionStale(claims, userId)) {
+                    unauthorized(response, "登录状态已失效，请重新登录");
+                    return;
+                }
                 chain.doFilter(new UserHeaderRequestWrapper(request, userId, role), response);
                 return;
             } catch (Exception e) {
@@ -164,12 +183,55 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 unauthorized(response, "登录状态无效");
                 return;
             }
-            Long userId = JwtUtils.getUserId(token, jwtSecret);
+            Claims claims = JwtUtils.parseToken(token, jwtSecret);
+            if (isRefreshToken(claims)) {
+                unauthorized(response, "刷新令牌不能访问业务接口");
+                return;
+            }
+            Long userId = Long.valueOf(claims.getSubject());
+            if (isTokenVersionStale(claims, userId)) {
+                unauthorized(response, "登录状态已失效，请重新登录");
+                return;
+            }
             chain.doFilter(new UserHeaderRequestWrapper(request, userId), response);
         } catch (Exception e) {
             log.warn("Token validation failed: {}", e.getMessage());
             unauthorized(response, "登录凭证无效");
         }
+    }
+
+    /** 刷新令牌（type=refresh）只允许调用 /user/refresh，禁止访问一切业务接口 */
+    private boolean isRefreshToken(Claims claims) {
+        return "refresh".equals(claims.get("type", String.class));
+    }
+
+    /**
+     * 令牌版本比对：token 内的 tv 声明与当前用户版本不一致（改密/封禁/角色权限变更后递增过）即失效。
+     * 老 token 无 tv 声明按 0 处理，在发生第一次失效事件前保持兼容。
+     */
+    private boolean isTokenVersionStale(Claims claims, Long userId) {
+        Integer tokenTv = claims.get("tv", Integer.class);
+        int tv = tokenTv == null ? 0 : tokenTv;
+        return tv != currentTokenVersion(userId);
+    }
+
+    /** 当前令牌版本：Redis 缓存优先，缺失时回源数据库并回填 */
+    private int currentTokenVersion(Long userId) {
+        String cached = redisTemplate.opsForValue().get("user:tv:" + userId);
+        if (cached != null) {
+            try {
+                return Integer.parseInt(cached);
+            } catch (NumberFormatException ignored) {
+                // 缓存异常时回源数据库
+            }
+        }
+        com.c2c.user.entity.User user = userMapper.selectById(userId);
+        if (user == null) {
+            return Integer.MIN_VALUE; // 用户不存在：与任何 tv 都不相等 → 拒绝
+        }
+        int tv = user.getTokenVersion() == null ? 0 : user.getTokenVersion();
+        redisTemplate.opsForValue().set("user:tv:" + userId, String.valueOf(tv));
+        return tv;
     }
 
     private String getPathInApplication(HttpServletRequest request) {

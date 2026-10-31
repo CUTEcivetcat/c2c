@@ -3,7 +3,10 @@
     <app-header v-if="showHeader" />
     <main class="main-content" :class="mainClass">
       <router-view v-slot="{ Component }">
-        <transition :name="transitionName" mode="out-in">
+        <!-- :duration 显式指定过渡时长：Vue 改用定时器结束过渡，不再依赖 transitionend 事件。
+             修复偶发白屏：transitionend 在登录后弹窗/多接口同帧竞争时可能丢失，
+             out-in 模式下旧页面（白底登录页）会永久卡在 opacity:0 的"离开中"状态遮住首页 -->
+        <transition :name="transitionName" mode="out-in" :duration="200">
           <!-- key 用完整路径：路由参数变化时强制重建组件，避免复用旧数据（如 /product/1 → /product/2） -->
           <component :is="Component" :key="route.fullPath" />
         </transition>

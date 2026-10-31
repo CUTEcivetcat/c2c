@@ -14,6 +14,11 @@ import './assets/styles/global.scss'
 
 const app = createApp(App)
 
+// 全局渲染错误处理：生产环境打印错误（路由过渡组件若渲染抛错会白屏，日志便于定位）
+app.config.errorHandler = (err, vm, info) => {
+  console.error('[render-error]', info, err)
+}
+
 // 注册所有 Element Plus 图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)

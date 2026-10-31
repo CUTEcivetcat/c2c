@@ -19,6 +19,9 @@ public class WechatService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.core.env.Environment environment;
+
     @Value("${wechat.appid:}")
     private String appid;
 
@@ -28,6 +31,18 @@ public class WechatService {
     /** 开发模式开关：true 时派生 mock openid，便于本地测试 */
     @Value("${wechat.mock:false}")
     private boolean mock;
+
+    /** 安全闸：生产环境禁止开启 mock（否则可伪造任意 openid 登录） */
+    @javax.annotation.PostConstruct
+    void checkMockGate() {
+        String profiles = environment.getProperty("spring.profiles.active", "");
+        if (mock && profiles.contains("prod")) {
+            throw new IllegalStateException("生产环境(prod)禁止开启微信 mock 模式（wechat.mock=true），请关闭或改用 test/dev profile");
+        }
+        if (mock) {
+            log.warn("[安全提醒] wechat.mock=true：微信登录将派生 mock openid，仅允许用于本地/测试环境！");
+        }
+    }
 
     /** 根据前端传来的 wx.login 的 code 换取 openid（+sessionKey） */
     public String code2Openid(String code) {

@@ -276,6 +276,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         userMapper.updateById(user);
         redisTemplate.delete(codeKey);
+        invalidateTokens(user.getId());
         log.info("password reset: account={}", dto.getAccount());
     }
 
@@ -422,17 +423,63 @@ public class UserServiceImpl implements UserService {
     private LoginVO buildLoginVO(User user) {
         // 普通登录也签发带角色标记的 token（role 0/1/2），
         // 供 /review/** 审核接口识别审核员（role=2）；旧 token 无该标记需重新登录。
+        Integer tv = user.getTokenVersion() == null ? 0 : user.getTokenVersion();
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", String.valueOf(user.getRole() == null ? 0 : user.getRole()));
+        claims.put("tv", tv);
         String token = JwtUtils.createToken(user.getId(), claims, jwtSecret, jwtExpiration);
-        String refreshToken = JwtUtils.createToken(user.getId(), jwtSecret, 2592000L);
+        // 刷新令牌隔离：带 type=refresh 声明，仅可用于 /user/refresh 换发，不能访问业务接口
+        Map<String, Object> refreshClaims = new HashMap<>();
+        refreshClaims.put("type", "refresh");
+        String refreshToken = JwtUtils.createToken(user.getId(), refreshClaims, jwtSecret, 2592000L);
         redisTemplate.opsForValue().set("refresh:token:" + user.getId(), refreshToken, Duration.ofDays(30));
+        redisTemplate.opsForValue().set("user:tv:" + user.getId(), String.valueOf(tv));
         return LoginVO.builder()
                 .token(token)
                 .refreshToken(refreshToken)
                 .expiresIn(jwtExpiration)
                 .userInfo(toUserVO(user))
                 .build();
+    }
+
+    @Override
+    public LoginVO refresh(String refreshToken) {
+        io.jsonwebtoken.Claims claims;
+        try {
+            claims = JwtUtils.parseToken(refreshToken, jwtSecret);
+        } catch (Exception e) {
+            throw new BusinessException(401, "刷新令牌无效");
+        }
+        if (!"refresh".equals(claims.get("type", String.class))) {
+            throw new BusinessException(401, "该令牌不是刷新令牌");
+        }
+        Long userId = Long.valueOf(claims.getSubject());
+        User user = userMapper.selectById(userId);
+        if (user == null || (user.getStatus() != null && user.getStatus() == 0)) {
+            throw new BusinessException(401, "账号不存在或已被禁用");
+        }
+        // 旋转校验：Redis 中的记录必须与传入的一致，防止旧刷新令牌重放
+        String cached = redisTemplate.opsForValue().get("refresh:token:" + userId);
+        if (cached == null || !cached.equals(refreshToken)) {
+            throw new BusinessException(401, "刷新令牌已失效，请重新登录");
+        }
+        redisTemplate.delete("refresh:token:" + userId);
+        log.info("token refreshed: userId={}", userId);
+        return buildLoginVO(user);
+    }
+
+    /** 使某用户的全部已签发令牌失效（改密/封禁/角色权限变更时调用）：递增令牌版本并清理刷新令牌 */
+    private void invalidateTokens(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return;
+        }
+        int tv = (user.getTokenVersion() == null ? 0 : user.getTokenVersion()) + 1;
+        user.setTokenVersion(tv);
+        userMapper.updateById(user);
+        redisTemplate.opsForValue().set("user:tv:" + userId, String.valueOf(tv));
+        redisTemplate.delete("refresh:token:" + userId);
+        log.info("tokens invalidated: userId={}, tv={}", userId, tv);
     }
 
     private UserVO toUserVO(User user) {

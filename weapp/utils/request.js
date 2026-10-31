@@ -5,10 +5,10 @@
 
 function baseUrl() {
   const app = getApp()
-  return (app && app.globalData && app.globalData.serverUrl) || 'http://192.168.163.135:8080/api/v1'
+  return (app && app.globalData && app.globalData.serverUrl) || 'http://192.168.1.11:8080/api/v1'
 }
 
-// 服务器「源」，如 http://192.168.163.135:8080（去掉 /api/v1 后缀）
+// 服务器「源」，如 http://192.168.1.11:8080（去掉 /api/v1 后缀）
 function origin() {
   const base = baseUrl()
   const idx = base.indexOf('/api')

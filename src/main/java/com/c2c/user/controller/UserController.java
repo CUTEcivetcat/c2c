@@ -135,6 +135,12 @@ public class UserController {
         return R.ok();
     }
 
+    @Operation(summary = "刷新令牌", description = "body: {refreshToken}；用刷新令牌换发新登录令牌（旋转刷新令牌），刷新令牌不能访问业务接口")
+    @PostMapping(ApiPath.USER_REFRESH)
+    public R<LoginVO> refresh(@RequestBody Map<String, String> body) {
+        return R.ok(userService.refresh(body.get("refreshToken")));
+    }
+
     // ==================== 个人信息 ====================
 
     @Operation(summary = "获取当前登录用户信息")

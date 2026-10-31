@@ -30,6 +30,7 @@ CREATE TABLE `user` (
   `secondary_pwd` VARCHAR(255) COMMENT '二级密码(BCrypt加密)，删除账户等高危操作校验',
   `admin_level` TINYINT NOT NULL DEFAULT 0 COMMENT '管理员等级 0非管理员 1次级·子级管理员 2总管理员admin',
   `admin_perms` VARCHAR(500) COMMENT '管理员权限码(逗号分隔)；admin_level=2 视为全部权限',
+  `token_version` INT NOT NULL DEFAULT 0 COMMENT '令牌版本：改密/封禁/角色权限变更时递增，使旧token全部失效',
   `reputation_score` DECIMAL(3,1) DEFAULT 5.0,
   `balance` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   `last_login_at` DATETIME,
@@ -129,7 +130,7 @@ CREATE TABLE `order` (
   `seller_rated` TINYINT DEFAULT 0,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX `idx_order_no` (`order_no`),
+  UNIQUE INDEX `uk_order_no` (`order_no`),
   INDEX `idx_buyer_status` (`buyer_id`, `status`),
   INDEX `idx_seller_status` (`seller_id`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

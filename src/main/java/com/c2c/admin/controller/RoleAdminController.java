@@ -33,6 +33,7 @@ public class RoleAdminController {
 
     private final UserMapper userMapper;
     private final AdminLogMapper adminLogMapper;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     @Operation(summary = "用户角色列表", description = "关键字搜索 + 角色筛选 + 分页，返回 id/用户名/昵称/角色/状态")
     @GetMapping(ApiPath.ADMIN_USER_ROLES)
@@ -90,7 +91,12 @@ public class RoleAdminController {
         }
         String oldRole = roleText(target.getRole());
         target.setRole(role);
+        // 角色变更使该用户已签发的全部令牌立即失效（递增令牌版本）
+        int tv = (target.getTokenVersion() == null ? 0 : target.getTokenVersion()) + 1;
+        target.setTokenVersion(tv);
         userMapper.updateById(target);
+        redisTemplate.opsForValue().set("user:tv:" + userId, String.valueOf(tv));
+        redisTemplate.delete("refresh:token:" + userId);
 
         AdminLog adminLog = new AdminLog();
         adminLog.setOperatorId(operatorId);
