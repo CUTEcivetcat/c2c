@@ -26,6 +26,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WalletServiceTest {
 
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        com.c2c.common.infra.TestLog.log("[测试类] 钱包服务：充值加余额写流水 / 负数拒绝 / 余额不足不扣款不写流水 / 收款入账");
+    }
+
     @Mock
     private UserMapper userMapper;
     @Mock

@@ -11,6 +11,11 @@ class JwtUtilsTest {
 
     private static final String SECRET = "test-secret-key-2026-min-length-32-ok";
 
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        com.c2c.common.infra.TestLog.log("[测试类] JWT 工具：生成 / 解析 / 过期 / 非法token校验");
+    }
+
     @Test
     void createAndParseToken() {
         String token = JwtUtils.createToken(1L, SECRET, 3600);

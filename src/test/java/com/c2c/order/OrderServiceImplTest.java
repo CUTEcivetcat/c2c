@@ -1,6 +1,7 @@
 package com.c2c.order;
 
 import com.c2c.common.exception.BusinessException;
+import com.c2c.common.infra.TestLog;
 import com.c2c.order.entity.Order;
 import com.c2c.order.feign.ProductFeignClient;
 import com.c2c.order.feign.UserFeignClient;
@@ -45,6 +46,7 @@ class OrderServiceImplTest {
     @InjectMocks
     private OrderServiceImpl orderService;
 
+    /** 已完成订单：买家=2，卖家=1 */
     private Order orderWithStatus(int status) {
         Order order = new Order();
         order.setId(1L);
@@ -59,6 +61,7 @@ class OrderServiceImplTest {
 
     @Test
     void pay_status0_deductsIntoEscrow() {
+        TestLog.log("[测试] 支付：status=0 → 扣款进入平台托管(status=1, escrow=总额)，不打款卖家");
         Order order = orderWithStatus(0);
         when(orderMapper.selectById(1L)).thenReturn(order);
 
@@ -68,13 +71,13 @@ class OrderServiceImplTest {
         assertEquals(1, order.getStatus(), "支付后应为 1 已支付(托管)");
         assertEquals(new BigDecimal("100.00"), order.getEscrow(), "托管金应等于订单总额");
         verify(orderMapper).updateById(order);
-        // 托管阶段不打款卖家、不标记已售
         verify(walletService, never()).receive(any(), any(), any(), any());
         verify(productFeignClient, never()).updateStatus(any(), any());
     }
 
     @Test
     void pay_wrongStatus_throws() {
+        TestLog.log("[测试] 支付：非待支付状态(status=1)重复支付应被拒绝，且不发生扣款");
         Order order = orderWithStatus(1);
         when(orderMapper.selectById(1L)).thenReturn(order);
 
@@ -84,6 +87,7 @@ class OrderServiceImplTest {
 
     @Test
     void ship_status1_transitionsTo2() {
+        TestLog.log("[测试] 发货：卖家在已支付(status=1)状态发货 → status=2，记录物流单号");
         Order order = orderWithStatus(1);
         when(orderMapper.selectById(1L)).thenReturn(order);
 
@@ -96,6 +100,7 @@ class OrderServiceImplTest {
 
     @Test
     void ship_wrongStatus_throws() {
+        TestLog.log("[测试] 发货：未支付(status=0)订单不允许发货");
         Order order = orderWithStatus(0);
         when(orderMapper.selectById(1L)).thenReturn(order);
 
@@ -104,6 +109,7 @@ class OrderServiceImplTest {
 
     @Test
     void receive_status2_releasesEscrowToSeller() {
+        TestLog.log("[测试] 收货：买家确认收货(status=2→4)，托管金打款卖家，商品标记已售");
         Order order = orderWithStatus(2);
         order.setEscrow(new BigDecimal("100.00"));
         when(orderMapper.selectById(1L)).thenReturn(order);
@@ -113,25 +119,26 @@ class OrderServiceImplTest {
         verify(walletService).receive(eq(1L), eq(new BigDecimal("100.00")), eq(1L), contains("订单收款"));
         assertEquals(4, order.getStatus(), "收货后应为 4 已完成");
         assertNull(order.getEscrow());
-        verify(productFeignClient).updateStatus(9L, 3); // 商品标记已售（ProductStatus.SOLD=3）
+        verify(productFeignClient).updateStatus(9L, 3); // ProductStatus.SOLD=3
     }
 
     @Test
     void cancel_unpaid_restoresProductWithoutRefund() {
+        TestLog.log("[测试] 取消：未支付(status=0)直接取消，不退款，商品恢复在售");
         Order order = orderWithStatus(0);
         when(orderMapper.selectById(1L)).thenReturn(order);
         when(orderMapper.update(isNull(), any())).thenReturn(1);
 
         orderService.cancel(1L, 2L, "不想买了");
 
-        // 未支付取消：不退款、写取消状态（条件更新落库）、商品恢复在售
         verify(walletService, never()).refund(any(), any(), any(), any());
         verify(orderMapper).update(isNull(), any());
-        verify(productFeignClient).updateStatus(9L, 1); // 恢复在售
+        verify(productFeignClient).updateStatus(9L, 1);
     }
 
     @Test
     void cancel_paid_refundsBuyer() {
+        TestLog.log("[测试] 取消：已支付(status=1)先全额退款买家再取消，商品恢复在售");
         Order order = orderWithStatus(1);
         order.setEscrow(new BigDecimal("100.00"));
         when(orderMapper.selectById(1L)).thenReturn(order);
@@ -139,7 +146,6 @@ class OrderServiceImplTest {
 
         orderService.cancel(1L, 2L, "协商取消");
 
-        // 已支付取消：先抢占总状态改为已取消，再全额退款给买家，商品恢复在售
         verify(orderMapper).update(isNull(), any());
         verify(walletService).refund(eq(2L), eq(new BigDecimal("100.00")), eq(1L), contains("订单退款"));
         verify(productFeignClient).updateStatus(9L, 1);
@@ -147,9 +153,10 @@ class OrderServiceImplTest {
 
     @Test
     void cancel_lostRace_throwsAndDoesNothing() {
+        TestLog.log("[测试] 取消并发：条件更新失败(被支付抢占)时抛异常，不退款不改商品");
         Order order = orderWithStatus(0);
         when(orderMapper.selectById(1L)).thenReturn(order);
-        when(orderMapper.update(isNull(), any())).thenReturn(0); // 并发支付抢占了状态
+        when(orderMapper.update(isNull(), any())).thenReturn(0);
 
         assertThrows(BusinessException.class, () -> orderService.cancel(1L, 2L, "取消"));
 
@@ -159,6 +166,7 @@ class OrderServiceImplTest {
 
     @Test
     void cancel_shippedOrder_throws() {
+        TestLog.log("[测试] 取消：已发货(status=2)订单不允许取消（需走售后流程）");
         Order order = orderWithStatus(2);
         when(orderMapper.selectById(1L)).thenReturn(order);
 
@@ -168,6 +176,7 @@ class OrderServiceImplTest {
 
     @Test
     void cancel_notParticipant_throws() {
+        TestLog.log("[测试] 取消：非买卖双方(路人)取消订单应被拒绝");
         Order order = orderWithStatus(0);
         when(orderMapper.selectById(1L)).thenReturn(order);
 

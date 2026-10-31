@@ -38,6 +38,11 @@ class RatingServiceTest {
     @InjectMocks
     private RatingService ratingService;
 
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        com.c2c.common.infra.TestLog.log("[测试类] 评价订单参与校验：正常互评 / 非订单双方 / 订单未完成 / 角色不符 / 被评人不符 / 重复评价 / 分数越界");
+    }
+
     /** 已完成订单：买家=2，卖家=1 */
     private Order finishedOrder() {
         Order order = new Order();

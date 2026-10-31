@@ -2,6 +2,7 @@ package com.c2c.admin;
 
 import com.c2c.admin.controller.AdminAuthController;
 import com.c2c.common.exception.BusinessException;
+import com.c2c.common.infra.TestLog;
 import com.c2c.system.service.SysConfigService;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
@@ -48,6 +49,11 @@ class AdminAuthLoginLockTest {
     private AdminAuthController controller;
 
     private User admin;
+
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        TestLog.log("[测试类] 管理员登录失败锁定：5次失败锁定15分钟 / 锁定期间拒绝 / 开关关闭不限制 / 成功清计数");
+    }
 
     @BeforeEach
     void setUp() {

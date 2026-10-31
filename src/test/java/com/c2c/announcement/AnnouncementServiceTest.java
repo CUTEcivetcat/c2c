@@ -19,6 +19,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AnnouncementServiceTest {
 
+    @org.junit.jupiter.api.BeforeAll
+    static void header() {
+        com.c2c.common.infra.TestLog.log("[测试类] 公告服务：发布校验 / 编辑保存扩展字段");
+    }
+
     @Mock
     private AnnouncementMapper announcementMapper;
     @InjectMocks

@@ -131,30 +131,14 @@ class TestEnv {
     }
 
     /**
-     * 测试输出：同时写到控制台与 target/connection-test-output.txt（UTF-8）。
-     * 控制台编码受平台影响可能乱码，报告文件始终是 UTF-8。
+     * 已迁移至 {@link TestLog}（保持本类内引用可用）。
      */
     static final class Out {
-        private static final Path FILE = Paths.get("target", "connection-test-output.txt");
-        private static boolean initialized = false;
-
         private Out() {
         }
 
-        static synchronized void print(String line) {
-            System.out.println(line);
-            try {
-                if (!initialized) {
-                    Files.createDirectories(FILE.getParent());
-                    Files.write(FILE, (line + "\n").getBytes(StandardCharsets.UTF_8));
-                    initialized = true;
-                } else {
-                    Files.write(FILE, (line + "\n").getBytes(StandardCharsets.UTF_8),
-                            StandardOpenOption.APPEND);
-                }
-            } catch (IOException ignored) {
-                // 文件输出失败不影响测试
-            }
+        static void print(String line) {
+            TestLog.log(line);
         }
     }
 }
