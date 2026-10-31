@@ -23,7 +23,8 @@ class MySqlConnectionTest {
     @BeforeAll
     static void init() {
         env = TestEnv.load();
-        TestEnv.Out.print("[env] mysql=" + env.mysqlHost + ":" + env.mysqlPort + "/" + env.mysqlDb
+        TestEnv.Out.print("[env] config=" + env.configFile
+                + " mysql=" + env.mysqlHost + ":" + env.mysqlPort + "/" + env.mysqlDb
                 + " redis=" + env.redisHost + ":" + env.redisPort);
     }
 

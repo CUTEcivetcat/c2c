@@ -21,6 +21,8 @@ class TestEnv {
 
     private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([A-Z_]+)(?::([^}]*))?}");
 
+    /** 实际加载的外部配置文件（便于确认"测的就是应用用的环境"） */
+    final Path configFile;
     final String mysqlHost;
     final int mysqlPort;
     final String mysqlDb;
@@ -30,9 +32,11 @@ class TestEnv {
     final int redisPort;
     final String redisPassword;
 
-    private TestEnv(String mysqlHost, int mysqlPort, String mysqlDb,
+    private TestEnv(Path configFile,
+                    String mysqlHost, int mysqlPort, String mysqlDb,
                     String mysqlUser, String mysqlPassword,
                     String redisHost, int redisPort, String redisPassword) {
+        this.configFile = configFile;
         this.mysqlHost = mysqlHost;
         this.mysqlPort = mysqlPort;
         this.mysqlDb = mysqlDb;
@@ -60,6 +64,7 @@ class TestEnv {
             throw new IllegalStateException("无法从 datasource.url 解析连接参数: " + url);
         }
         return new TestEnv(
+                cfg.toAbsolutePath().normalize(),
                 m.group(1), Integer.parseInt(m.group(2)), m.group(3),
                 resolve(ds.get("username")), resolve(ds.get("password")),
                 resolve(redis.get("host")), Integer.parseInt(resolve(redis.get("port"))),

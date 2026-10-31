@@ -26,6 +26,8 @@ class RedisConnectionTest {
     @BeforeAll
     static void init() {
         env = TestEnv.load();
+        TestEnv.Out.print("[env] config=" + env.configFile
+                + " redis=" + env.redisHost + ":" + env.redisPort);
     }
 
     /** 建立 socket 连接（含 AUTH 鉴权），输出连接耗时 */
