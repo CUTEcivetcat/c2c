@@ -113,7 +113,9 @@ class TestEnv {
             return "";
         }
         Matcher m = PLACEHOLDER.matcher(value);
-        StringBuilder sb = new StringBuilder();
+        // 注意：Matcher.appendReplacement/Tail 的 StringBuilder 重载是 Java 9+ API，
+        // 项目兼容 JDK8，此处必须用 StringBuffer
+        StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String env = System.getenv(m.group(1));
             String def = m.group(2) == null ? "" : m.group(2);
