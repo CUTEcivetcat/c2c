@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 后端：JDK 必须是 17（Lombok 1.18.30 不支持 JDK 21+）
+  backend:
+    name: 后端编译 + 单元测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: 编译打包 + 全部单元测试（排除依赖内网环境的连接状态测试）
+        run: mvn -B clean package -Dtest='*,!MySqlConnectionTest,!RedisConnectionTest' -DfailIfNoTests=false
+
+  # 用户端前端：lint + 构建
+  frontend:
+    name: 用户端 lint + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+
+  # 管理端前端：构建（该目录未配置 lint 脚本）
+  admin-frontend:
+    name: 管理端 build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: admin-frontend/package-lock.json
+      - working-directory: admin-frontend
+        run: |
+          npm ci
+          npm run build
