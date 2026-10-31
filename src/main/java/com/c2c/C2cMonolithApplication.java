@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @MapperScan("com.c2c.**.mapper")
 @SpringBootApplication
+@org.springframework.scheduling.annotation.EnableScheduling
 public class C2cMonolithApplication {
     public static void main(String[] args) {
         SpringApplication.run(C2cMonolithApplication.class, args);

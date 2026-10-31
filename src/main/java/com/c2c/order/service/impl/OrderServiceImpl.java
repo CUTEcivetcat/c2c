@@ -162,27 +162,18 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException("当前订单状态不允许支付");
             }
 
-            // 余额扣款 + 平台托管
+            // 余额扣款，资金进入平台托管（escrow）；确认收货后打款卖家，取消则全额退款
             BigDecimal amount = order.getTotalAmount();
             walletService.deductBalance(buyerId, amount, orderId, "订单支付 #" + order.getOrderNo());
 
-            // 自动发货 + 自动确认收货
-            walletService.receive(order.getSellerId(), amount, orderId,
-                    "订单收款 #" + order.getOrderNo());
-
-            order.setStatus(4);
+            order.setStatus(1);
             order.setPaymentMethod("balance");
             order.setPaymentTime(LocalDateTime.now());
-            order.setShipTime(LocalDateTime.now());
-            order.setShipCompany("自动发货");
-            order.setReceiveTime(LocalDateTime.now());
-            order.setCompleteTime(LocalDateTime.now());
-            order.setEscrow(null);
+            order.setEscrow(amount);
             orderMapper.updateById(order);
 
-            productFeignClient.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
             eventPublisher.publishOrderPaid(orderId);
-            log.info("order paid & auto-completed: orderId={}, amount={}", orderId, amount);
+            log.info("order paid into escrow: orderId={}, amount={}", orderId, amount);
         }
     }
 
@@ -226,6 +217,9 @@ public class OrderServiceImpl implements OrderService {
         order.setCompleteTime(LocalDateTime.now());
         order.setEscrow(null);
         orderMapper.updateById(order);
+
+        // 交易完成，商品标记已售
+        productFeignClient.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
         log.info("order received and completed: orderId={}", orderId);
     }
 
@@ -239,26 +233,33 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getBuyerId().equals(userId) && !order.getSellerId().equals(userId)) {
             throw new BusinessException("无权操作该订单");
         }
-        if (order.getStatus() != 0 && order.getStatus() != 1) {
+        Integer statusBefore = order.getStatus();
+        if (statusBefore != 0 && statusBefore != 1) {
             throw new BusinessException("当前订单状态不允许取消");
         }
+        boolean needRefund = statusBefore == 1
+                && order.getEscrow() != null && order.getEscrow().compareTo(BigDecimal.ZERO) > 0;
 
-        // 已支付（有托管金）则退款
-        if (order.getEscrow() != null && order.getEscrow().compareTo(BigDecimal.ZERO) > 0) {
+        // 条件更新抢占状态：与支付/发货并发时只有一个能成功，防止互相覆盖（字符串列名，避免 Lambda 缓存依赖）
+        int updated = orderMapper.update(null, new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Order>()
+                .eq("id", orderId)
+                .in("status", 0, 1)
+                .set("status", 5)
+                .set("cancel_time", LocalDateTime.now())
+                .set("cancel_reason", reason)
+                .set("escrow", null));
+        if (updated == 0) {
+            throw new BusinessException("订单状态已变化，请刷新后重试");
+        }
+
+        // 已支付（有托管金）取消 → 全额退款给买家
+        if (needRefund) {
             walletService.refund(order.getBuyerId(), order.getEscrow(), orderId,
                     "订单退款 #" + order.getOrderNo());
         }
-
-        order.setStatus(5);
-        order.setCancelTime(LocalDateTime.now());
-        order.setCancelReason(reason);
-        order.setEscrow(null);
-        orderMapper.updateById(order);
-
-        if (order.getStatus() == 5 || order.getStatus() == 1) {
-            productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
-        }
-        log.info("order cancelled: orderId={}", orderId);
+        // 未支付/已支付未发货的订单取消后，商品恢复在售
+        productFeignClient.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+        log.info("order cancelled: orderId={}, statusBefore={}", orderId, statusBefore);
     }
 
     private Object lockFor(String key) {
