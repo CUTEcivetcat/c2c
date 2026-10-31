@@ -56,7 +56,7 @@
       <div v-loading="loading" class="goods-list">
         <div v-for="p in list" :key="p.id" class="goods-card">
           <router-link :to="`/product/${p.id}`" class="goods-cover-wrap">
-            <product-cover :src="coverOf(p)" class="goods-cover" />
+            <product-cover :src="coverOf(p)" :title="p.title" class="goods-cover" />
           </router-link>
           <div class="goods-main">
             <div class="goods-title">

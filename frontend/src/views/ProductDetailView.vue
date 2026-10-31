@@ -5,14 +5,14 @@
       <!-- 左侧图片 -->
       <div class="detail-gallery">
         <div class="main-image-wrap">
-          <product-cover :src="activeImage" class="main-image" fit="contain" />
+          <product-cover :src="activeImage" :title="product?.title" class="main-image" fit="contain" />
           <span class="img-badge" v-if="product.conditionText">{{ product.conditionText }}</span>
         </div>
         <div class="thumb-list" v-if="product.images?.length > 1">
           <div v-for="(img, i) in product.images" :key="i"
             :class="['thumb', { active: activeImage === img.url }]"
             @click="activeImage = img.url">
-            <product-cover :src="img.url" />
+            <product-cover :src="img.url" :title="product?.title" />
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@
       <h2 class="section-title">猜你喜欢</h2>
       <div class="similar-grid">
         <div v-for="p in similar" :key="p.id" class="similar-card" @click="$router.push(`/product/${p.id}`)">
-          <product-cover :src="p.images?.[0]?.url" class="similar-img" />
+          <product-cover :src="p.images?.[0]?.url" :title="p.title" class="similar-img" />
           <div class="similar-info">
             <div class="similar-title">{{ p.title }}</div>
             <div class="similar-price">¥{{ p.price }}</div>

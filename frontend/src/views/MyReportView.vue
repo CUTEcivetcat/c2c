@@ -4,7 +4,7 @@
     <div v-loading="loading" class="list">
       <div v-for="r in list" :key="r.id" class="card">
         <router-link :to="`/product/${r.productId}`" class="head">
-          <product-cover v-if="r.productCover" :src="r.productCover" class="cover" />
+          <product-cover :src="r.productCover" :title="r.productTitle" class="cover" />
           <div class="title-box">
             <div class="title">{{ r.productTitle }}</div>
             <div class="tags">
