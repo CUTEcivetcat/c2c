@@ -63,7 +63,8 @@ import { getMessages, sendMessage, markRead, getConversations } from '@/api/im'
 const route = useRoute()
 const router = useRouter()
 const store = useUserStore()
-const myId = store.userInfo?.id
+// 当前用户ID必须用 computed：userInfo 可能异步加载，快照取值会导致所有消息都渲染到一侧
+const myId = computed(() => store.userInfo?.id ?? null)
 const messages = ref([])
 const text = ref('')
 const msgBox = ref(null)
@@ -74,12 +75,16 @@ let lastId = 0
 let pollTimer = null
 
 onMounted(async () => {
+  // userInfo 未加载时先拉取（否则下方 myId 为 null，消息方向会全错）
+  if (!store.userInfo) {
+    try { await store.fetchProfile() } catch (e) { /* 拦截器已提示 */ }
+  }
   // 会话里没有昵称字段，先展示"用户+id"（后续可扩展为昵称）
   try {
     const convs = await getConversations()
     const conv = (convs || []).find(c => String(c.id) === String(route.params.id))
     if (conv) {
-      const pId = myId === conv.user1Id ? conv.user2Id : conv.user1Id
+      const pId = myId.value === conv.user1Id ? conv.user2Id : conv.user1Id
       partnerId.value = pId
       partnerName.value = '用户' + pId
     }
@@ -156,7 +161,7 @@ const goPartner = () => { if (partnerId.value) router.push(`/user/${partnerId.va
 const updatePartnerName = () => {
   const fallback = '用户' + (partnerId.value ?? '')
   if (partnerName.value && partnerName.value !== fallback) return
-  const m = messages.value.find(x => x.senderId !== myId && x.senderName)
+  const m = messages.value.find(x => x.senderId !== myId.value && x.senderName)
   if (m) partnerName.value = m.senderName
 }
 
@@ -190,7 +195,7 @@ const messageItems = computed(() => {
     if (time && (!prev || !prev.time || prev.senderId !== m.senderId || (time - prev.time) >= 5 * 60 * 1000)) {
       showTime = true
     }
-    const mine = m.senderId === myId
+    const mine = m.senderId === myId.value
     const avatarText = mine
       ? (store.userInfo?.nickname?.charAt(0) || '我')
       : ((m.senderName || '用户').charAt(0))
