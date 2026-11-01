@@ -197,6 +197,10 @@ app:
     chat-timeout: ${AI_CHAT_TIMEOUT:12000}
 ```
 
+> 💡 测试/开发后端可直接用 K50 OlliteRT（局域网 OpenAI 兼容端点，零 API 成本）：
+> `AI_BASE_URL=http://192.168.1.14:8000/v1`、`AI_API_KEY=任意非空`（K50 未开鉴权）、
+> model 用 `GET /v1/models` 查已加载的名字。详见 docs/OlliteRT-SpringAI对接文档.docx。
+
 `sys_config` 新增两行（管理端「系统设置」面板自动出现，无需改前端）：
 
 | config_key | 默认值 | 说明 |
