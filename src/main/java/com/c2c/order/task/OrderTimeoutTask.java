@@ -56,6 +56,8 @@ public class OrderTimeoutTask {
                 continue;
             }
             productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+            // 【G4 接入点⑤】超时关单通知（建好组件后取消注释）：
+            // orderNoticeService.notifyOrderEvent(order, "超时未支付，订单已自动取消");
             log.info("timeout order cancelled: orderId={}, orderNo={}", order.getId(), order.getOrderNo());
         }
     }
