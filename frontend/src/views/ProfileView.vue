@@ -237,9 +237,12 @@ const save = async () => {
 
 <style scoped>
 .profile-header-card {
-  background: #fff; border-radius: 20px; padding: 32px;
+  background: linear-gradient(135deg, #fff7f2 0%, #ffffff 70%);
+  border-radius: 20px; padding: 32px;
   text-align: center; border: 1px solid var(--c2c-line-soft); margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.07);
 }
+.profile-header-card .el-avatar { box-shadow: 0 6px 16px rgba(255, 107, 53, 0.25); }
 .profile-header-card h3 { font-size: 20px; font-weight: 700; margin: 12px 0 6px; color: var(--c2c-text); }
 .rep-badge { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .rep-badge span { font-size: 14px; font-weight: 600; color: var(--c2c-primary); }

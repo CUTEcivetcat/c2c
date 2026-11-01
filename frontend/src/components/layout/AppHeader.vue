@@ -199,3 +199,20 @@ watch(() => route.fullPath, () => { fetchUnread() })
   .mobile-menu { display: none !important; }
 }
 </style>
+
+<!-- 用户下拉浮层挂在 body 上，需要全局样式（不受 scoped 限制） -->
+<style>
+.user-dropdown { border-radius: 14px !important; padding: 6px; box-shadow: 0 12px 32px rgba(36, 59, 83, 0.12) !important; }
+.user-dropdown .dropdown-user-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px 10px; margin-bottom: 4px;
+  border-bottom: 1px solid #f0f2f5;
+}
+.user-dropdown .dropdown-user-info { display: flex; flex-direction: column; line-height: 1.4; }
+.user-dropdown .dropdown-user-info span { font-size: 12px; color: #9aa5b1; }
+.user-dropdown .el-dropdown-menu__item {
+  display: flex; align-items: center; gap: 8px;
+  border-radius: 10px; margin: 2px 0; padding: 8px 14px;
+}
+.user-dropdown .el-dropdown-menu__item:hover { background: #fff5f0; color: #ff6b35; }
+</style>
