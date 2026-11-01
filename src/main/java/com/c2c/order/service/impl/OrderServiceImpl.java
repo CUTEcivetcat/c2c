@@ -13,6 +13,7 @@ import com.c2c.order.service.OrderNoticeService;
 import com.c2c.order.service.OrderService;
 import com.c2c.product.dto.ProductVO;
 import com.c2c.wallet.service.WalletService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,9 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private final UserDelegate userDelegate;
     private final OrderEventPublisher eventPublisher;
     private final WalletService walletService;
-    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
-    // 【G4 接入点①】订单系统通知组件（已注入；5 个触发点的调用取消注释即可）
-    private final com.c2c.order.service.OrderNoticeService orderNoticeService;
+    private final ObjectMapper objectMapper;
+    private final OrderNoticeService orderNoticeService;
 
     @Override
     @Transactional
@@ -175,8 +175,8 @@ public class OrderServiceImpl implements OrderService {
             order.setEscrow(amount);
             orderMapper.updateById(order);
 
-            // 【G4 接入点②】支付成功通知（建好组件后取消注释）：
-            // orderNoticeService.notifyOrderEvent(order, "订单已支付，等待卖家发货");
+            // 【G4 接入点②】支付成功通知）：
+            orderNoticeService.notifyOrderEvent(order, "订单已支付，等待卖家发货");
 
             eventPublisher.publishOrderPaid(orderId);
             log.info("order paid into escrow: orderId={}, amount={}", orderId, amount);
@@ -198,8 +198,8 @@ public class OrderServiceImpl implements OrderService {
         order.setShipNo(shipNo);
         order.setShipTime(LocalDateTime.now());
         orderMapper.updateById(order);
-        // 【G4 接入点③】发货通知（建好组件后取消注释；shipNo 可空，拼接前注意判空）：
-        // orderNoticeService.notifyOrderEvent(order, "卖家已发货（" + shipCompany + " " + shipNo + "），请注意查收");
+        // 【G4 接入点③】发货通知（shipNo 可空，拼接前注意判空）：
+        orderNoticeService.notifyOrderEvent(order, "卖家已发货（" + shipCompany + " " + shipNo + "），请注意查收");
         log.info("order shipped: orderId={}", orderId);
     }
 
@@ -228,8 +228,8 @@ public class OrderServiceImpl implements OrderService {
 
         // 交易完成，商品标记已售
         productDelegate.updateStatus(order.getProductId(), ProductStatus.SOLD.getCode());
-        // 【G4 接入点④】确认收货/交易完成通知（建好组件后取消注释）：
-        // orderNoticeService.notifyOrderEvent(order, "订单已完成，感谢交易 🎉");
+        // 【G4 接入点④】确认收货/交易完成通知：
+        orderNoticeService.notifyOrderEvent(order, "订单已完成，感谢交易 🎉");
         log.info("order received and completed: orderId={}", orderId);
     }
 
@@ -269,8 +269,8 @@ public class OrderServiceImpl implements OrderService {
         }
         // 未支付/已支付未发货的订单取消后，商品恢复在售
         productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
-        // 【G4 接入点⑥】取消订单通知（建好组件后取消注释）：
-        // orderNoticeService.notifyOrderEvent(order, "订单已取消：" + (reason == null ? "无" : reason));
+        // 【G4 接入点⑥】取消订单通知：
+        orderNoticeService.notifyOrderEvent(order, "订单已取消：" + (reason == null ? "无" : reason));
         log.info("order cancelled: orderId={}, statusBefore={}", orderId, statusBefore);
     }
 

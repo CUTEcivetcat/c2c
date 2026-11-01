@@ -7,6 +7,7 @@ import com.c2c.order.delegate.ProductDelegate;
 import com.c2c.order.delegate.UserDelegate;
 import com.c2c.order.mapper.OrderMapper;
 import com.c2c.order.mq.OrderEventPublisher;
+import com.c2c.order.service.OrderNoticeService;
 import com.c2c.order.service.impl.OrderServiceImpl;
 import com.c2c.wallet.service.WalletService;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ class OrderServiceImplTest {
     private UserDelegate userDelegate;
     @Mock
     private OrderEventPublisher eventPublisher;
+    @Mock
+    private OrderNoticeService orderNoticeService;
     @Mock
     private WalletService walletService;
     @Mock
@@ -73,6 +76,17 @@ class OrderServiceImplTest {
         verify(orderMapper).updateById(order);
         verify(walletService, never()).receive(any(), any(), any(), any());
         verify(productDelegate, never()).updateStatus(any(), any());
+    }
+
+    @Test
+    void pay_triggersOrderNotice() {
+        TestLog.log("[测试] 支付：应触发订单系统通知（G4，给买卖双方发灰条消息）");
+        Order order = orderWithStatus(0);
+        when(orderMapper.selectById(1L)).thenReturn(order);
+
+        orderService.pay(1L, 2L);
+
+        verify(orderNoticeService).notifyOrderEvent(order, "订单已支付，等待卖家发货");
     }
 
     @Test
