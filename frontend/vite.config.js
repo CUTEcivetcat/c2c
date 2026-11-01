@@ -16,7 +16,9 @@ export default defineConfig(({ mode }) => {
     },
     '/files': {
       target: serverOrigin,
-      changeOrigin: true
+      changeOrigin: true,
+      // 后端有 context-path /api/v1，开发代理需重写（生产由 nginx 直接映射 /files 无此问题）
+      rewrite: p => p.replace(/^\/files/, '/api/v1/files')
     }
   }
 
