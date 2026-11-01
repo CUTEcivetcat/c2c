@@ -133,13 +133,15 @@
         </div>
 
         <div class="comment-list" v-if="comments.length">
-          <div v-for="c in comments" :key="c.id" class="comment-item">
+          <!-- 一级评论 + 其回复紧随（displayComments 已按 父→子 拍平，子评论缩进展示） -->
+          <div v-for="c in displayComments" :key="c.id" class="comment-item" :class="{ 'is-reply': !!c.parentId }">
             <el-avatar :size="36" style="background:linear-gradient(135deg,var(--c2c-primary),var(--c2c-primary-light));flex-shrink:0">
               {{ c.nickname?.charAt(0) || '?' }}
             </el-avatar>
             <div class="comment-body">
               <div class="comment-meta">
                 <strong>{{ c.nickname || '匿名用户' }}</strong>
+                <span v-if="c.parentId" class="reply-to">回复 @{{ parentNameOf(c) }}</span>
                 <span class="comment-time">{{ fmtTime(c.createdAt) }}</span>
                 <div class="comment-ops">
                   <el-button link type="primary" size="small" @click="replyTo = c.id">回复</el-button>
@@ -233,7 +235,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getProductDetail, getComments, addComment, deleteComment, createIntent, searchProducts } from '@/api/product'
@@ -252,6 +254,30 @@ const isFav = ref(false)
 
 // 评论
 const comments = ref([])
+// 评论展示序：一级评论 + 其回复紧随（按时间正序），不再平铺
+const displayComments = computed(() => {
+  const list = comments.value || []
+  const childrenOf = new Map()
+  list.filter(c => c.parentId).forEach(c => {
+    const arr = childrenOf.get(c.parentId) || []
+    arr.push(c)
+    childrenOf.set(c.parentId, arr)
+  })
+  const result = []
+  list.filter(c => !c.parentId).forEach(top => {
+    result.push(top)
+    const kids = (childrenOf.get(top.id) || [])
+      .slice()
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    result.push(...kids)
+  })
+  // 兜底：父评论不在当前页（被删/翻页）的回复，平铺到尾部
+  result.push(...list.filter(c => c.parentId && !list.some(t => t.id === c.parentId)))
+  return result
+})
+// 回复的父级昵称（父不在当前列表时降级文案）
+const listFindName = (id) => (comments.value || []).find(x => x.id === id)?.nickname
+const parentNameOf = (c) => listFindName(c.parentId) || '层主'
 const commentTotal = ref(0)
 const loadingComments = ref(false)
 const commentSubmitting = ref(false)
@@ -561,6 +587,18 @@ const contactSeller = async () => {
 .comment-login-tip a { color: var(--c2c-primary); font-weight: 600; }
 .comment-list { display: flex; flex-direction: column; gap: 20px; }
 .comment-item { display: flex; gap: 12px; }
+/* 子评论（回复）：缩进 + 浅底，挂在父评论下方 */
+.comment-item.is-reply {
+  margin-left: 48px;
+  padding: 10px 12px;
+  background: #f8f9fb;
+  border-radius: 12px;
+}
+.comment-item.is-reply .reply-to {
+  font-size: 12px;
+  color: var(--c2c-primary, #ff6b35);
+  margin-left: 6px;
+}
 .comment-body { flex: 1; min-width: 0; }
 .comment-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .comment-meta strong { font-size: 14px; color: var(--c2c-text); }
