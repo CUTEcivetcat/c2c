@@ -1,0 +1,13 @@
+<batch>
+  <items>
+    <item type="IMAGE" path="/deliverables/banner-20261101/digital" title="校园二手数码横幅" brief="校园开学季二手数码专场横幅底图（3:1，无文字，左侧留白，供叠加标题）">
+      <size width="3546" height="1182" />
+      <asset url="https://aka.doubaocdn.com/s/O8UDLKcE0q" />
+    </item>
+    <item type="IMAGE" path="/deliverables/banner-20261101/storage" title="宿舍收纳好物横幅" brief="宿舍收纳好物促销横幅底图（3:1，无文字，左侧留白，供叠加标题）">
+      <size width="3546" height="1182" />
+      <asset url="https://aka.doubaocdn.com/s/MP8JfgA3RI" />
+    </item>
+  </items>
+  <frames />
+</batch>
