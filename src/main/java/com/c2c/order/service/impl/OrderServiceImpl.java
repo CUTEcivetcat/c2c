@@ -34,7 +34,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService, OrderNoticeService {
+public class OrderServiceImpl implements OrderService {
 
     /** 条纹锁：固定 64 把，替代无限增长的 ConcurrentHashMap（防内存膨胀） */
     private static final Object[] LOCKS = new Object[64];
@@ -52,8 +52,8 @@ public class OrderServiceImpl implements OrderService, OrderNoticeService {
     private final OrderEventPublisher eventPublisher;
     private final WalletService walletService;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
-    // 【G4 接入点①】注入订单系统通知组件（建好 OrderNoticeService 后取消注释）：
-    // private final com.c2c.order.service.OrderNoticeService orderNoticeService;
+    // 【G4 接入点①】订单系统通知组件（已注入；5 个触发点的调用取消注释即可）
+    private final com.c2c.order.service.OrderNoticeService orderNoticeService;
 
     @Override
     @Transactional
