@@ -15,20 +15,15 @@
 
     <!-- 功能入口 -->
     <div class="profile-menu">
-      <router-link to="/wallet" class="menu-item">
-        <span class="menu-ico">💰</span><span>我的钱包</span>
-      </router-link>
-      <router-link to="/my/report" class="menu-item">
-        <span class="menu-ico">⚑</span><span>我的举报</span>
-      </router-link>
-      <router-link to="/my/appeal" class="menu-item">
-        <span class="menu-ico">🔁</span><span>我的整改申诉</span>
-      </router-link>
-      <router-link to="/browse-history" class="menu-item">
-        <span class="menu-ico">🕐</span><span>最近浏览</span>
+      <router-link v-for="m in menuItems" :key="m.to" :to="m.to" class="menu-item">
+        <span class="menu-ico" :style="{ background: m.bg }">{{ m.icon }}</span>
+        <span class="menu-label">{{ m.label }}</span>
+        <span class="menu-arrow">›</span>
       </router-link>
       <router-link v-if="store.userInfo?.role === 2" to="/review" class="menu-item">
-        <span class="menu-ico">🛡️</span><span>审核工作台</span>
+        <span class="menu-ico" style="background:#f3f0ff">🛡️</span>
+        <span class="menu-label">审核工作台</span>
+        <span class="menu-arrow">›</span>
       </router-link>
     </div>
 
@@ -137,6 +132,15 @@ import { getMyEcoStats } from '@/api/eco'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const store = useUserStore()
+// 个人中心功能入口（订单/意向提前，钱包举报等随后）
+const menuItems = [
+  { to: '/order/list', label: '我的订单', icon: '📦', bg: '#fff1ea' },
+  { to: '/intent', label: '我的意向', icon: '💬', bg: '#eef4ff' },
+  { to: '/wallet', label: '我的钱包', icon: '💰', bg: '#fff8e0' },
+  { to: '/my/report', label: '我的举报', icon: '⚑', bg: '#fdeef0' },
+  { to: '/my/appeal', label: '我的整改申诉', icon: '🔁', bg: '#eefaf3' },
+  { to: '/browse-history', label: '最近浏览', icon: '🕐', bg: '#f3f0ff' }
+]
 const router = useRouter()
 const form = ref({ nickname: '', gender: 0 })
 
@@ -247,16 +251,29 @@ const save = async () => {
 }
 .nickname-tip { margin-top: 6px; font-size: 12px; color: var(--c2c-text-muted); }
 .profile-menu {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-  margin-bottom: 20px;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  margin-bottom: 22px;
 }
 .menu-item {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 14px;
-  padding: 18px 10px; text-decoration: none; color: var(--c2c-text);
-  font-size: 14px; font-weight: 600; transition: all 0.2s;
+  display: flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid var(--c2c-line-soft); border-radius: 16px;
+  padding: 14px 16px; text-decoration: none; color: var(--c2c-text);
+  font-size: 14px; font-weight: 600; transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(36, 59, 83, 0.04);
 }
-.menu-item:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff8f5; }
+.menu-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--c2c-primary);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.12);
+  color: var(--c2c-primary);
+}
+.menu-ico {
+  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 19px;
+}
+.menu-label { white-space: nowrap; }
+.menu-arrow { margin-left: auto; color: #c0c8d2; font-size: 18px; transition: transform 0.2s; }
+.menu-item:hover .menu-arrow { transform: translateX(3px); color: var(--c2c-primary); }
 .menu-ico { font-size: 20px; }
 
 /* 我的环保贡献 */
