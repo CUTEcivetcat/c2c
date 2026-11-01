@@ -184,9 +184,11 @@ public class UserServiceImpl implements UserService {
         if (isEmail(account)) {
             user.setEmail(account);
             user.setEmailVerified(1);
+            user.setLoginSource("email");
         } else {
             user.setPhone(account);
             user.setEmailVerified(0);
+            user.setLoginSource("phone");
         }
 
         String seq = String.format("%05d", (userMapper.selectCount(null) + 1) % 100000);
@@ -405,9 +407,11 @@ public class UserServiceImpl implements UserService {
         if (isEmail(account)) {
             user.setEmail(account);
             user.setEmailVerified(1);
+            user.setLoginSource("email");
         } else {
             user.setPhone(account);
             user.setEmailVerified(0);
+            user.setLoginSource("phone");
         }
 
         String seq = String.format("%05d", (userMapper.selectCount(null) + 1) % 100000);
