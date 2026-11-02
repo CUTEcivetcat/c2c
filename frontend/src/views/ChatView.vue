@@ -44,6 +44,11 @@
       </div>
     </div>
 
+    <!-- 快捷问题（仅助手会话） -->
+    <div v-if="isAssistant && faqChips.length" class="faq-chips">
+      <span v-for="q in faqChips" :key="q" class="faq-chip" @click="sendChip(q)">{{ q }}</span>
+    </div>
+
     <!-- 输入栏 -->
     <div class="chat-input-bar">
       <input v-model="text" type="text" placeholder="输入消息…" class="chat-input" @keyup.enter="send" />
@@ -59,6 +64,10 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getMessages, sendMessage, markRead, getConversations } from '@/api/im'
+import { aiChat, getFaqSuggestions } from '@/api/ai'
+
+/** 平台助手账号（与后端 AiChatService.ASSISTANT_ID 一致） */
+const ASSISTANT_ID = 90000001
 
 const route = useRoute()
 const router = useRouter()
@@ -70,6 +79,9 @@ const text = ref('')
 const msgBox = ref(null)
 const partnerName = ref('')
 const partnerId = ref(null)
+// 是否为平台助手会话（发送分流 + 快捷问题 chips）
+const isAssistant = computed(() => partnerId.value === ASSISTANT_ID)
+const faqChips = ref([])
 const sending = ref(false)
 let lastId = 0
 let pollTimer = null
@@ -86,7 +98,11 @@ onMounted(async () => {
     if (conv) {
       const pId = myId.value === conv.user1Id ? conv.user2Id : conv.user1Id
       partnerId.value = pId
-      partnerName.value = '用户' + pId
+      partnerName.value = pId === ASSISTANT_ID ? '青禾助手' : ('用户' + pId)
+      // 助手会话：加载快捷问题 chips
+      if (pId === ASSISTANT_ID) {
+        try { faqChips.value = await getFaqSuggestions() || [] } catch (e) { faqChips.value = [] }
+      }
     }
   } catch (e) { /* 忽略，只影响顶栏展示 */ }
   await load()
@@ -142,15 +158,26 @@ const send = async () => {
   if (!content || sending.value) return
   sending.value = true
   try {
-    const msg = await sendMessage(route.params.id, content)
-    messages.value.push(msg)
-    lastId = Math.max(lastId, Number(msg.id) || 0)
-    text.value = ''
-    nextTick(scrollBottom)
-  } catch (e) { /* 拦截器已提示（如内容为空/无权发言） */ } finally {
+    if (isAssistant.value) {
+      // 助手会话：走 AI 客服接口（后端已写入用户消息并生成回复落库），刷新即可看到对话
+      await aiChat(Number(route.params.id), content)
+      text.value = ''
+      await load()
+      scrollBottom()
+    } else {
+      const msg = await sendMessage(route.params.id, content)
+      messages.value.push(msg)
+      lastId = Math.max(lastId, Number(msg.id) || 0)
+      text.value = ''
+      nextTick(scrollBottom)
+    }
+  } catch (e) { /* 拦截器已提示（如内容为空/无权发言/维护中） */ } finally {
     sending.value = false
   }
 }
+
+// 快捷问题：点击直接发送
+const sendChip = (q) => { text.value = q; send() }
 
 const scrollBottom = () => nextTick(() => { if (msgBox.value) msgBox.value.scrollTop = msgBox.value.scrollHeight })
 
@@ -267,6 +294,23 @@ const messageItems = computed(() => {
 .sys-time { font-size: 10px; color: var(--c2c-text-muted); }
 
 /* 输入栏 */
+/* 快捷问题 chips（助手会话） */
+.faq-chips {
+  display: flex; gap: 8px; overflow-x: auto; padding: 8px 4px 4px;
+  scrollbar-width: none;
+}
+.faq-chips::-webkit-scrollbar { display: none; }
+.faq-chip {
+  flex-shrink: 0; padding: 6px 14px; font-size: 12px;
+  background: #fff; border: 1px solid var(--c2c-line-soft, #e6e9ee);
+  border-radius: 999px; color: var(--c2c-text-secondary, #52606d);
+  cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.faq-chip:hover {
+  border-color: var(--c2c-primary, #ff6b35);
+  color: var(--c2c-primary, #ff6b35);
+  background: #fff5f0;
+}
 .chat-input-bar {
   display: flex; gap: 8px; padding: 12px 16px;
   background: #fff; border-top: 1px solid var(--c2c-line-soft);

@@ -1,6 +1,15 @@
 <template>
   <div class="page-container" style="max-width:600px">
     <page-back-bar title="消息" />
+    <!-- 平台助手固定入口 -->
+    <div class="assistant-entry" @click="goAssistant">
+      <div class="assistant-avatar">🤖</div>
+      <div class="assistant-main">
+        <div class="assistant-title"><strong>青禾助手</strong><span class="ai-tag">AI</span></div>
+        <div class="assistant-sub">查订单 · 问规则 · 7×24 在线</div>
+      </div>
+      <span class="assistant-arrow">›</span>
+    </div>
     <!-- 未读消息提醒：汇总所有会话的未读数 -->
     <div v-if="totalUnread > 0" class="unread-banner">
       <el-badge :value="totalUnread" :max="99" />
@@ -31,12 +40,24 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { getConversations } from '@/api/im'
+import { getConversations, getOrCreateConversation } from '@/api/im'
 
 const store = useUserStore()
+const router = useRouter()
 const conversations = ref([])
 let timer = null
+
+/** 平台助手账号（与后端一致） */
+const ASSISTANT_ID = 90000001
+// 进入/创建助手会话并跳转
+const goAssistant = async () => {
+  try {
+    const conv = await getOrCreateConversation({ targetUserId: ASSISTANT_ID })
+    if (conv && conv.id) router.push(`/chat/${conv.id}`)
+  } catch (e) { /* 拦截器已提示 */ }
+}
 
 // 会话中"对方"的 ID
 const partnerId = (c) => {
@@ -71,8 +92,35 @@ onUnmounted(() => clearInterval(timer))
 </script>
 
 <style scoped>
-.unread-banner {
-  display: flex; align-items: center; gap: 10px;
+/* 平台助手固定入口 */
+.assistant-entry {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #fff7f2, #ffffff);
+  border: 1px solid var(--c2c-line-soft, #f0e6e0);
+  border-radius: 16px; padding: 14px 16px; margin-bottom: 12px;
+  cursor: pointer; transition: all 0.25s ease;
+  box-shadow: 0 2px 10px rgba(255, 107, 53, 0.06);
+}
+.assistant-entry:hover {
+  transform: translateY(-2px);
+  border-color: var(--c2c-primary, #ff6b35);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.14);
+}
+.assistant-avatar {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--c2c-primary, #ff6b35), var(--c2c-primary-light, #ff8c5a));
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.assistant-main { flex: 1; min-width: 0; }
+.assistant-title { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--c2c-text, #243b53); }
+.ai-tag {
+  font-size: 10px; font-weight: 700; color: #fff;
+  background: linear-gradient(135deg, #ff6b35, #ff8c5a);
+  padding: 1px 7px; border-radius: 999px;
+}
+.assistant-sub { font-size: 12px; color: #9aa5b1; margin-top: 3px; }
+.assistant-arrow { color: #c0c8d2; font-size: 20px; }
+.unread-banner {  display: flex; align-items: center; gap: 10px;
   background: linear-gradient(135deg, #fff3ee, #ffe8e0);
   border: 1px solid #ffd9cc; border-radius: 10px;
   padding: 10px 14px; margin-bottom: 10px;

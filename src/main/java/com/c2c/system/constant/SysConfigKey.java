@@ -19,4 +19,10 @@ public interface SysConfigKey {
 
     /** 管理员登录锁定时长（分钟） */
     String ADMIN_LOGIN_LOCK_LOCK_MINUTES = "security.admin-login-lock.lock-minutes";
+
+    /** AI 客服总开关 */
+    String AI_ASSISTANT_ENABLED = "sys.ai-assistant.enabled";
+
+    /** 单用户每日 AI 客服问答上限 */
+    String AI_ASSISTANT_DAILY_LIMIT = "sys.ai-assistant.daily-limit";
 }

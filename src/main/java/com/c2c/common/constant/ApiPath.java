@@ -165,6 +165,9 @@ public interface ApiPath {
     // ==================== AI 智能发布 /ai（需登录） ====================
     String AI = "/ai";
     String AI_INTELLIGENT_PUBLISH = "/ai/intelligent-publish";
+    /** AI 智能客服（登录用户；助手会话内发消息走此接口） */
+    String AI_CHAT = "/ai/chat";
+    String AI_CHAT_FAQ = "/ai/chat/faq-suggestions";
 
     // ==================== 低碳循环 /eco（用户统计需登录；/admin/eco 需管理端 DASHBOARD 权限） ====================
     String ECO_USER_STATS = "/eco/user/stats";

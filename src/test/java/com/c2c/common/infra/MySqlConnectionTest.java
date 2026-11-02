@@ -129,7 +129,7 @@ class MySqlConnectionTest {
                     TestEnv.Out.print(String.format("[sys_config] %s = %s", rs.getString(1), rs.getString(2)));
                 }
                 TestEnv.Out.print(String.format("[MySQL] sys_config 表查询 %d 行, 耗时: %.2f ms", n, ms));
-                assertEquals(4, n, "sys_config 应为 4 行种子配置");
+                assertTrue(n >= 4, "sys_config 应至少包含 4 行种子配置（验证码回显/登录锁定/AI 客服等）");
             }
         }
     }

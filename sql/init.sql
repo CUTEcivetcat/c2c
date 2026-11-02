@@ -333,4 +333,17 @@ CREATE TABLE `sys_config` (
   UNIQUE KEY `uk_config_key` (`config_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统运行配置（后台控制面板可动态调整）';
 
+-- 客服知识库：AI 客服的检索源（关键词匹配；管理端二期可维护）
+CREATE TABLE `faq` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `question` VARCHAR(200) NOT NULL COMMENT '标准问',
+  `answer` TEXT NOT NULL COMMENT '答案',
+  `category` VARCHAR(50) DEFAULT NULL COMMENT '分类 交易规则/账号/支付/发货/退款/违规/AI',
+  `keywords` VARCHAR(500) DEFAULT NULL COMMENT '检索关键词(逗号分隔)',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '1启用0停用',
+  `sort_order` INT DEFAULT 0 COMMENT '排序(小的在前)',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客服知识库(FAQ)';
+
 SET FOREIGN_KEY_CHECKS = 1;

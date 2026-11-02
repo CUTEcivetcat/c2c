@@ -17,6 +17,10 @@ vi.mock('@/api/im', () => ({
   markRead: vi.fn(),
   getConversations: vi.fn()
 }))
+vi.mock('@/api/ai', () => ({
+  aiChat: vi.fn(),
+  getFaqSuggestions: vi.fn()
+}))
 vi.mock('@/api/user', () => ({ getProfile: vi.fn() }))
 
 // jsdom 无 scrollTo

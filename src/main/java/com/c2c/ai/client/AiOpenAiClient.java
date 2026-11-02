@@ -99,4 +99,49 @@ public class AiOpenAiClient {
     private String safeBody(HttpResponse resp) {
         return new String(resp.bodyBytes(), StandardCharsets.UTF_8);
     }
+
+    /**
+     * 通用对话调用（AI 客服）：传入消息数组与工具描述，返回 choices[0].message（含 content / tool_calls）。
+     *
+     * @return assistant 的 message JSON 对象；调用失败/无 choices 返回 null（上层降级规则引擎）
+     */
+    public cn.hutool.json.JSONObject chat(cn.hutool.json.JSONArray messages, String toolsJson) {
+        if (StrUtil.isBlank(properties.getApiKey()) || StrUtil.isBlank(properties.getBaseUrl())) {
+            return null;
+        }
+        JSONObject body = new JSONObject();
+        body.set("model", properties.getModel());
+        body.set("max_tokens", 600);
+        body.set("temperature", 0.4);
+        body.set("messages", messages);
+        if (StrUtil.isNotBlank(toolsJson)) {
+            body.set("tools", JSONUtil.parseArray(toolsJson));
+            body.set("tool_choice", "auto");
+        }
+
+        try {
+            String url = StrUtil.removeSuffix(properties.getBaseUrl(), "/") + "/chat/completions";
+            HttpResponse resp = HttpRequest.post(url)
+                    .header("Authorization", "Bearer " + properties.getApiKey())
+                    .header("Content-Type", "application/json")
+                    .body(body.toString())
+                    .timeout((int) properties.getTimeout())
+                    .execute();
+            String respBody = safeBody(resp);
+            if (!resp.isOk() || StrUtil.isBlank(respBody)) {
+                log.warn("AI 对话调用失败: http={}, body={}", resp.getStatus(), StrUtil.maxLength(respBody, 200));
+                return null;
+            }
+            JSONObject json = JSONUtil.parseObj(respBody);
+            JSONArray choices = json.getJSONArray("choices");
+            if (choices == null || choices.isEmpty()) {
+                return null;
+            }
+            JSONObject message = choices.getJSONObject(0).getJSONObject("message");
+            return message == null || message.isEmpty() ? null : message;
+        } catch (Exception e) {
+            log.warn("AI 对话调用异常: {}", e.getMessage());
+            return null;
+        }
+    }
 }
