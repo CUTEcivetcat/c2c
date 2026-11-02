@@ -57,13 +57,13 @@ c2c/
 ├── src/main/resources/           # 配置（脱敏占位符版，真实值走外部 config/）
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
-├── blog/                         # 博客前端（Vite 5175）
 ├── weapp/                        # 微信小程序（完整功能：登录/发布/订单/钱包等）
 ├── sql/                          # init.sql 全量建表(21张) / data.sql 全量演示数据
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
 ├── deploy/                       # 部署脚本与示例配置（脱敏）
-├── BUGS.md                       # 已知问题记录
+├── assets/                       # 演示横幅等素材（部署时复制到 uploads/）
+├── docs/                         # 文档：项目计划书(总纲) / 优化台账 / 实施指南 / 教学指南
 ```
 
 ## 🏃 快速开始（本地开发）
