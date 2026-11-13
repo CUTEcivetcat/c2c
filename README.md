@@ -36,7 +36,7 @@
 | 后端 | Java 17 · Spring Boot 3.3 · Spring AI 1.1(OpenAI 兼容) · MyBatis-Plus 3.5(boot3 starter) · MySQL 8 · Redis · JWT · Hutool · Lombok · SpringDoc 2.x(Swagger) |
 | 用户端前端 | Vue 3 · Vite 5 · Vue Router · Pinia · Element Plus · ESLint |
 | 管理端前端 | Vue 3 · Element Plus · ECharts · ESLint |
-| 微信小程序 | 原生微信小程序（完整闭环：登录/发布/订单/钱包） |
+| 微信小程序 | 原生微信小程序（完整闭环：登录/发布/订单/钱包）· **已于 2026-11-13 停更**，后续迭代仅覆盖 Web 端，代码保留作历史参考 |
 | 部署 | Maven 打包 jar · Nginx 静态托管 · 宝塔面板 |
 
 ## 📁 项目结构
@@ -63,7 +63,7 @@ c2c/
 ├── src/main/resources/           # 配置（脱敏占位符版，真实值走外部 config/）
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
-├── weapp/                        # 微信小程序（完整功能：登录/发布/订单/钱包等）
+├── weapp/                        # 微信小程序（已于 2026-11-13 停更，历史保留，不再随 Web 端迭代）
 ├── sql/                          # init.sql 全量建表(26张) / data.sql 全量演示数据
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
@@ -125,7 +125,10 @@ cd frontend && npm install && npm run dev
 cd frontend && npm run lint   # ESLint 检查 Vue 项目
 ```
 
-### 5. 微信小程序（可选）
+### 5. 微信小程序（已于 2026-11-13 停更，仅供历史参考）
+
+> ⚠️ 小程序端自 **2026-11-13** 起停止维护，后续新功能/缺陷修复仅覆盖 Web 用户端与管理端；下列启动步骤仅为复现历史版本保留。
+
 ```bash
 # 微信开发者工具 → 导入项目 → 选择 weapp/ 目录
 # 修改 weapp/app.js 中的 serverUrl 为你的后端地址

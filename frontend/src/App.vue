@@ -78,9 +78,11 @@ const shownIds = ref([])     // 本次已展示的公告 id（用于会话内去
 let countdownTimer = null
 const readFlagKey = 'c2c_force_read'
 
-// 独立流程页：隐藏头尾/客服窗，也不弹活动与公告弹窗
+// 独立流程页：隐藏头尾/客服窗
 const hideLayoutPages = ['Chat', 'ChatList', 'RechargeH5']
-const showGlobalPopup = computed(() => !hideLayoutPages.includes(route.name))
+// 不弹全局活动/公告弹窗的页面：独立流程页 + 认证跳转页（登录/注册/找回密码）
+const popupHiddenPages = [...hideLayoutPages, 'Login', 'Register', 'ForgotPassword']
+const showGlobalPopup = computed(() => !popupHiddenPages.includes(route.name))
 
 const showNext = () => {
   if (!queue.value.length) {
@@ -118,10 +120,10 @@ const onDialogClosed = () => {
   document.body.classList.remove('el-popup-parent--hidden')
 }
 
-// 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）；独立流程页不打扰
+// 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）；独立流程/认证页不打扰
 watch(() => store.isLoggedIn(), async (loggedIn) => {
   if (!loggedIn) return
-  if (hideLayoutPages.includes(route.name)) return
+  if (popupHiddenPages.includes(route.name)) return
   try {
     const list = await getAnnouncementForce() || []
     const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
