@@ -4,8 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.c2c.ai.client.AiOpenAiClient;
-import com.c2c.ai.config.AiProperties;
+import com.c2c.ai.client.SpringAiModelClient;
 import com.c2c.ai.dto.AiPublishRequest;
 import com.c2c.ai.dto.AiPublishVO;
 import com.c2c.ai.mapper.ProductPriceMapper;
@@ -41,8 +40,18 @@ public class AiServiceImpl implements AiService {
 
     private static final String CACHE_KEY_PREFIX = "ai:publish:";
 
-    private final AiProperties aiProperties;
-    private final AiOpenAiClient aiOpenAiClient;
+    /** 系统提示词：强制只输出一个 JSON 对象，禁止编造不确定信息 */
+    private static final String SYSTEM_PROMPT =
+            "你是二手交易平台的智能发布助手。\n"
+            + "根据用户提供的商品图片，识别物品类别、成色、品牌型号（能识别才写），"
+            + "并给出适合发布的中文标题、描述、平台分类名与二手建议售价区间。\n"
+            + "要求：\n"
+            + "1. 只输出一个 JSON 对象，不要输出任何其他文字、解释或 Markdown。\n"
+            + "2. JSON 字段：title（≤30字）、description（≤100字）、categoryName（匹配平台两级分类名，如\"教材教辅\"、\"数码电器\"下的子类）、"
+            + "condition（1全新/2几乎全新/3轻微使用/4明显使用）、priceMin、priceMax（按二手行情给建议区间，数字）。\n"
+            + "3. 不确定的信息用空字符串或 null，禁止编造。";
+
+    private final SpringAiModelClient springAiClient;
     private final ProductPriceMapper productPriceMapper;
     private final CategoryMapper categoryMapper;
     private final StringRedisTemplate redisTemplate;
@@ -72,8 +81,8 @@ public class AiServiceImpl implements AiService {
         AiPublishVO vo = new AiPublishVO();
         // ② 优先大模型
         boolean modelOk = false;
-        if (StrUtil.isNotBlank(aiProperties.getApiKey())) {
-            String content = aiOpenAiClient.chatWithImage(imageUrl);
+        if (springAiClient.configured()) {
+            String content = springAiClient.chatWithImage(SYSTEM_PROMPT, imageUrl);
             if (StrUtil.isNotBlank(content)) {
                 modelOk = parseModelResult(content, vo);
             }

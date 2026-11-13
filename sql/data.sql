@@ -285,3 +285,10 @@ INSERT INTO `faq` (`question`, `answer`, `category`, `keywords`, `status`, `sort
 INSERT INTO `sys_config` (`config_key`, `config_value`, `remark`) VALUES
 ('sys.ai-assistant.enabled', 'true', 'AI 客服总开关（关闭则助手提示维护中）'),
 ('sys.ai-assistant.daily-limit', '30', '单用户每日 AI 客服问答上限');
+
+-- AI 模型接入配置（管理端「AI 接入配置」页可调，运行时热更新；留空 Base URL/Key 走本地规则引擎）
+INSERT INTO `sys_config` (`config_key`, `config_value`, `remark`) VALUES
+('ai.base-url', '', 'OpenAI 兼容接口 Base URL，如 https://ark.cn-beijing.volces.com/api/v3'),
+('ai.api-key', '', '模型 API Key（留空 = 规则引擎模式，不发起真实调用）'),
+('ai.model', 'doubao-1-5-vision-pro-250828', '模型名（客服与多模态发布共用，需支持 vision）'),
+('ai.timeout', '15000', '模型调用超时（毫秒）');

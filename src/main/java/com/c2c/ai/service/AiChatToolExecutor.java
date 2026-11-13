@@ -16,8 +16,11 @@ import com.c2c.wallet.entity.WalletLog;
 import com.c2c.wallet.mapper.WalletLogMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,22 +54,66 @@ public class AiChatToolExecutor {
     public static final String TOOL_WALLET = "query_wallet";
     public static final String TOOL_HANDOFF = "handoff_to_human";
 
-    /** OpenAI tools 协议描述（注入请求体） */
+    /** OpenAI tools 协议描述（注入请求体，兼容旧协议口径） */
     public String toolsJson() {
-        return "["
-                + tool(TOOL_ORDER, "查询当前登录用户的订单状态。orderNo 可选：提供则查指定订单，缺省查最近一笔。",
-                        "{\"type\":\"object\",\"properties\":{\"orderNo\":{\"type\":\"string\",\"description\":\"22位订单号，可空\"}}}") + ","
-                + tool(TOOL_PRODUCT, "查询商品详情与在售状态。参数 productId 为商品ID。",
-                        "{\"type\":\"object\",\"properties\":{\"productId\":{\"type\":\"integer\"}},\"required\":[\"productId\"]}") + ","
-                + tool(TOOL_ANNOUNCEMENT, "列出平台最新公告（最多5条）。无参数。", "{\"type\":\"object\",\"properties\":{}}") + ","
-                + tool(TOOL_WALLET, "查询当前登录用户的余额与最近流水（最多5条）。无参数。", "{\"type\":\"object\",\"properties\":{}}") + ","
-                + tool(TOOL_HANDOFF, "用户要求人工/投诉/纠纷时调用，返回人工处理指引。无参数。", "{\"type\":\"object\",\"properties\":{}}")
-                + "]";
+        StringBuilder sb = new StringBuilder("[");
+        List<ToolSpec> specs = specs();
+        for (int i = 0; i < specs.size(); i++) {
+            ToolSpec s = specs.get(i);
+            sb.append(tool(s.name(), s.desc(), s.schema()));
+            if (i < specs.size() - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.append("]").toString();
+    }
+
+    /**
+     * 适配为 Spring AI {@link ToolCallback} 列表，供 {@code OpenAiChatOptions.toolCallbacks} 注册；
+     * 工具执行仍委托 {@link #execute}，userId 由会话上下文闭包传入做权限收敛。
+     */
+    public List<ToolCallback> callbacks(Long currentUserId) {
+        List<ToolCallback> callbacks = new ArrayList<>();
+        for (ToolSpec s : specs()) {
+            callbacks.add(new ToolCallback() {
+                @Override
+                public ToolDefinition getToolDefinition() {
+                    return ToolDefinition.builder()
+                            .name(s.name())
+                            .description(s.desc())
+                            .inputSchema(s.schema())
+                            .build();
+                }
+
+                @Override
+                public String call(String arguments) {
+                    return execute(s.name(), arguments, currentUserId);
+                }
+            });
+        }
+        return callbacks;
+    }
+
+    /** 工具元数据（名称 / 描述 / JSON Schema），toolsJson 与 ToolCallback 共用 */
+    private List<ToolSpec> specs() {
+        return List.of(
+                new ToolSpec(TOOL_ORDER, "查询当前登录用户的订单状态。orderNo 可选：提供则查指定订单，缺省查最近一笔。",
+                        "{\"type\":\"object\",\"properties\":{\"orderNo\":{\"type\":\"string\",\"description\":\"22位订单号，可空\"}}}"),
+                new ToolSpec(TOOL_PRODUCT, "查询商品详情与在售状态。参数 productId 为商品ID。",
+                        "{\"type\":\"object\",\"properties\":{\"productId\":{\"type\":\"integer\"}},\"required\":[\"productId\"]}"),
+                new ToolSpec(TOOL_ANNOUNCEMENT, "列出平台最新公告（最多5条）。无参数。", "{\"type\":\"object\",\"properties\":{}}"),
+                new ToolSpec(TOOL_WALLET, "查询当前登录用户的余额与最近流水（最多5条）。无参数。", "{\"type\":\"object\",\"properties\":{}}"),
+                new ToolSpec(TOOL_HANDOFF, "用户要求人工/投诉/纠纷时调用，返回人工处理指引。无参数。", "{\"type\":\"object\",\"properties\":{}}")
+        );
     }
 
     private String tool(String name, String desc, String params) {
         return "{\"type\":\"function\",\"function\":{\"name\":\"" + name + "\","
                 + "\"description\":\"" + desc + "\",\"parameters\":" + params + "}}";
+    }
+
+    /** 工具元数据记录 */
+    private record ToolSpec(String name, String desc, String schema) {
     }
 
     /** 执行工具调用，返回给模型/规则层的文本结果 */

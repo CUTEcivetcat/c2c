@@ -1,7 +1,7 @@
 package com.c2c.ai.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.c2c.ai.client.AiOpenAiClient;
+import com.c2c.ai.client.SpringAiModelClient;
 import com.c2c.ai.dto.AiChatRequest;
 import com.c2c.ai.dto.AiChatVO;
 import com.c2c.ai.entity.Faq;
@@ -14,11 +14,15 @@ import com.c2c.system.constant.SysConfigKey;
 import com.c2c.system.service.SysConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +59,7 @@ public class AiChatService {
     private final StringRedisTemplate redisTemplate;
     private final FaqSearchService faqSearchService;
     private final AiChatToolExecutor toolExecutor;
-    private final AiOpenAiClient aiClient;
+    private final SpringAiModelClient springAiClient;
 
     /** 单轮问答：校验→落库→模型/规则→回复落库 */
     public AiChatVO chat(Long userId, AiChatRequest req) {
@@ -133,50 +137,32 @@ public class AiChatService {
         return conv;
     }
 
-    // ==================== 大模型（工具调用最多3轮） ====================
+    // ==================== 大模型（Spring AI + 工具回调） ====================
 
     private String tryModelReply(Conversation conv, Long userId, String userText) {
-        cn.hutool.json.JSONArray faqHits = new cn.hutool.json.JSONArray();
-        faqSearchService.search(userText, 3).forEach(f -> faqHits.add(f.getQuestion() + "：" + f.getAnswer()));
+        if (!springAiClient.configured()) {
+            return null; // 未配置 Key → 规则兜底
+        }
+        List<Faq> faqHits = faqSearchService.search(userText, 3);
+        StringBuilder system = new StringBuilder(SYSTEM_PROMPT);
+        if (!faqHits.isEmpty()) {
+            system.append("\n\n相关平台规则（可引用）：\n")
+                    .append(String.join("\n", faqHits.stream().map(f -> f.getQuestion() + "：" + f.getAnswer()).toList()));
+        }
 
-        cn.hutool.json.JSONArray messages = new cn.hutool.json.JSONArray();
-        messages.add(new cn.hutool.json.JSONObject().set("role", "system").set("content", SYSTEM_PROMPT
-                + (faqHits.isEmpty() ? "" : "\n\n相关平台规则（可引用）：\n" + String.join("\n", faqHits.stream().map(Object::toString).toArray(String[]::new)))));
+        List<org.springframework.ai.chat.messages.Message> messages = new ArrayList<>();
+        messages.add(new SystemMessage(system.toString()));
 
         // 上下文：本会话最近 10 条（含刚写入的用户消息）
         List<Message> recent = imService.getMessages(conv.getId(), userId, null, null, 10).getRecords();
         for (Message m : recent) {
             boolean fromUser = m.getSenderId().equals(userId);
-            messages.add(new cn.hutool.json.JSONObject()
-                    .set("role", fromUser ? "user" : "assistant")
-                    .set("content", m.getContent()));
+            messages.add(fromUser ? new UserMessage(m.getContent()) : new AssistantMessage(m.getContent()));
         }
 
-        String tools = toolExecutor.toolsJson();
-        for (int round = 0; round < 3; round++) {
-            cn.hutool.json.JSONObject assistantMsg = aiClient.chat(messages, tools);
-            if (assistantMsg == null) {
-                return null; // 未配置/调用失败 → 规则兜底
-            }
-            String content = assistantMsg.getStr("content");
-            cn.hutool.json.JSONArray toolCalls = assistantMsg.getJSONArray("tool_calls");
-            if (toolCalls == null || toolCalls.isEmpty()) {
-                return content;
-            }
-            // 有工具调用：执行并回填，继续下一轮
-            messages.add(assistantMsg);
-            for (Object tc : toolCalls) {
-                cn.hutool.json.JSONObject call = (cn.hutool.json.JSONObject) tc;
-                cn.hutool.json.JSONObject fn = call.getJSONObject("function");
-                String result = toolExecutor.execute(fn.getStr("name"), fn.getStr("arguments"), userId);
-                messages.add(new cn.hutool.json.JSONObject()
-                        .set("role", "tool")
-                        .set("tool_call_id", call.getStr("id"))
-                        .set("content", result));
-            }
-        }
-        cn.hutool.json.JSONObject finalMsg = aiClient.chat(messages, null);
-        return finalMsg == null ? null : finalMsg.getStr("content");
+        // 工具回调由框架在模型需要时自动执行循环；userId 闭包传入做权限收敛
+        var options = springAiClient.chatOptions(0.4, 600, toolExecutor.callbacks(userId), null);
+        return springAiClient.chatText(messages, options);
     }
 
     // ==================== 规则引擎兜底 ====================

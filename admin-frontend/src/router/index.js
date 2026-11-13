@@ -15,6 +15,8 @@ const routes = [
   { path: '/permissions', name: 'Permissions', component: () => import('@/views/UserRoleManageView.vue'), meta: { requiresAuth: true, requiresTop: true } },
   // 系统设置：运行时可调的系统开关（验证码回显、管理员登录锁定等），仅总管理员
   { path: '/config', name: 'SystemConfig', component: () => import('@/views/SystemConfigView.vue'), meta: { requiresAuth: true, requiresTop: true } },
+  // AI 接入配置：模型 Base URL / Key / 模型名 / 超时，表单 + JSON 导入导出，仅总管理员
+  { path: '/ai-config', name: 'AiConfig', component: () => import('@/views/AiConfigView.vue'), meta: { requiresAuth: true, requiresTop: true } },
   { path: '/review', name: 'Review', component: () => import('@/views/ReviewManageView.vue'), meta: { requiresAuth: true, perm: 'review' } },
   { path: '/announcement', name: 'Announcement', component: () => import('@/views/AnnouncementManageView.vue'), meta: { requiresAuth: true, perm: 'announcement' } },
   { path: '/popup', name: 'Popup', component: () => import('@/views/PopupManageView.vue'), meta: { requiresAuth: true, perm: 'announcement' } },

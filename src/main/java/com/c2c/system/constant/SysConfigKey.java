@@ -25,4 +25,16 @@ public interface SysConfigKey {
 
     /** 单用户每日 AI 客服问答上限 */
     String AI_ASSISTANT_DAILY_LIMIT = "sys.ai-assistant.daily-limit";
+
+    /** AI 模型 OpenAI 兼容 Base URL（运行时热更新，留空走规则引擎） */
+    String AI_BASE_URL = "ai.base-url";
+
+    /** AI 模型 API Key（运行时热更新，留空走规则引擎） */
+    String AI_API_KEY = "ai.api-key";
+
+    /** AI 模型名（需支持多模态 vision） */
+    String AI_MODEL = "ai.model";
+
+    /** AI 调用超时（毫秒） */
+    String AI_TIMEOUT = "ai.timeout";
 }

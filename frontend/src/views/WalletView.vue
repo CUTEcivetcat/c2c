@@ -43,7 +43,7 @@
         </div>
         <div class="bank-right">
           <el-button v-if="c.isDefault !== 1" size="small" plain @click="pickDefault(c.id)">设为默认</el-button>
-          <el-button size="small" plain type="danger" @click="removeCard(c.id)">解绑</el-button>
+          <el-button size="small" plain type="danger" @click="removeCard(c)">解绑</el-button>
         </div>
       </div>
     </div>
@@ -138,7 +138,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import QRCode from 'qrcode'
 import {
   getWalletProfile, rechargeByCard, createRechargeTicket, withdraw,
@@ -255,9 +255,18 @@ const submitCard = async () => {
   } catch (e) { /* */ } finally { savingCard.value = false }
 }
 
-const removeCard = async (id) => {
+const removeCard = async (card) => {
   try {
-    await removeCardApi(id)
+    await ElMessageBox.confirm(
+      `确定要解绑尾号 ${last4(card.cardNo)} 的银行卡吗？解绑后需重新绑定才能使用。`,
+      '解绑银行卡',
+      { type: 'warning', confirmButtonText: '确认解绑', cancelButtonText: '取消' }
+    )
+  } catch (e) {
+    return // 用户取消
+  }
+  try {
+    await removeCardApi(card.id)
     ElMessage.success('已解绑')
     loadCards()
   } catch (e) { /* */ }
