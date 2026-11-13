@@ -19,6 +19,7 @@
 | ⭐ 评价 | 交易完成后买卖双方互评、**信誉平均分自动计算** |
 | 📢 公告 | 强制弹窗/停留秒数/滚动显示/**发布页右侧展示**，管理员全流程管理 |
 | 💰 钱包 | **余额充值、平台担保托管（支付/确认收款/退款）、资金流水** |
+| 🎟️ 优惠券 | 满减/折扣券（使用门槛/适用分类/折扣封顶）、领券与我的券包、结算选券抵扣、未支付占用券态与过期自动失效；管理端券模板管理 |
 | ⚑ 审核 | 举报/违规下架/申诉/昵称审核，审核员工作台 |
 | 🖥️ 管理后台 | 仪表盘（ECharts、**7日/30日/自定义趋势**、**待处理卡片**、**低碳循环看板**）、用户/商品/订单/审核/公告/**轮播图**管理、**登录来源**、**二级密码 + 次级管理员 + 删除账户**、**侧边栏折叠**、**uiverse 风格** |
 | 🤖 AI 智能发布 | **拍照即发布**：多模态识别首图 → 一键回填标题/描述/分类/成色 + AI 建议价区间；**未配置 API Key 自动降级本地规则引擎**；同分类已售历史成交均价修正估价；Redis 按图 24h 缓存 |
@@ -49,7 +50,8 @@ c2c/
 │   ├── favorite/ rating/         # 收藏 / 评价
 │   ├── review/                   # 举报/申诉/审核工作台
 │   ├── wallet/                   # 余额钱包：充值/支付/退款/流水
-│   ├── ai/                       # AI 智能发布：多模态识别 + 规则引擎降级 + 历史价修正
+│   ├── coupon/                   # 优惠券：模板/领取/结算抵扣/过期任务
+│   ├── ai/                       # AI 智能发布(多模态识别+规则引擎降级+历史价修正) / 智能客服会话看板与 FAQ 管理
 │   ├── eco/                      # 低碳循环：用户环保贡献 / 平台减排总览与趋势
 │   ├── banner/                   # 首页轮播图管理
 │   ├── announcement/             # 平台公告管理
@@ -58,7 +60,7 @@ c2c/
 ├── frontend/                     # 用户端前端（Vite 5173）
 ├── admin-frontend/               # 管理端前端（Vite 5174，base /admin/）
 ├── weapp/                        # 微信小程序（完整功能：登录/发布/订单/钱包等）
-├── sql/                          # init.sql 全量建表(21张) / data.sql 全量演示数据
+├── sql/                          # init.sql 全量建表(23张) / data.sql 全量演示数据
 ├── config/                       # 外部真实配置（含敏感值，已被 .gitignore 排除）
 ├── start/                        # 前端一键启动脚本（bat/sh）
 ├── deploy/                       # 部署脚本与示例配置（脱敏）
@@ -79,7 +81,7 @@ c2c/
 ### 1. 数据库
 ```sql
 -- 全新部署：建库 + 建表 + 演示数据（init 会清空重建 c2c 库）
-source sql/init.sql;      -- 全量建表（20 张表 + 字段注释）
+source sql/init.sql;      -- 全量建表（23 张表 + 字段注释）
 source sql/data.sql;      -- 全量演示数据（8 用户含 admin 总管理员 + 30 商品覆盖全部分类）
 
 -- 注意：历史增量脚本（二级密码、管理员等级等）已全部并入全量脚本并删除，
@@ -179,7 +181,7 @@ cd frontend && npm run lint   # ESLint 检查 Vue 项目
 
 ## 📊 数据库表结构
 
-共 21 张表，231 个字段。
+共 23 张表，256 个字段。
 
 ### 关系图（E-R图）
 
@@ -208,6 +210,12 @@ flowchart LR
     P-->O
     U-->O
   end
+  subgraph 券体系
+    CT[COUPON_TEMPLATE 券模板]-->UC[USER_COUPON 用户券]
+    U-->UC
+    UC-->O
+    CT-->CAT
+  end
   subgraph 消息体系
     C[CONVERSATION 会话]-->M[MESSAGE 消息]
     U-->C
@@ -217,6 +225,7 @@ flowchart LR
     B[BANNER 轮播图]
     CAT[CATEGORY 分类]
     CFG[SYS_CONFIG 系统配置]
+    FAQ[FAQ 客服知识库]
   end
 ```
 
@@ -303,6 +312,27 @@ flowchart LR
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
 
+### `coupon_template`
+
+> 优惠券模板（批次）
+
+|字段|类型|注释|可空|默认|
+|:---|---|:---|:---:|---|
+|`id`|bigint(20)|ID|N||
+|`name`|varchar(100)|券名称|N||
+|`type`|tinyint(4)|券类型 1满减 2折扣|N|1|
+|`discount_amount`|decimal(10,2)|满减金额|N||
+|`min_amount`|decimal(10,2)|使用门槛(订单金额满此额可用)，0无门槛|Y|0|
+|`category_id`|bigint(20)|适用分类ID(category.id)，0全部分类通用|Y|0|
+|`max_discount_amount`|decimal(10,2)|折扣券减免封顶金额，0不封顶|Y|0|
+|`total_count`|int(11)|发行总量|Y|0|
+|`claimed_count`|int(11)|已领取数|Y|0|
+|`valid_start`|datetime|生效开始|Y||
+|`valid_end`|datetime|有效期截止|Y||
+|`status`|tinyint(4)|1生效 0停用|Y|1|
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
 ### `favorite`
 
 > 商品收藏
@@ -313,6 +343,22 @@ flowchart LR
 |`user_id`|bigint(20)|用户ID|N||
 |`product_id`|bigint(20)|商品ID|N||
 |`created_at`|datetime|收藏时间|Y|CURRENT_TIMESTAMP|
+
+### `faq`
+
+> 客服知识库（AI 客服检索源）
+
+|字段|类型|注释|可空|默认|
+|:---|---|:---|:---:|---|
+|`id`|bigint(20)|ID|N||
+|`question`|varchar(200)|标准问|N||
+|`answer`|text|答案|N||
+|`category`|varchar(50)|分类 交易规则/账号/支付/发货/退款/违规/AI|Y||
+|`keywords`|varchar(500)|检索关键词(逗号分隔)|Y||
+|`status`|tinyint(4)|1启用 0停用|Y|1|
+|`sort_order`|int(11)|排序(小的在前)|Y|0|
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
 
 ### `message`
 
@@ -502,6 +548,20 @@ flowchart LR
 |`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
 
+### `sys_config`
+
+> 系统运行配置（后台控制面板可动态调整，运行时经 Redis 缓存读取）
+
+|字段|类型|注释|可空|默认|
+|:---|---|:---|:---:|---|
+|`id`|bigint(20)|ID|N||
+|`config_key`|varchar(100)|配置键|N||
+|`config_value`|varchar(500)|配置值|N||
+|`remark`|varchar(500)|配置说明|Y||
+|`updated_by`|bigint(20)|最后修改人ID|Y||
+|`created_at`|datetime|创建时间|N|CURRENT_TIMESTAMP|
+|`updated_at`|datetime|更新时间|N|CURRENT_TIMESTAMP|
+
 ### `user`
 
 > 用户/账号
@@ -552,6 +612,22 @@ flowchart LR
 |`is_default`|tinyint(4)|是否默认地址 1是0否|Y|0|
 |`created_at`|datetime|创建时间|Y|CURRENT_TIMESTAMP|
 |`updated_at`|datetime|更新时间|Y|CURRENT_TIMESTAMP|
+
+### `user_coupon`
+
+> 用户已领优惠券
+
+|字段|类型|注释|可空|默认|
+|:---|---|:---|:---:|---|
+|`id`|bigint(20)|ID|N||
+|`coupon_id`|bigint(20)|券模板ID(coupon_template.id)|N||
+|`user_id`|bigint(20)|持有人|N||
+|`status`|tinyint(4)|0未使用 1已使用 2已过期 3已作废|Y|0|
+|`order_id`|bigint(20)|使用后回填订单ID|Y||
+|`discount_amount`|decimal(10,2)|本券抵扣金额(快照)|Y|0|
+|`receive_time`|datetime|领取时间|N|CURRENT_TIMESTAMP|
+|`use_time`|datetime|使用时间|Y||
+|`expire_time`|datetime|过期时间|Y||
 
 ### `wallet_log`
 
