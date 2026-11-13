@@ -27,7 +27,9 @@ const store = useUserStore()
 const visible = ref(false)
 const queue = ref([])
 const current = ref(null)
-const shownKey = 'c2c_popup_shown'
+
+// 已弹记录按账号隔离存 localStorage：每个用户对同一弹窗只展示一次（跨会话持久）
+const shownKey = () => `c2c_popup_shown_${store.userInfo?.id || 'guest'}`
 
 const hasJump = computed(() => {
   const t = current.value?.jumpType
@@ -37,7 +39,7 @@ const hasJump = computed(() => {
 const load = async () => {
   try {
     const list = await getActivePopups() || []
-    const shown = JSON.parse(sessionStorage.getItem(shownKey) || '[]')
+    const shown = JSON.parse(localStorage.getItem(shownKey()) || '[]')
     queue.value = list.filter(p => !shown.includes(p.id))
     if (queue.value.length) showNext()
   } catch (e) { /* 接口异常不影响主流程 */ }
@@ -51,10 +53,10 @@ const showNext = () => {
 
 const markShown = () => {
   if (!current.value) return
-  const shown = JSON.parse(sessionStorage.getItem(shownKey) || '[]')
+  const shown = JSON.parse(localStorage.getItem(shownKey()) || '[]')
   if (!shown.includes(current.value.id)) {
     shown.push(current.value.id)
-    sessionStorage.setItem(shownKey, JSON.stringify(shown))
+    localStorage.setItem(shownKey(), JSON.stringify(shown))
   }
 }
 
@@ -90,7 +92,7 @@ const goJump = () => {
   }
 }
 
-// 登录后拉取生效弹窗；会话内已弹过的不再重复
+// 登录后拉取生效弹窗；当前账号已弹过的不再重复（localStorage 按账号持久）
 watch(() => store.isLoggedIn(), (logged) => { if (logged) load() }, { immediate: true })
 </script>
 

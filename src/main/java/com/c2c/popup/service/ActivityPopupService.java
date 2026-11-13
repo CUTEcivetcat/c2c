@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.coupon.entity.CouponTemplate;
+import com.c2c.coupon.entity.UserCoupon;
 import com.c2c.coupon.mapper.CouponTemplateMapper;
+import com.c2c.coupon.mapper.UserCouponMapper;
 import com.c2c.popup.entity.ActivityPopup;
 import com.c2c.popup.mapper.ActivityPopupMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +27,10 @@ public class ActivityPopupService {
 
     private final ActivityPopupMapper popupMapper;
     private final CouponTemplateMapper templateMapper;
+    private final UserCouponMapper userCouponMapper;
 
-    /** 用户端生效弹窗：已展示、在有效期内；绑券的额外校验券仍生效未过期 */
-    public List<ActivityPopup> active() {
+    /** 用户端生效弹窗：已展示、在有效期内；绑券的额外校验券仍生效未过期，且本人未领取过该券 */
+    public List<ActivityPopup> active(Long userId) {
         LocalDateTime now = LocalDateTime.now();
         List<ActivityPopup> all = popupMapper.selectList(new LambdaQueryWrapper<ActivityPopup>()
                 .eq(ActivityPopup::getStatus, 1)
@@ -36,11 +39,26 @@ public class ActivityPopupService {
                 .orderByDesc(ActivityPopup::getId));
         List<ActivityPopup> result = new ArrayList<>();
         for (ActivityPopup p : all) {
-            if (isCouponAlive(p.getCouponTemplateId())) {
-                result.add(p);
+            if (!isCouponAlive(p.getCouponTemplateId())) {
+                continue;
             }
+            if (hasClaimed(userId, p.getCouponTemplateId())) {
+                continue;
+            }
+            result.add(p);
         }
         return result;
+    }
+
+    /** 绑券弹窗：登录用户已领取过该模板券则不再展示；游客/未绑券直接通过 */
+    private boolean hasClaimed(Long userId, Long couponTemplateId) {
+        if (userId == null || couponTemplateId == null || couponTemplateId <= 0) {
+            return false;
+        }
+        Long count = userCouponMapper.selectCount(new LambdaQueryWrapper<UserCoupon>()
+                .eq(UserCoupon::getUserId, userId)
+                .eq(UserCoupon::getCouponId, couponTemplateId));
+        return count != null && count > 0;
     }
 
     /** 管理端全量弹窗（含下架），按 ID 倒序 */
