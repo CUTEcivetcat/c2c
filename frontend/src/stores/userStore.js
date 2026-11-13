@@ -16,8 +16,11 @@ export const useUserStore = defineStore('user', () => {
     afterLoginCallback = typeof cb === 'function' ? cb : null
     loginDialogVisible.value = true
   }
+  // 只关闭弹窗，不清登录后回调；回调由 runAfterLogin 消费或手动取消时 clearLoginCallback 清理
   const closeLoginDialog = () => {
     loginDialogVisible.value = false
+  }
+  const clearLoginCallback = () => {
     afterLoginCallback = null
   }
   const runAfterLogin = () => {
@@ -54,5 +57,5 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return { token, userInfo, isLoggedIn, login, fetchProfile, logout,
-    loginDialogVisible, openLoginDialog, closeLoginDialog, runAfterLogin }
+    loginDialogVisible, openLoginDialog, closeLoginDialog, clearLoginCallback, runAfterLogin }
 })

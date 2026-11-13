@@ -93,7 +93,7 @@ const store = useUserStore()
 
 const visible = computed({
   get: () => store.loginDialogVisible,
-  set: (v) => { if (!v) store.closeLoginDialog() }
+  set: (v) => { if (!v) { store.closeLoginDialog(); store.clearLoginCallback() } }
 })
 
 const loginType = ref(1)
@@ -140,14 +140,15 @@ const handleSubmit = async () => {
     }
     await store.login(data)
     ElMessage.success(loginType.value === 2 ? '登录成功（自动注册）' : '登录成功')
-    store.closeLoginDialog()
+    // 先执行登录后回调（内部消费并清空回调），再关闭弹窗，避免回调被提前清空
     store.runAfterLogin()
+    store.closeLoginDialog()
   } catch (e) { /* 拦截器已提示 */ }
   loading.value = false
 }
 
-// 跳注册/忘记密码：先关弹窗再走路由
-const goRoute = (path) => { store.closeLoginDialog(); router.push(path) }
+// 跳注册/忘记密码：先关弹窗并清回调，再走路由
+const goRoute = (path) => { store.closeLoginDialog(); store.clearLoginCallback(); router.push(path) }
 
 const goAdmin = () => {
   const url = import.meta.env.DEV ? 'http://localhost:5174/' : '/admin/'

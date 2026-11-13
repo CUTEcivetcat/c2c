@@ -78,7 +78,7 @@
 
 <script setup>
 import { ref, computed, onUnmounted, nextTick } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getOrCreateConversation, getMessages, markRead } from '@/api/im'
 import { aiChat, getFaqSuggestions } from '@/api/ai'
@@ -89,7 +89,6 @@ const ASSISTANT_ID = 90000001
 /** 命中即自动转接人工的关键词 */
 const HANDOFF_KEYWORDS = ['转人工', '人工客服', '找人工', '联系人工', '人工处理', '人工服务', '真人', '投诉', '纠纷']
 
-const route = useRoute()
 const router = useRouter()
 const store = useUserStore()
 
@@ -108,7 +107,8 @@ const myId = computed(() => store.userInfo?.id ?? null)
 
 const openPanel = async () => {
   if (!store.isLoggedIn()) {
-    router.push({ name: 'Login', query: { redirect: route.fullPath } })
+    // 未登录就地弹登录窗，登录成功后回调重开客服面板，不跳路由避免 redirect 嵌套
+    store.openLoginDialog(() => openPanel())
     return
   }
   open.value = true

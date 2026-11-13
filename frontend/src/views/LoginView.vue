@@ -97,6 +97,14 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
+
+// 回跳目标校验：仅放行站内相对路径，排除认证页与外链，避免 /login?redirect 嵌套与开放重定向
+const resolveRedirect = () => {
+  const r = route.query.redirect
+  if (typeof r !== 'string' || !r.startsWith('/') || r.startsWith('//')) return '/'
+  if (/^\/(login|register|forgot-password)(\?|$)/.test(r)) return '/'
+  return r
+}
 const loginType = ref(1)
 const loading = ref(false)
 const countdown = ref(0)
@@ -148,7 +156,7 @@ const handleSubmit = async () => {
     localStorage.setItem('token', res.token)
     localStorage.setItem('userInfo', JSON.stringify(res.userInfo))
     ElMessage.success(loginType.value === 2 && res.userInfo ? '登录成功（自动注册）' : '登录成功')
-    router.push(route.query.redirect || '/')
+    router.push(resolveRedirect())
   } catch (e) { /* handled */ }
   loading.value = false
 }

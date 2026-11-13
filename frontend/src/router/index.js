@@ -172,10 +172,13 @@ const router = createRouter({
 })
 
 // 路由守卫
+const AUTH_ROUTE_NAMES = ['Login', 'Register', 'ForgotPassword']
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   if (to.meta.requiresAuth && !token) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
+    // 回跳目标若是认证页自身则不带 redirect，避免 /login?redirect=/login 无限嵌套
+    const redirect = AUTH_ROUTE_NAMES.includes(to.name) ? undefined : to.fullPath
+    next({ name: 'Login', query: redirect ? { redirect } : {} })
     return
   }
   // 审核工作台仅审核员（role=2）可进入
