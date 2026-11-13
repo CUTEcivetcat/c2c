@@ -4,7 +4,9 @@ import com.c2c.common.exception.BusinessException;
 import com.c2c.common.infra.TestLog;
 import com.c2c.coupon.entity.CouponTemplate;
 import com.c2c.coupon.mapper.CouponTemplateMapper;
+import com.c2c.coupon.mapper.UserCouponMapper;
 import com.c2c.coupon.service.CouponAdminService;
+import com.c2c.wallet.service.WalletService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +30,10 @@ class CouponAdminServiceTest {
 
     @Mock
     private CouponTemplateMapper templateMapper;
+    @Mock
+    private UserCouponMapper userCouponMapper;
+    @Mock
+    private WalletService walletService;
 
     @InjectMocks
     private CouponAdminService couponAdminService;
@@ -218,5 +224,16 @@ class CouponAdminServiceTest {
 
         assertEquals(0, exist.getStatus());
         verify(templateMapper).updateById(exist);
+    }
+
+    @Test
+    void grant_nonBalanceCoupon_throws() {
+        TestLog.log("[测试] 定向分发：仅余额券可直发，满减券应被拒绝，不扣库存不写券记录");
+        CouponTemplate t = fullReduction(new BigDecimal("10"), new BigDecimal("50"), 5);
+        t.setId(1L);
+        when(templateMapper.selectById(1L)).thenReturn(t);
+        assertThrows(BusinessException.class, () -> couponAdminService.grantToUser(1L, 2L));
+        verify(templateMapper, never()).claimOne(any());
+        verify(userCouponMapper, never()).insert(any());
     }
 }

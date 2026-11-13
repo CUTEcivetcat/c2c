@@ -155,6 +155,24 @@ public interface ApiPath {
     // ==================== 钱包 /user/wallet ====================
     String WALLET_PROFILE = "/user/wallet/profile";
     String WALLET_RECHARGE = "/user/wallet/recharge";
+    String WALLET_RECHARGE_CARD = "/user/wallet/recharge/card";
+    String WALLET_WITHDRAW = "/user/wallet/withdraw";
+    /** 充值二维码票据：PC 端生成短期票据，H5 凭票据充值 */
+    String WALLET_RECHARGE_TICKET = "/user/wallet/recharge/ticket";
+    /** H5 凭票据充值（票据鉴权，不走登录态） */
+    String WALLET_RECHARGE_BY_TICKET = "/user/wallet/recharge/confirm";
+    // ==================== 演示银行卡 /user/wallet/bank-cards ====================
+    String BANK_CARD_LIST = "/user/wallet/bank-cards";
+    String BANK_CARD = "/user/wallet/bank-cards";
+    String BANK_CARD_ID = "/user/wallet/bank-cards/{id}";
+    String BANK_CARD_DEFAULT = "/user/wallet/bank-cards/{id}/default";
+
+    // ==================== 活动弹窗 /popup ====================
+    String POPUP_ACTIVE = "/popup/active";
+    String POPUP_ADMIN_LIST = "/admin/popup/list";
+    String POPUP_ADMIN = "/admin/popup";
+    String POPUP_ADMIN_ID = "/admin/popup/{id}";
+    String POPUP_ADMIN_STATUS = "/admin/popup/{id}/status";
 
     // ==================== 轮播图 /banner ====================
     String BANNER_LIST = "/banner/list";
@@ -197,4 +215,5 @@ public interface ApiPath {
     String ADMIN_COUPON = "/admin/coupon";
     String ADMIN_COUPON_ID = "/admin/coupon/{id}";
     String ADMIN_COUPON_STATUS = "/admin/coupon/{id}/status";
+    String ADMIN_COUPON_GRANT = "/admin/coupon/{id}/grant";
 }

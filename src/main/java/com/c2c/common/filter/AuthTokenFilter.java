@@ -53,6 +53,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             "/user/refresh",
             "/product/category",
             "/product/list",
+            "/user/wallet/recharge/confirm",
             "/admin/login"
     ));
 
@@ -381,6 +382,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if (path.startsWith("/admin/products")) return AdminPerm.PRODUCTS;
         if (path.startsWith("/admin/orders")) return AdminPerm.ORDERS;
         if (path.startsWith("/admin/announcement")) return AdminPerm.ANNOUNCEMENT;
+        if (path.startsWith("/admin/popup")) return AdminPerm.ANNOUNCEMENT;
         if (path.startsWith("/admin/banner")) return AdminPerm.BANNER;
         if (path.startsWith("/admin/auth")) return AdminPerm.SECURITY;
         if (path.startsWith("/admin/faq")) return AdminPerm.AI;

@@ -10,6 +10,7 @@ import com.c2c.coupon.mapper.CouponTemplateMapper;
 import com.c2c.coupon.mapper.UserCouponMapper;
 import com.c2c.product.entity.Category;
 import com.c2c.product.mapper.CategoryMapper;
+import com.c2c.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -74,6 +75,7 @@ public class CouponService {
     private final UserCouponMapper userCouponMapper;
     private final CategoryMapper categoryMapper;
     private final StringRedisTemplate redisTemplate;
+    private final WalletService walletService;
 
     /** 可领取券列表：生效中、在有效期内、尚有库存；标注当前用户是否已领。
      *  categoryId 非空时仅返回通用券或绑定该分类的券。 */
@@ -148,12 +150,16 @@ public class CouponService {
                 throw new BusinessException("优惠券已被抢光");
             }
 
+            boolean balanceCoupon = Integer.valueOf(CouponTemplate.TYPE_BALANCE).equals(tpl.getType());
             UserCoupon coupon = new UserCoupon();
             coupon.setCouponId(couponId);
             coupon.setUserId(userId);
-            coupon.setStatus(STATUS_UNUSED);
+            coupon.setStatus(balanceCoupon ? STATUS_USED : STATUS_UNUSED);
             coupon.setDiscountAmount(tpl.getDiscountAmount());
             coupon.setExpireTime(tpl.getValidEnd());
+            if (balanceCoupon) {
+                coupon.setUseTime(LocalDateTime.now());
+            }
             try {
                 userCouponMapper.insert(coupon);
             } catch (Exception e) {
@@ -161,7 +167,13 @@ public class CouponService {
                 log.warn("领券唯一索引冲突: couponId={}, userId={}", couponId, userId);
                 throw new BusinessException("您已领取过该券");
             }
-            log.info("coupon claimed: userCouponId={}, couponId={}, userId={}", coupon.getId(), couponId, userId);
+            if (balanceCoupon) {
+                // 余额券：领取即等额加余额，记 bonus 流水
+                walletService.grantBonus(userId, tpl.getDiscountAmount(), null,
+                        "余额券到账 ¥" + tpl.getDiscountAmount() + "（" + tpl.getName() + "）");
+            }
+            log.info("coupon claimed: userCouponId={}, couponId={}, userId={}, balance={}",
+                    coupon.getId(), couponId, userId, balanceCoupon);
             return coupon;
         } finally {
             releaseClaimLock(lockKey, lockValue);
@@ -245,6 +257,9 @@ public class CouponService {
         CouponTemplate tpl = templateMapper.selectById(uc.getCouponId());
         if (tpl == null || tpl.getStatus() == null || tpl.getStatus() != 1) {
             throw new BusinessException("优惠券已停用");
+        }
+        if (Integer.valueOf(CouponTemplate.TYPE_BALANCE).equals(tpl.getType())) {
+            throw new BusinessException("余额券已兑换到余额，不可用于下单抵扣");
         }
         BigDecimal minAmount = tpl.getMinAmount() != null ? tpl.getMinAmount() : BigDecimal.ZERO;
         if (orderAmount.compareTo(minAmount) < 0) {

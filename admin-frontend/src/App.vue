@@ -42,6 +42,9 @@
         <el-tooltip :content="'公告管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('announcement')" to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
         </el-tooltip>
+        <el-tooltip :content="'活动弹窗'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('announcement')" to="/popup" class="nav-item"><el-icon><Megaphone /></el-icon><span v-show="!collapsed">活动弹窗</span></router-link>
+        </el-tooltip>
         <el-tooltip :content="'FAQ 知识库'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('ai')" to="/faq" class="nav-item"><el-icon><QuestionFilled /></el-icon><span v-show="!collapsed">FAQ 知识库</span></router-link>
         </el-tooltip>

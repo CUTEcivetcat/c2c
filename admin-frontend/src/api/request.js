@@ -112,5 +112,13 @@ export const adminApi = {
   createCoupon: (data) => request.post('/admin/coupon', data),
   updateCoupon: (id, data) => request.put(`/admin/coupon/${id}`, data),
   toggleCouponStatus: (id, status) => request.put(`/admin/coupon/${id}/status`, { status }),
-  deleteCoupon: (id) => request.delete(`/admin/coupon/${id}`)
+  deleteCoupon: (id) => request.delete(`/admin/coupon/${id}`),
+  // 余额券定向分发（直接入账到指定用户）
+  grantCoupon: (id, userId) => request.post(`/admin/coupon/${id}/grant`, { userId }),
+  // 活动弹窗管理
+  getPopups: (params) => request.get('/admin/popup/list', { params }),
+  createPopup: (data) => request.post('/admin/popup', data),
+  updatePopup: (id, data) => request.put(`/admin/popup/${id}`, data),
+  togglePopupStatus: (id, status) => request.put(`/admin/popup/${id}/status`, { status }),
+  deletePopup: (id) => request.delete(`/admin/popup/${id}`)
 }

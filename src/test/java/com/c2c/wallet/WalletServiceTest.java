@@ -3,18 +3,23 @@ package com.c2c.wallet;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
+import com.c2c.wallet.entity.BankCard;
 import com.c2c.wallet.mapper.WalletLogMapper;
+import com.c2c.wallet.service.BankCardService;
 import com.c2c.wallet.service.WalletService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -30,6 +35,10 @@ class WalletServiceTest {
     private UserMapper userMapper;
     @Mock
     private WalletLogMapper walletLogMapper;
+    @Mock
+    private StringRedisTemplate redisTemplate;
+    @Mock
+    private BankCardService bankCardService;
     @InjectMocks
     private WalletService walletService;
 
@@ -102,5 +111,53 @@ class WalletServiceTest {
 
         verify(userMapper).addBalance(1L, new BigDecimal("30"));
         verify(walletLogMapper).insert(any());
+    }
+
+    private BankCard defaultCard() {
+        BankCard card = new BankCard();
+        card.setId(1L);
+        card.setCardHolder("小王");
+        card.setCardNo("6222000000001234");
+        return card;
+    }
+
+    @Test
+    void withdraw_noBoundCard_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 提现未绑卡：拦截提示先绑卡，不扣余额不写流水");
+        when(bankCardService.requireBoundCard(1L)).thenThrow(new BusinessException("请先绑定演示银行卡"));
+        assertThrows(BusinessException.class, () -> walletService.withdraw(1L, new BigDecimal("10"), null));
+        verify(userMapper, never()).deductBalance(any(), any());
+    }
+
+    @Test
+    void withdraw_insufficient_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 提现余额不足：原子扣减返回0行 → 抛异常不写流水");
+        User user = userWithBalance("10");
+        when(bankCardService.requireBoundCard(1L)).thenReturn(defaultCard());
+        when(userMapper.selectById(1L)).thenReturn(user);
+        when(userMapper.deductBalance(1L, new BigDecimal("20"))).thenReturn(0);
+        assertThrows(BusinessException.class, () -> walletService.withdraw(1L, new BigDecimal("20"), null));
+        verify(walletLogMapper, never()).insert(any());
+    }
+
+    @Test
+    void grantBonus_addsBalance_andWritesLog() {
+        com.c2c.common.infra.TestLog.log("[测试] 余额券补贴：加余额 + 写 bonus 流水");
+        User user = userWithBalance("0");
+        when(userMapper.selectById(1L)).thenReturn(user);
+        when(userMapper.addBalance(1L, new BigDecimal("20"))).thenReturn(1);
+        walletService.grantBonus(1L, new BigDecimal("20"), null, "余额券到账");
+        verify(userMapper).addBalance(1L, new BigDecimal("20"));
+        verify(walletLogMapper).insert(any());
+    }
+
+    @Test
+    void rechargeByTicket_invalidTicket_throws() {
+        com.c2c.common.infra.TestLog.log("[测试] 票据失效：Redis 无票据 → 拒绝充值，不加余额");
+        ValueOperations<String, String> ops = mock(ValueOperations.class);
+        when(redisTemplate.opsForValue()).thenReturn(ops);
+        when(ops.get(anyString())).thenReturn(null);
+        assertThrows(BusinessException.class, () -> walletService.rechargeByTicket("bad-ticket", new BigDecimal("10")));
+        verify(userMapper, never()).addBalance(any(), any());
     }
 }

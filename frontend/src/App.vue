@@ -24,6 +24,9 @@
     <!-- 全局登录弹窗（未登录操作就地弹出，蒙版遮罩当前页） -->
     <login-dialog />
 
+    <!-- 活动弹窗（登录后拉取生效中活动，会话内一次性） -->
+    <activity-popup />
+
     <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭） -->
     <el-dialog v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
       :close-on-click-modal="false" :close-on-press-escape="false" align-center
@@ -58,6 +61,7 @@ import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
 import ChatWidget from './components/chat/ChatWidget.vue'
 import LoginDialog from './components/layout/LoginDialog.vue'
+import ActivityPopup from './components/popup/ActivityPopup.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -126,7 +130,7 @@ watch(() => store.isLoggedIn(), async (loggedIn) => {
 onUnmounted(() => { if (countdownTimer) clearInterval(countdownTimer) })
 
 // 隐藏头尾的页面
-const hideLayoutPages = ['Chat', 'ChatList']
+const hideLayoutPages = ['Chat', 'ChatList', 'RechargeH5']
 const showHeader = computed(() => !hideLayoutPages.includes(route.name))
 const showFooter = computed(() => !hideLayoutPages.includes(route.name))
 // 悬浮客服窗：聊天全屏页与消息列表页不重复展示

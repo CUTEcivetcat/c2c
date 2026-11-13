@@ -352,7 +352,7 @@ CREATE TABLE `faq` (
 CREATE TABLE `coupon_template` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `name` VARCHAR(100) NOT NULL COMMENT '券名称',
-  `type` TINYINT NOT NULL DEFAULT 1 COMMENT '券类型 1满减(预留折扣)',
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT '券类型 1满减 2折扣 3余额券(领取/发放即加余额)',
   `discount_amount` DECIMAL(10,2) NOT NULL COMMENT '满减金额',
   `min_amount` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '使用门槛(订单金额满此额可用)，0无门槛',
   `category_id` BIGINT NOT NULL DEFAULT 0 COMMENT '适用分类ID(category.id)，0全部分类通用',
@@ -380,5 +380,35 @@ CREATE TABLE `user_coupon` (
   UNIQUE KEY `uk_coupon_user` (`coupon_id`, `user_id`),
   KEY `idx_user_status` (`user_id`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户已领优惠券';
+
+-- 演示银行卡：未接入真实支付/清算业务，仅课程演示用；充值(银行卡方式)与提现均走本模拟流程，不发生真实资金划转
+CREATE TABLE `user_bank_card` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL COMMENT '持有人用户ID',
+  `card_holder` VARCHAR(50) NOT NULL COMMENT '持卡人姓名',
+  `card_no` VARCHAR(30) NOT NULL COMMENT '演示银行卡号(模拟数据, 非真实卡号)',
+  `bank_name` VARCHAR(50) DEFAULT NULL COMMENT '开户行',
+  `is_default` TINYINT NOT NULL DEFAULT 0 COMMENT '是否默认卡 1是0否',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='演示银行卡(未接真实支付, 仅课程演示; 充值/提现均为模拟流程)';
+
+-- 活动弹窗：管理员配置的活动提示，可绑定优惠券等活动；绑定券时有效期跟随券有效期
+CREATE TABLE `activity_popup` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `title` VARCHAR(100) NOT NULL COMMENT '弹窗标题',
+  `content` VARCHAR(1000) DEFAULT NULL COMMENT '弹窗内容',
+  `image_url` VARCHAR(500) DEFAULT NULL COMMENT '弹窗配图(可空)',
+  `coupon_template_id` BIGINT DEFAULT 0 COMMENT '关联券模板ID, 0表示无关联活动',
+  `jump_type` VARCHAR(20) NOT NULL DEFAULT 'none' COMMENT '跳转类型 coupon/product/announcement/url/none',
+  `jump_target` VARCHAR(200) DEFAULT NULL COMMENT '跳转目标(券/商品/公告ID 或 链接)',
+  `valid_start` DATETIME DEFAULT NULL COMMENT '生效开始',
+  `valid_end` DATETIME DEFAULT NULL COMMENT '有效期截止; 绑定券时跟随券有效期',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '1展示 0下架',
+  `created_by` BIGINT DEFAULT NULL COMMENT '创建人ID',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='活动弹窗(可绑定优惠券等管理员活动)';
 
 SET FOREIGN_KEY_CHECKS = 1;

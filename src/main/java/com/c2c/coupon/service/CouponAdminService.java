@@ -4,11 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.exception.BusinessException;
 import com.c2c.coupon.entity.CouponTemplate;
+import com.c2c.coupon.entity.UserCoupon;
 import com.c2c.coupon.mapper.CouponTemplateMapper;
+import com.c2c.coupon.mapper.UserCouponMapper;
+import com.c2c.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * 优惠券管理端服务：分页列表、创建、编辑、启停、删除。
@@ -18,6 +23,8 @@ import java.math.BigDecimal;
 public class CouponAdminService {
 
     private final CouponTemplateMapper templateMapper;
+    private final UserCouponMapper userCouponMapper;
+    private final WalletService walletService;
 
     /** 管理端全量券模板（含停用），按 ID 倒序 */
     public Page<CouponTemplate> listAll(int page, int size, String keyword) {
@@ -76,6 +83,46 @@ public class CouponAdminService {
     /** 删除券模板 */
     public void delete(Long id) {
         templateMapper.deleteById(id);
+    }
+
+    /** 定向分发余额券：选指定用户直接入账，无需领取；扣库存 + 加余额 + 券包留记录 */
+    @Transactional
+    public UserCoupon grantToUser(Long templateId, Long userId) {
+        CouponTemplate tpl = templateMapper.selectById(templateId);
+        if (tpl == null) {
+            throw new BusinessException("优惠券不存在");
+        }
+        if (!Integer.valueOf(CouponTemplate.TYPE_BALANCE).equals(tpl.getType())) {
+            throw new BusinessException("仅余额券支持定向分发");
+        }
+        if (userId == null) {
+            throw new BusinessException("请选择发放用户");
+        }
+        Long exists = userCouponMapper.selectCount(new LambdaQueryWrapper<UserCoupon>()
+                .eq(UserCoupon::getCouponId, templateId)
+                .eq(UserCoupon::getUserId, userId));
+        if (exists != null && exists > 0) {
+            throw new BusinessException("该用户已持有此券");
+        }
+        int rows = templateMapper.claimOne(templateId);
+        if (rows == 0) {
+            throw new BusinessException("优惠券已被抢光或已停用");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        UserCoupon uc = new UserCoupon();
+        uc.setCouponId(templateId);
+        uc.setUserId(userId);
+        uc.setStatus(CouponService.STATUS_USED);
+        uc.setDiscountAmount(tpl.getDiscountAmount());
+        uc.setReceiveTime(now);
+        uc.setUseTime(now);
+        uc.setExpireTime(tpl.getValidEnd());
+        userCouponMapper.insert(uc);
+
+        walletService.grantBonus(userId, tpl.getDiscountAmount(), null,
+                "管理员发放余额券 ¥" + tpl.getDiscountAmount() + "（" + tpl.getName() + "）");
+        return uc;
     }
 
     private void checkRequired(CouponTemplate t) {

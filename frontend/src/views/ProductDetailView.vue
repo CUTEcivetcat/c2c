@@ -267,7 +267,7 @@ import { addFavorite, removeFavorite, checkFavorite } from '@/api/favorite'
 import { getOrCreateConversation } from '@/api/im'
 import { createReport, createAppeal } from '@/api/review'
 import { claimCoupon } from '@/api/coupon'
-import { couponFaceText, couponThresholdText, couponCategoryText } from '@/utils/coupon'
+import { COUPON_TYPE_BALANCE, couponFaceText, couponThresholdText, couponCategoryText, balanceArrivedNotify } from '@/utils/coupon'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -372,7 +372,8 @@ const claimOne = async (c) => {
   claiming.value = c.couponId
   try {
     await claimCoupon(c.couponId)
-    ElMessage.success('领取成功，可在「我的优惠券」查看')
+    if (Number(c.type) === COUPON_TYPE_BALANCE) balanceArrivedNotify(c)
+    else ElMessage.success('领取成功，可在「我的优惠券」查看')
     couponStore.invalidate()
     claimableCoupons.value = claimableCoupons.value.filter(x => x.couponId !== c.couponId)
     ownedCoupons.value.unshift({ ...c, key: 'own-' + c.couponId, owned: true })

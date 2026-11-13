@@ -1,14 +1,24 @@
 // 优惠券展示口径工具（与后端 CouponTemplate 类型/用户券状态保持一致）
+import { ElMessageBox } from 'element-plus'
 
 /** 满减券：满门槛减定额 */
 export const COUPON_TYPE_FULL = 1
 /** 折扣券：按折扣率打折 */
 export const COUPON_TYPE_DISCOUNT = 2
+/** 余额券：领取/发放即等额加余额，不参与下单抵扣 */
+export const COUPON_TYPE_BALANCE = 3
 
 /** 用户券状态：0 未使用 / 1 已使用 / 2 已过期 / 3 已作废 / 4 已锁定（待支付占用） */
 export const COUPON_STATUS = { 0: '未使用', 1: '已使用', 2: '已过期', 3: '已作废', 4: '占用中' }
 
-/** 面额文案：满减 ¥xx；折扣 x 折（0.9 → 9 折） */
+/** 类型文案 */
+export const couponTypeText = (c) => ({
+  [COUPON_TYPE_FULL]: '满减券',
+  [COUPON_TYPE_DISCOUNT]: '折扣券',
+  [COUPON_TYPE_BALANCE]: '余额券'
+}[Number(c.type)] || '优惠券')
+
+/** 面额文案：满减/余额 ¥xx；折扣 x 折（0.9 → 9 折） */
 export const couponFaceText = (c) => {
   if (Number(c.type) === COUPON_TYPE_DISCOUNT) {
     const rate = Number(c.discountAmount)
@@ -36,4 +46,13 @@ export const couponValidText = (c) => {
   const start = fmt(c.validStart || c.receiveTime)
   const end = fmt(c.validEnd || c.expireTime)
   return end ? `${start ? start + ' ~ ' : ''}${end} 截止` : '长期有效'
+}
+
+/** 余额券到账一次性提醒：领取/发放成功后弹窗提示余额已入账 */
+export const balanceArrivedNotify = (coupon) => {
+  ElMessageBox.alert(
+    `余额券 ¥${coupon.discountAmount} 已存入账户余额，可在「我的钱包」流水查看`,
+    '余额到账',
+    { confirmButtonText: '我知道了', type: 'success' }
+  ).catch(() => { /* 用户关闭弹窗无需处理 */ })
 }

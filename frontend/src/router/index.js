@@ -138,6 +138,11 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/wallet/recharge',
+    name: 'RechargeH5',
+    component: () => import('@/views/RechargeH5View.vue')
+  },
+  {
     path: '/coupon/my',
     name: 'CouponMy',
     component: () => import('@/views/CouponMyView.vue'),

@@ -19,6 +19,8 @@ public class CouponTemplate {
     public static final int TYPE_FULL_REDUCTION = 1;
     /** 折扣券：按折扣率打折 */
     public static final int TYPE_DISCOUNT = 2;
+    /** 余额券：领取/发放即等额加余额，不参与下单抵扣 */
+    public static final int TYPE_BALANCE = 3;
 
     @TableId(type = IdType.AUTO)
     private Long id;

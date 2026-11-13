@@ -58,4 +58,13 @@ public class AdminCouponController {
         couponAdminService.delete(id);
         return R.ok();
     }
+
+    @Operation(summary = "定向分发余额券", description = "body: {userId}；直接入账到指定用户，无需领取")
+    @PostMapping(ApiPath.ADMIN_COUPON_GRANT)
+    public R<Void> grant(@Parameter(description = "券模板 ID") @PathVariable Long id,
+                         @RequestBody Map<String, Object> body) {
+        Long userId = body.get("userId") == null ? null : Long.valueOf(body.get("userId").toString());
+        couponAdminService.grantToUser(id, userId);
+        return R.ok();
+    }
 }

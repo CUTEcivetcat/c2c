@@ -16,7 +16,7 @@
           <span style="font-weight:600">{{ row.name }}</span>
         </template></el-table-column>
         <el-table-column label="类型" width="90"><template #default="{row}">
-          <el-tag :type="row.type === 2 ? 'warning' : 'success'" size="small">{{ typeText(row.type) }}</el-tag>
+          <el-tag :type="row.type === 2 ? 'warning' : row.type === 3 ? 'primary' : 'success'" size="small">{{ typeText(row.type) }}</el-tag>
         </template></el-table-column>
         <el-table-column label="优惠力度" width="120"><template #default="{row}">
           <span style="font-weight:600;color:#ff6b35">{{ strengthText(row) }}</span>
@@ -37,8 +37,9 @@
         <el-table-column label="状态" width="90"><template #default="{row}">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">{{ row.status === 1 ? '启用' : '停用' }}</el-tag>
         </template></el-table-column>
-        <el-table-column label="操作" width="220" fixed="right"><template #default="{row}">
+        <el-table-column label="操作" width="280" fixed="right"><template #default="{row}">
           <el-button size="small" @click="openDialog(row)">编辑</el-button>
+          <el-button v-if="row.type === 3" size="small" type="primary" plain @click="openGrant(row)">分发</el-button>
           <el-button size="small" :type="row.status === 1 ? 'warning' : 'success'" plain @click="toggleStatus(row)">
             {{ row.status === 1 ? '停用' : '启用' }}
           </el-button>
@@ -60,23 +61,24 @@
           <el-select v-model="form.type" :disabled="!!form.id" style="width:100%" @change="onTypeChange">
             <el-option :value="1" label="满减券" />
             <el-option :value="2" label="折扣券" />
+            <el-option :value="3" label="余额券" />
           </el-select>
           <span class="form-tip" v-if="form.id">类型创建后不可修改</span>
         </el-form-item>
-        <el-form-item :label="form.type === 2 ? '折扣率' : '减免金额'" required>
+        <el-form-item :label="form.type === 2 ? '折扣率' : form.type === 3 ? '赠送金额' : '减免金额'" required>
           <el-input-number v-if="form.type === 2" v-model="form.discountAmount" :min="0.1" :max="0.99" :step="0.01" :precision="2" />
           <el-input-number v-else v-model="form.discountAmount" :min="0.01" :precision="2" />
-          <span class="form-tip">{{ form.type === 2 ? '0.9 表示 9 折' : '满足门槛后减免的金额' }}</span>
+          <span class="form-tip">{{ form.type === 2 ? '0.9 表示 9 折' : form.type === 3 ? '领取/发放即等额加余额' : '满足门槛后减免的金额' }}</span>
         </el-form-item>
         <el-form-item label="封顶金额" v-if="form.type === 2">
           <el-input-number v-model="form.maxDiscountAmount" :min="0" :precision="2" />
           <span class="form-tip">折扣减免最多减多少，0 表示不封顶</span>
         </el-form-item>
-        <el-form-item label="使用门槛">
+        <el-form-item label="使用门槛" v-if="form.type !== 3">
           <el-input-number v-model="form.minAmount" :min="0" :precision="2" />
           <span class="form-tip">0 表示无门槛</span>
         </el-form-item>
-        <el-form-item label="适用分类">
+        <el-form-item label="适用分类" v-if="form.type !== 3">
           <el-select v-model="form.categoryId" style="width:100%">
             <el-option :value="0" label="全部分类（通用）" />
             <el-option v-for="c in categoryOptions" :key="c.id" :value="c.id" :label="c.name" />
@@ -101,6 +103,23 @@
         <el-button type="primary" :loading="saving" @click="save">保存</el-button>
       </template>
     </el-dialog>
+
+    <!-- 余额券定向分发弹窗 -->
+    <el-dialog v-model="grantVisible" title="定向分发余额券" width="420px">
+      <el-alert type="info" :closable="false" show-icon style="margin-bottom:14px"
+        :title="`将「${grantRow?.name}」¥${grantRow?.discountAmount} 余额券直接发放到所选用户余额，无需领取`" />
+      <el-form label-width="80px">
+        <el-form-item label="发放用户" required>
+          <el-select v-model="grantUserId" filterable remote :remote-method="searchUser" placeholder="搜索昵称/手机号/邮箱" style="width:100%">
+            <el-option v-for="u in grantUsers" :key="u.id" :value="u.id" :label="`${u.nickname || u.username}（${u.phone || u.email || 'ID ' + u.id}）`" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="grantVisible = false">取消</el-button>
+        <el-button type="primary" :loading="granting" @click="doGrant">确认发放</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -118,6 +137,12 @@ const dialogVisible = ref(false)
 const saving = ref(false)
 const form = ref(emptyForm())
 const categoryOptions = ref([])
+// 余额券定向分发
+const grantVisible = ref(false)
+const grantRow = ref(null)
+const grantUserId = ref(null)
+const grantUsers = ref([])
+const granting = ref(false)
 
 function emptyForm() {
   return { id: null, name: '', type: 1, discountAmount: null, maxDiscountAmount: 0, minAmount: 0, categoryId: 0, totalCount: 100, validStart: null, validEnd: null, status: 1 }
@@ -140,9 +165,10 @@ const loadCategories = async () => {
   } catch (e) { categoryOptions.value = [] }
 }
 
-const typeText = (t) => ({ 1: '满减', 2: '折扣' }[t] || '满减')
+const typeText = (t) => ({ 1: '满减', 2: '折扣', 3: '余额券' }[t] || '满减')
 const strengthText = (row) => {
   if (row.type === 2) return `${(Number(row.discountAmount) * 10).toFixed(1)} 折`
+  if (row.type === 3) return `送 ¥${row.discountAmount}`
   return `减 ¥${row.discountAmount}`
 }
 const fmtDate = (s) => s ? String(s).replace('T', ' ').slice(0, 16) : '不限'
@@ -207,6 +233,31 @@ const remove = async (row) => {
   await adminApi.deleteCoupon(row.id)
   ElMessage.success('已删除')
   load()
+}
+
+const openGrant = (row) => {
+  grantRow.value = row
+  grantUserId.value = null
+  grantUsers.value = []
+  grantVisible.value = true
+}
+
+const searchUser = async (kw) => {
+  try {
+    const res = await adminApi.getUsers({ keyword: kw || undefined, page: 1, size: 20 })
+    grantUsers.value = res.records || []
+  } catch (e) { grantUsers.value = [] }
+}
+
+const doGrant = async () => {
+  if (!grantUserId.value) { ElMessage.warning('请选择发放用户'); return }
+  granting.value = true
+  try {
+    await adminApi.grantCoupon(grantRow.value.id, grantUserId.value)
+    ElMessage.success('已发放到用户余额')
+    grantVisible.value = false
+    load()
+  } catch (e) { /* */ } finally { granting.value = false }
 }
 
 onMounted(() => { load(); loadCategories() })

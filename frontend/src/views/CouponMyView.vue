@@ -10,7 +10,7 @@
       <div v-for="c in list" :key="c.userCouponId" class="coupon-card" :class="{ inactive: c.status !== 0 }">
         <div class="coupon-face">
           <div class="face-value">{{ couponFaceText(c) }}</div>
-          <div class="face-sub">{{ Number(c.type) === COUPON_TYPE_DISCOUNT ? '折扣券' : '满减券' }}</div>
+          <div class="face-sub">{{ couponTypeText(c) }}</div>
         </div>
         <div class="coupon-main">
           <div class="coupon-name">{{ c.name || ('优惠券 #' + c.couponId) }}</div>
@@ -18,6 +18,7 @@
           <div class="coupon-cat">{{ couponCategoryText(c) }}</div>
           <div class="coupon-valid">{{ couponValidText(c) }}</div>
           <div class="coupon-extra" v-if="c.status === 1 && c.orderId">已用于订单 #{{ c.orderId }}</div>
+          <div class="coupon-extra" v-if="Number(c.type) === COUPON_TYPE_BALANCE">已到账余额，可在钱包查看流水</div>
         </div>
         <div class="coupon-action">
           <el-tag :type="statusType(c.status)">{{ COUPON_STATUS[c.status] }}</el-tag>
@@ -31,7 +32,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getMyCoupons } from '@/api/coupon'
-import { COUPON_TYPE_DISCOUNT, COUPON_STATUS, couponFaceText, couponThresholdText, couponValidText, couponCategoryText } from '@/utils/coupon'
+import { COUPON_TYPE_BALANCE, COUPON_STATUS, couponFaceText, couponTypeText, couponThresholdText, couponValidText, couponCategoryText } from '@/utils/coupon'
 
 const tab = ref('0')
 const list = ref([])
