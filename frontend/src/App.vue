@@ -24,11 +24,11 @@
     <!-- 全局登录弹窗（未登录操作就地弹出，蒙版遮罩当前页） -->
     <login-dialog />
 
-    <!-- 活动弹窗（登录后拉取生效中活动，会话内一次性） -->
-    <activity-popup />
+    <!-- 活动弹窗（登录后拉取生效中活动，按账号一次性；独立流程页不弹出） -->
+    <activity-popup v-if="showGlobalPopup" />
 
-    <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭） -->
-    <el-dialog v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
+    <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭；独立流程页不弹出） -->
+    <el-dialog v-if="showGlobalPopup" v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
       :close-on-click-modal="false" :close-on-press-escape="false" align-center
       :destroy-on-close="true" :lock-scroll="false" @closed="onDialogClosed"
       :modal="false" append-to-body>
@@ -78,6 +78,10 @@ const shownIds = ref([])     // 本次已展示的公告 id（用于会话内去
 let countdownTimer = null
 const readFlagKey = 'c2c_force_read'
 
+// 独立流程页：隐藏头尾/客服窗，也不弹活动与公告弹窗
+const hideLayoutPages = ['Chat', 'ChatList', 'RechargeH5']
+const showGlobalPopup = computed(() => !hideLayoutPages.includes(route.name))
+
 const showNext = () => {
   if (!queue.value.length) {
     forceDialog.value = false
@@ -114,9 +118,10 @@ const onDialogClosed = () => {
   document.body.classList.remove('el-popup-parent--hidden')
 }
 
-// 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）
+// 登录后拉取强制公告并弹出（会话内只弹一次：sessionStorage 记录已读公告 id）；独立流程页不打扰
 watch(() => store.isLoggedIn(), async (loggedIn) => {
   if (!loggedIn) return
+  if (hideLayoutPages.includes(route.name)) return
   try {
     const list = await getAnnouncementForce() || []
     const readIds = JSON.parse(sessionStorage.getItem(readFlagKey) || '[]')
@@ -130,7 +135,6 @@ watch(() => store.isLoggedIn(), async (loggedIn) => {
 onUnmounted(() => { if (countdownTimer) clearInterval(countdownTimer) })
 
 // 隐藏头尾的页面
-const hideLayoutPages = ['Chat', 'ChatList', 'RechargeH5']
 const showHeader = computed(() => !hideLayoutPages.includes(route.name))
 const showFooter = computed(() => !hideLayoutPages.includes(route.name))
 // 悬浮客服窗：聊天全屏页与消息列表页不重复展示
