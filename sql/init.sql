@@ -411,4 +411,20 @@ CREATE TABLE `activity_popup` (
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='活动弹窗(可绑定优惠券等管理员活动)';
 
+-- 用户意见建议反馈：用户提交建议，管理端查看并回复是否采纳
+CREATE TABLE `suggestion` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL COMMENT '提交人用户ID',
+  `content` VARCHAR(1000) NOT NULL COMMENT '建议/反馈内容',
+  `contact` VARCHAR(50) DEFAULT NULL COMMENT '联系方式(可空)',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '1待处理 2已采纳 3未采纳',
+  `reply` VARCHAR(1000) DEFAULT NULL COMMENT '管理回复意见',
+  `replied_by` BIGINT DEFAULT NULL COMMENT '回复人管理员ID',
+  `replied_at` DATETIME DEFAULT NULL COMMENT '回复时间',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_user` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户意见建议反馈(管理端查看并回复是否采纳)';
+
 SET FOREIGN_KEY_CHECKS = 1;

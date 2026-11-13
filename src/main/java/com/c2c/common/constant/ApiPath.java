@@ -216,4 +216,11 @@ public interface ApiPath {
     String ADMIN_COUPON_ID = "/admin/coupon/{id}";
     String ADMIN_COUPON_STATUS = "/admin/coupon/{id}/status";
     String ADMIN_COUPON_GRANT = "/admin/coupon/{id}/grant";
+
+    // ==================== 意见建议反馈 /suggestion（用户端需登录） ====================
+    String SUGGESTION = "/suggestion";
+    String SUGGESTION_MY = "/suggestion/my";
+    // 管理端建议反馈（需管理员 review 权限）
+    String ADMIN_SUGGESTION_LIST = "/admin/suggestion/list";
+    String ADMIN_SUGGESTION_REPLY = "/admin/suggestion/{id}/reply";
 }

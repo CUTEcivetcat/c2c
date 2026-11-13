@@ -120,5 +120,13 @@ export const adminApi = {
   createPopup: (data) => request.post('/admin/popup', data),
   updatePopup: (id, data) => request.put(`/admin/popup/${id}`, data),
   togglePopupStatus: (id, status) => request.put(`/admin/popup/${id}/status`, { status }),
-  deletePopup: (id) => request.delete(`/admin/popup/${id}`)
+  deletePopup: (id) => request.delete(`/admin/popup/${id}`),
+  // 商品分类管理（商品管理权限）
+  getAdminCategories: () => request.get('/product/admin/category'),
+  createCategory: (data) => request.post('/product/admin/category', data),
+  updateCategory: (id, data) => request.put(`/product/admin/category/${id}`, data),
+  deleteCategory: (id) => request.delete(`/product/admin/category/${id}`),
+  // 建议反馈管理（审核管理权限）
+  getSuggestions: (params) => request.get('/admin/suggestion/list', { params }),
+  replySuggestion: (id, data) => request.post(`/admin/suggestion/${id}/reply`, data)
 }

@@ -117,6 +117,7 @@ const menuItems = [
   { to: '/coupon/my', label: '我的优惠券', icon: '🎟️', bg: '#eef4ff' },
   { to: '/my/report', label: '我的举报', icon: '⚑', bg: '#fdeef0' },
   { to: '/my/appeal', label: '我的整改申诉', icon: '🔁', bg: '#eefaf3' },
+  { to: '/suggestion', label: '意见反馈', icon: '💬', bg: '#fdeef0' },
   { to: '/browse-history', label: '最近浏览', icon: '🕐', bg: '#f3f0ff' }
 ]
 const router = useRouter()

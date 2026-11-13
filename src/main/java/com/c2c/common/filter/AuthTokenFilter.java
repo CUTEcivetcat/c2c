@@ -380,7 +380,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         if (path.startsWith("/admin/eco")) return AdminPerm.DASHBOARD;
         if (path.startsWith("/admin/users")) return AdminPerm.USERS;
         if (path.startsWith("/admin/products")) return AdminPerm.PRODUCTS;
+        if (path.startsWith("/product/admin")) return AdminPerm.PRODUCTS;
         if (path.startsWith("/admin/orders")) return AdminPerm.ORDERS;
+        if (path.startsWith("/admin/suggestion")) return AdminPerm.REVIEW;
         if (path.startsWith("/admin/announcement")) return AdminPerm.ANNOUNCEMENT;
         if (path.startsWith("/admin/popup")) return AdminPerm.ANNOUNCEMENT;
         if (path.startsWith("/admin/banner")) return AdminPerm.BANNER;

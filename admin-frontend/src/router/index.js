@@ -9,6 +9,8 @@ const routes = [
   // 安全设置：所有管理员基础能力（设置自己的二级密码），次级管理员管理部分页面内按总管理员判断
   { path: '/security', name: 'Security', component: () => import('@/views/AdminSecurityView.vue'), meta: { requiresAuth: true } },
   { path: '/products', name: 'Products', component: () => import('@/views/ProductManageView.vue'), meta: { requiresAuth: true, perm: 'products' } },
+  { path: '/category', name: 'Category', component: () => import('@/views/CategoryManageView.vue'), meta: { requiresAuth: true, perm: 'products' } },
+  { path: '/suggestion', name: 'Suggestion', component: () => import('@/views/SuggestionManageView.vue'), meta: { requiresAuth: true, perm: 'review' } },
   { path: '/orders', name: 'Orders', component: () => import('@/views/OrderManageView.vue'), meta: { requiresAuth: true, perm: 'orders' } },
   { path: '/permissions', name: 'Permissions', component: () => import('@/views/UserRoleManageView.vue'), meta: { requiresAuth: true, requiresTop: true } },
   // 系统设置：运行时可调的系统开关（验证码回显、管理员登录锁定等），仅总管理员

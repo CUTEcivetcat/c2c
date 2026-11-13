@@ -27,8 +27,14 @@
         <el-tooltip :content="'审核管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('review')" to="/review" class="nav-item"><el-icon><Checked /></el-icon><span v-show="!collapsed">审核管理</span></router-link>
         </el-tooltip>
+        <el-tooltip :content="'建议反馈'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('review')" to="/suggestion" class="nav-item"><el-icon><ChatLineRound /></el-icon><span v-show="!collapsed">建议反馈</span></router-link>
+        </el-tooltip>
         <el-tooltip :content="'商品管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('products')" to="/products" class="nav-item"><el-icon><Goods /></el-icon><span v-show="!collapsed">商品管理</span></router-link>
+        </el-tooltip>
+        <el-tooltip :content="'分类管理'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('products')" to="/category" class="nav-item"><el-icon><FolderOpened /></el-icon><span v-show="!collapsed">分类管理</span></router-link>
         </el-tooltip>
         <el-tooltip :content="'订单管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('orders')" to="/orders" class="nav-item"><el-icon><Document /></el-icon><span v-show="!collapsed">订单管理</span></router-link>
