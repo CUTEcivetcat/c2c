@@ -55,13 +55,13 @@
           </el-dropdown>
         </template>
         <template v-else>
-          <router-link to="/login"><el-button type="primary" size="large" round>登录 / 注册</el-button></router-link>
+          <el-button type="primary" size="large" round @click="store.openLoginDialog()">登录 / 注册</el-button>
         </template>
       </div>
 
       <!-- 手机端登录按钮 -->
       <div class="mobile-auth" v-if="!store.isLoggedIn()">
-        <router-link to="/login"><el-button type="primary" size="small" round>登录</el-button></router-link>
+        <el-button type="primary" size="small" round @click="store.openLoginDialog()">登录</el-button>
       </div>
       <div class="mobile-auth" v-else>
         <router-link to="/publish" class="mobile-publish-btn"><el-icon><Plus /></el-icon></router-link>
@@ -98,17 +98,19 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { useCouponStore } from '@/stores/couponStore'
 import { getUnreadCount } from '@/api/im'
 
 const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
+const couponStore = useCouponStore()
 const keyword = ref('')
 const unread = ref(0)
 const mobileMenuOpen = ref(false)
 
 const goSearch = () => { if (keyword.value.trim()) { router.push({ name: 'Search', query: { keyword: keyword.value.trim() } }); mobileMenuOpen.value = false } }
-const handleLogout = async () => { await store.logout(); router.push('/'); mobileMenuOpen.value = false }
+const handleLogout = async () => { await store.logout(); couponStore.invalidate(); router.push('/'); mobileMenuOpen.value = false }
 // 管理后台入口：开发环境跳本地管理端(5174)，生产跳 /admin/
 const goAdmin = () => {
   const url = import.meta.env.DEV ? 'http://localhost:5174/' : '/admin/'
@@ -126,7 +128,7 @@ watch(() => route.fullPath, () => { fetchUnread() })
 
 <style scoped>
 .app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; background: rgba(255,255,255,0.94); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
-.header-inner { max-width: 1200px; margin: 0 auto; height: 100%; padding: 0 16px; display: flex; align-items: center; gap: 12px; }
+.header-inner { max-width: 1600px; margin: 0 auto; height: 100%; padding: 0 24px; display: flex; align-items: center; gap: 12px; }
 
 /* Logo */
 .logo { display: flex; align-items: center; gap: 4px; text-decoration: none; white-space: nowrap; flex-shrink: 0; }
@@ -135,7 +137,7 @@ watch(() => route.fullPath, () => { fetchUnread() })
 .logo-sub { font-size: 10px; color: var(--c2c-primary); background: #fff5f0; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
 
 /* 搜索栏 */
-.search-bar { flex: 1; max-width: 420px; }
+.search-bar { flex: 1; max-width: 560px; }
 .search-input-wrap {
   display: flex; align-items: center; gap: 8px;
   background: var(--c2c-bg-soft); border-radius: 24px; padding: 0 16px; height: 38px;

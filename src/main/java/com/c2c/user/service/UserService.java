@@ -50,6 +50,9 @@ public interface UserService {
 
     /** 获取用户公开信息（供其他用户查看） */
     UserVO getUserPublicInfo(Long userId);
+
+    /** 批量获取用户公开信息，返回 userId -> UserVO，供列表页一次性装配避免 N+1 */
+    java.util.Map<Long, UserVO> listPublicInfoByIds(java.util.Collection<Long> userIds);
 }
 
 

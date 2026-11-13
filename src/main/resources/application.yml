@@ -40,12 +40,13 @@ spring:
       idle-timeout: 60000
       connection-test-query: SELECT 1
       validation-timeout: 5000
-  redis:
-    host: ${REDIS_HOST:127.0.0.1}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:your-redis-password}
-    database: ${REDIS_DATABASE:0}
-    timeout: 5000ms
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:your-redis-password}
+      database: ${REDIS_DATABASE:0}
+      timeout: 5000ms
   servlet:
     multipart:
       max-file-size: 20MB

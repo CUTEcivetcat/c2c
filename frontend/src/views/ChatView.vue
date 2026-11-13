@@ -242,7 +242,7 @@ const messageItems = computed(() => {
 </script>
 
 <style scoped>
-.chat-page-layout { display: flex; flex-direction: column; height: 100vh; background: #f5f6f8; max-width: 700px; margin: 0 auto; }
+.chat-page-layout { display: flex; flex-direction: column; height: 100vh; background: #f5f6f8; max-width: 900px; margin: 0 auto; }
 .chat-topbar {
   display: flex; align-items: center; gap: 12px; padding: 0 16px;
   height: 56px; background: #fff; border-bottom: 1px solid var(--c2c-line-soft);

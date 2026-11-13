@@ -19,21 +19,12 @@
         <el-carousel-item v-for="b in banners" :key="b.id">
           <div class="banner-slide" @click="goBanner(b)">
             <img :src="b.imageUrl" alt="" class="banner-img" />
-            <span v-if="b.title" class="banner-title">{{ b.title }}</span>
           </div>
         </el-carousel-item>
       </el-carousel>
     </div>
 
-    <!-- 最新公告横幅（滚动轮播显示 scroll=1 的公告） -->
-    <div v-if="scrollList.length" class="announce-banner" @click="$router.push('/announcement')">
-      <span class="ann-icon">📢</span>
-      <span class="ann-label">{{ annType(scrollList[annIndex]) }}</span>
-      <span class="ann-text">{{ scrollList[annIndex].title }}</span>
-      <span class="ann-more">{{ scrollList.length > 1 ? `${annIndex + 1}/${scrollList.length}` : '查看全部 ›' }}</span>
-    </div>
-
-    <!-- Banner 横幅 -->
+    <!-- Banner 横幅 + 公告轮播 -->
     <div class="hero-banner fade-in-up" v-if="!selectedCat && products.length > 0">
       <div class="hero-content">
         <h1>发现好物，分享闲置</h1>
@@ -42,6 +33,45 @@
           <el-icon><Plus /></el-icon> 发布你的第一件商品
         </router-link>
       </div>
+      <div class="hero-announce" v-if="scrollList.length">
+        <div class="ha-head">
+          <span class="ha-title-label">📢 平台公告</span>
+          <router-link to="/announcement" class="ha-more">查看全部 ›</router-link>
+        </div>
+        <el-carousel height="100px" direction="vertical" :interval="3000" indicator-position="none" loop>
+          <el-carousel-item v-for="a in scrollList" :key="a.id" @click="$router.push('/announcement')">
+            <div class="ha-slide">
+              <span class="ha-label">{{ annType(a) }}</span>
+              <div class="ha-text-wrap">
+                <div class="ha-title">{{ a.title }}</div>
+                <div class="ha-desc" v-if="a.content">{{ a.content.slice(0, 48) }}{{ a.content.length > 48 ? '…' : '' }}</div>
+              </div>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+    </div>
+
+    <!-- 优惠券活动栏（游客可见可领券；领取需登录，弹窗完成） -->
+    <div class="coupon-banner" v-if="bannerCoupons.length">
+      <div class="banner-head">
+        <el-icon><Ticket /></el-icon>
+        <span class="coupon-title">优惠活动</span>
+      </div>
+      <div class="banner-tags">
+        <div v-for="c in bannerCoupons" :key="c.key" class="banner-tag" :class="{ owned: c.owned }">
+          <div class="tag-main">
+            <strong>{{ couponFaceText(c) }}</strong>
+            <span class="tag-threshold">{{ couponThresholdText(c) }}</span>
+            <span class="tag-cat">{{ couponCategoryText(c) }}</span>
+          </div>
+          <button v-if="!c.owned" class="tag-claim" :disabled="claiming === c.couponId" @click="claimOne(c)">
+            {{ claiming === c.couponId ? '领取中' : '领取' }}
+          </button>
+          <em v-else class="tag-state">已持有</em>
+        </div>
+      </div>
+      <router-link v-if="store.isLoggedIn()" to="/coupon/my" class="banner-more">我的券 ›</router-link>
     </div>
 
     <!-- 排序 -->
@@ -66,7 +96,7 @@
         @click="$router.push(`/product/${p.id}`)"
       >
         <div class="card-img-wrap">
-          <product-cover :src="p.images?.[0]?.url" :title="p.title" class="card-img" />
+          <product-cover :src="p.images?.[0]?.thumbUrl || p.images?.[0]?.url" :title="p.title" class="card-img" />
           <span class="condition-badge">{{ conditionMap[p.condition] || '' }}</span>
           <button class="favorite-btn-mini" @click.stop="toggleFav(p)" v-if="store.isLoggedIn()">
             <el-icon :size="16" :style="{ color: p._fav ? 'var(--c2c-primary)' : 'var(--c2c-text-muted)' }">
@@ -118,14 +148,21 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { useCouponStore } from '@/stores/couponStore'
 import { getCategories, searchProducts } from '@/api/product'
 import { addFavorite, removeFavorite } from '@/api/favorite'
 import { getAnnouncementLatest } from '@/api/announcement'
 import { getBanners } from '@/api/banner'
+import { claimCoupon } from '@/api/coupon'
+import { couponFaceText, couponThresholdText, couponCategoryText } from '@/utils/coupon'
+import { ElMessage } from 'element-plus'
 
 const store = useUserStore()
+const couponStore = useCouponStore()
+const router = useRouter()
 // 本地分类图标（后端 iconUrl 未配置时兜底，与小程序同一套风格）
 const CAT_ICONS = {
   书籍: '/images/category/book.jpg', 数码: '/images/category/digital.jpg',
@@ -143,24 +180,17 @@ const total = ref(0)
 const sort = ref('created_at')
 const loading = ref(false)
 const announcements = ref([])
-const annIndex = ref(0)
 const banners = ref([])
-let annTimer = null
+// 首页券活动栏：已持有未用券 + 可领券（登录后拉取，无券不展示）
+const ownedCoupons = ref([])
+const claimableCoupons = ref([])
+const claiming = ref(null)
+const bannerCoupons = computed(() => [...ownedCoupons.value, ...claimableCoupons.value].slice(0, 4))
 const conditionMap = { 1: '全新', 2: '几乎全新', 3: '轻微使用', 4: '明显使用' }
 
 const annType = (a) => ({ 1: '公告', 2: '平台公约', 3: '通知' }[a?.type] || '公告')
 // 参与滚动的公告（scroll=1 或未设置），默认滚动显示
 const scrollList = computed(() => (announcements.value || []).filter(a => a.scroll !== 0))
-// 轮播：每 4 秒切换下一条
-const startAnnRoll = () => {
-  stopAnnRoll()
-  if (scrollList.value.length > 1) {
-    annTimer = setInterval(() => {
-      annIndex.value = (annIndex.value + 1) % scrollList.value.length
-    }, 4000)
-  }
-}
-const stopAnnRoll = () => { if (annTimer) { clearInterval(annTimer); annTimer = null } }
 
 const loadProducts = async () => {
   loading.value = true
@@ -185,21 +215,53 @@ const toggleFav = async (p) => {
   } catch (e) { /* */ }
 }
 
+// 券活动栏：我的未用券优先，其次可领未领券；首页不按分类过滤；游客也可看可领券；失败内部消化
+const loadCouponBanner = async () => {
+  try {
+    const mineP = store.isLoggedIn() ? couponStore.fetchMine().catch(() => []) : Promise.resolve([])
+    const [mine, avail] = await Promise.all([
+      mineP,
+      couponStore.fetchAvailable().catch(() => [])
+    ])
+    ownedCoupons.value = (mine || []).map(c => ({ ...c, key: 'own-' + c.userCouponId, owned: true }))
+    claimableCoupons.value = (avail || [])
+      .filter(c => !c.claimed && c.remaining > 0)
+      .map(c => ({ ...c, key: 'avail-' + c.couponId, owned: false }))
+  } catch (e) { /* 拦截器已提示 */ }
+}
+
+// 活动栏直接领取：未登录先弹登录窗，登录成功后刷新券栏；成功后移入已持有列表
+const claimOne = async (c) => {
+  if (!store.isLoggedIn()) {
+    store.openLoginDialog(() => loadCouponBanner())
+    return
+  }
+  claiming.value = c.couponId
+  try {
+    await claimCoupon(c.couponId)
+    ElMessage.success('领取成功，可在「我的优惠券」查看')
+    couponStore.invalidate()
+    claimableCoupons.value = claimableCoupons.value.filter(x => x.couponId !== c.couponId)
+    ownedCoupons.value.unshift({ ...c, key: 'own-' + c.couponId, owned: true })
+  } catch (e) { /* 拦截器已提示 */ } finally {
+    claiming.value = null
+  }
+}
+
 onMounted(() => {
   // 首页各模块并行加载、互不阻塞：任一接口慢/失败不影响其他区域渲染
   // （修复：登录后弹公告期间页面空白 = 原串行 await 分类接口被阻塞，整页等待）
-  getCategories().then(r => { categories.value = r || [] }).catch(() => { categories.value = [] })
+  getCategories().then(r => { categories.value = r || []; couponStore.hydrateCategoryTree(r) }).catch(() => { categories.value = [] })
   loadProducts()
-  // 加载最新公告（首页横幅，滚动轮播）
+  // 加载最新公告（hero 右侧轮播）
   getAnnouncementLatest(6).then(r => {
     announcements.value = r || []
-    annIndex.value = 0
-    startAnnRoll()
   }).catch(() => {})
   // 加载轮播图
   getBanners().then(r => { banners.value = r || [] }).catch(() => {})
+  // 加载券活动栏（登录后）
+  loadCouponBanner()
 })
-onUnmounted(stopAnnRoll)
 
 const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 </script>
@@ -227,38 +289,15 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 .home-banner { margin-bottom: 16px; border-radius: 14px; overflow: hidden; }
 .banner-slide { position: relative; height: 100%; cursor: pointer; }
 .banner-img { width: 100%; height: 100%; object-fit: cover; }
-.banner-title {
-  position: absolute; bottom: 10px; left: 14px;
-  color: #fff; font-size: 14px; font-weight: 600;
-  background: rgba(0,0,0,0.45); padding: 3px 12px; border-radius: 10px;
-  backdrop-filter: blur(4px);
-}
 
-/* 最新公告横幅 */
-.announce-banner {  display: flex; align-items: center; gap: 8px;
-  background: linear-gradient(135deg, #fff8f0, #fff3e6);
-  border: 1px solid #ffe3c2; border-radius: 12px;
-  padding: 10px 16px; margin: -10px 0 20px; cursor: pointer;
-  transition: all 0.25s; overflow: hidden;
-}
-.announce-banner:hover { border-color: #ffb26b; box-shadow: 0 4px 16px rgba(255,107,53,0.12); }
-.ann-icon { font-size: 16px; flex-shrink: 0; }
-.ann-label {
-  flex-shrink: 0; font-size: 11px; color: var(--c2c-primary-dark); font-weight: 700;
-  background: #ffe8dc; padding: 1px 8px; border-radius: 8px;
-}
-.ann-text {
-  flex: 1; font-size: 13px; color: var(--c2c-text); font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ann-more { flex-shrink: 0; font-size: 12px; color: var(--c2c-text-muted); }
-
-/* Banner */
+/* Banner + 公告轮播 */
 .hero-banner {
+  display: flex; align-items: center; gap: 32px;
   background: linear-gradient(135deg, #fff5f0 0%, #ffe8e0 50%, #fff 100%);
   border-radius: 20px; padding: 40px 48px; margin-bottom: 28px;
   border: 1px solid #ffe0d0;
 }
+.hero-content { flex: 1; min-width: 0; }
 .hero-content h1 { font-size: 28px; font-weight: 800; color: var(--c2c-text); margin-bottom: 8px; }
 .hero-content p { font-size: 15px; color: var(--c2c-text-secondary); margin-bottom: 20px; }
 .hero-btn {
@@ -268,6 +307,53 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
   text-decoration: none; transition: all 0.25s;
 }
 .hero-btn:hover { background: var(--c2c-primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
+
+/* hero 右侧公告轮播 */
+.hero-announce {
+  flex: 1.7; min-width: 0; background: rgba(255,255,255,0.75);
+  border: 1px solid #ffe3d6; border-radius: 16px; padding: 16px 22px;
+}
+.ha-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ha-title-label { font-size: 13px; font-weight: 700; color: var(--c2c-text); }
+.ha-more { font-size: 12px; color: var(--c2c-primary); text-decoration: none; font-weight: 600; }
+.ha-slide { display: flex; align-items: center; gap: 10px; height: 100%; cursor: pointer; }
+.ha-label {
+  flex-shrink: 0; font-size: 11px; color: var(--c2c-primary-dark); font-weight: 700;
+  background: #ffe8dc; padding: 2px 10px; border-radius: 8px;
+}
+.ha-text-wrap { min-width: 0; }
+.ha-title { font-size: 14px; font-weight: 600; color: var(--c2c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ha-desc { font-size: 12px; color: var(--c2c-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+/* 优惠券活动栏 */
+.coupon-banner {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #fff5f0, #fff);
+  border: 1px solid #ffe3d6; border-radius: 14px;
+  padding: 12px 16px; margin-bottom: 20px;
+}
+.banner-head { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.banner-head .el-icon { color: var(--c2c-primary); }
+.coupon-title { font-size: 14px; font-weight: 700; color: var(--c2c-text); }
+.banner-tags { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.banner-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid var(--c2c-primary-light);
+  border-radius: 10px; padding: 6px 10px; font-size: 12px;
+}
+.tag-main { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.banner-tag strong { color: var(--c2c-danger); font-size: 15px; }
+.tag-threshold { color: var(--c2c-text-secondary); }
+.tag-cat { color: var(--c2c-text-muted); }
+.tag-state { font-style: normal; color: var(--c2c-primary); font-weight: 600; }
+.tag-claim {
+  flex-shrink: 0; border: none; cursor: pointer;
+  background: var(--c2c-primary); color: #fff;
+  font-size: 12px; font-weight: 600; border-radius: 8px; padding: 3px 10px;
+}
+.tag-claim:disabled { opacity: 0.6; cursor: default; }
+.banner-tag.owned { border-color: var(--c2c-line-soft); }
+.banner-more { flex-shrink: 0; font-size: 13px; color: var(--c2c-primary); text-decoration: none; font-weight: 600; }
 
 /* 工具栏 */
 .toolbar {
@@ -359,4 +445,9 @@ const goBanner = (b) => { if (b.linkUrl) window.open(b.linkUrl, '_blank') }
 
 .pagination-wrap { display: flex; justify-content: center; margin-top: 32px; }
 </style>
-@media (max-width: 480px) { .hero-banner { margin-bottom: 16px; } }
+@media (max-width: 480px) {
+  .hero-banner { flex-direction: column; align-items: stretch; gap: 16px; padding: 24px 20px; margin-bottom: 16px; }
+  .hero-content h1 { font-size: 22px; }
+  .coupon-banner { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .banner-more { width: 100%; text-align: right; }
+}

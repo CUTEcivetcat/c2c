@@ -33,6 +33,7 @@ public class OrderTimeoutTask {
 
     private final OrderMapper orderMapper;
     private final ProductDelegate productDelegate;
+    private final com.c2c.coupon.service.CouponService couponService;
     // 【G4 接入点⑤】订单系统通知组件
     private final com.c2c.order.service.OrderNoticeService orderNoticeService;
 
@@ -58,6 +59,10 @@ public class OrderTimeoutTask {
                 continue;
             }
             productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());
+            // 释放待支付期间被占用的券
+            if (order.getCouponId() != null) {
+                couponService.releaseAfterCancel(order.getCouponId(), order.getId());
+            }
             // 【G4 接入点⑤】超时关单通知：
             orderNoticeService.notifyOrderEvent(order, "超时未支付，订单已自动取消");
             log.info("timeout order cancelled: orderId={}, orderNo={}", order.getId(), order.getOrderNo());

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container profile-page fade-in-up" style="max-width:600px">
+  <div class="page-container profile-page fade-in-up" style="max-width:1000px">
     <page-back-bar title="个人中心" />
     <!-- 头像卡片 -->
     <div class="profile-header-card">
@@ -95,29 +95,6 @@
         <el-button type="danger" :loading="appealing" @click="submitAppeal">提交申诉</el-button>
       </template>
     </el-dialog>
-
-    <!-- 编辑表单 -->
-    <div class="profile-form-card">
-      <el-form :model="form" label-position="top" size="large">
-        <el-form-item label="昵称">
-          <el-input v-model="form.nickname" placeholder="设置你的昵称" maxlength="20" />
-          <div v-if="store.userInfo?.nicknameStatus === 1" class="nickname-pending">
-            <el-icon><Loading /></el-icon> 昵称「{{ store.userInfo.nicknamePending }}」审核中，通过后生效
-          </div>
-          <div v-else class="nickname-tip">修改昵称需审核：自动拦截敏感词，通过后由审核员人工审核</div>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="form.gender">
-            <el-radio-button :value="1">男</el-radio-button>
-            <el-radio-button :value="2">女</el-radio-button>
-            <el-radio-button :value="0">保密</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" size="large" @click="save" style="width:100%;height:48px;border-radius:14px;font-size:15px">保存修改</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
   </div>
 </template>
 
@@ -125,7 +102,6 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
-import { updateProfile } from '@/api/user'
 import { getMyPublished, offShelfProduct, updateStatus } from '@/api/product'
 import { createAppeal } from '@/api/review'
 import { getMyEcoStats } from '@/api/eco'
@@ -134,15 +110,16 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const store = useUserStore()
 // 个人中心功能入口（订单/意向提前，钱包举报等随后）
 const menuItems = [
+  { to: '/profile/edit', label: '资料设置', icon: '✏️', bg: '#fff1ea' },
   { to: '/order/list', label: '我的订单', icon: '📦', bg: '#fff1ea' },
   { to: '/intent', label: '我的意向', icon: '💬', bg: '#eef4ff' },
   { to: '/wallet', label: '我的钱包', icon: '💰', bg: '#fff8e0' },
+  { to: '/coupon/my', label: '我的优惠券', icon: '🎟️', bg: '#eef4ff' },
   { to: '/my/report', label: '我的举报', icon: '⚑', bg: '#fdeef0' },
   { to: '/my/appeal', label: '我的整改申诉', icon: '🔁', bg: '#eefaf3' },
   { to: '/browse-history', label: '最近浏览', icon: '🕐', bg: '#f3f0ff' }
 ]
 const router = useRouter()
-const form = ref({ nickname: '', gender: 0 })
 
 // ============ 我的环保贡献（参赛功能） ============
 const eco = ref(null)
@@ -165,8 +142,8 @@ const appealTarget = ref(null)
 // 商品状态标签：1 在售 / 2 已预订 / 3 已售 / 4 已下架 / 5 违规下架
 const statusType = (s) => ({ 1: 'success', 2: 'warning', 3: 'info', 4: 'info', 5: 'danger' }[s] || 'info')
 
-// 封面图：取 isCover 的图片，否则第一张
-const coverOf = (p) => (p.images || []).find(i => i.isCover)?.url || (p.images || [])[0]?.url || ''
+// 封面图：取 isCover 的图片，否则第一张；优先缩略图，回退原图
+const coverOf = (p) => { const c = (p.images || []).find(i => i.isCover) || (p.images || [])[0]; return c?.thumbUrl || c?.url || '' }
 
 const load = async () => {
   loading.value = true
@@ -219,20 +196,8 @@ const submitAppeal = async () => {
 
 onMounted(async () => {
   await store.fetchProfile()
-  form.value = {
-    nickname: store.userInfo?.nickname || '',
-    gender: store.userInfo?.gender || 0
-  }
   load()
 })
-
-const save = async () => {
-  const oldNick = store.userInfo?.nickname || ''
-  const nickChanged = form.value.nickname.trim() !== oldNick
-  await updateProfile({ nickname: form.value.nickname, gender: form.value.gender })
-  await store.fetchProfile()
-  ElMessage.success(nickChanged ? '昵称已提交审核，通过后生效；其他资料已保存' : '保存成功')
-}
 </script>
 
 <style scoped>
@@ -246,13 +211,6 @@ const save = async () => {
 .profile-header-card h3 { font-size: 20px; font-weight: 700; margin: 12px 0 6px; color: var(--c2c-text); }
 .rep-badge { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .rep-badge span { font-size: 14px; font-weight: 600; color: var(--c2c-primary); }
-.profile-form-card { background: #fff; border-radius: 20px; padding: 28px; border: 1px solid var(--c2c-line-soft); }
-.nickname-pending {
-  margin-top: 6px; font-size: 12px; color: var(--c2c-primary-dark);
-  display: flex; align-items: center; gap: 4px;
-  background: #fff5f0; border-radius: 8px; padding: 6px 10px;
-}
-.nickname-tip { margin-top: 6px; font-size: 12px; color: var(--c2c-text-muted); }
 .profile-menu {
   display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
   margin-bottom: 22px;
@@ -337,4 +295,4 @@ const save = async () => {
 .pager { text-align: center; margin-top: 14px; }
 :deep(.el-radio-button__inner) { border-radius: 10px !important; }
 </style>
-@media (max-width: 480px) { .profile-header-card { padding: 20px; } .profile-form-card { padding: 16px; } }
+@media (max-width: 480px) { .profile-header-card { padding: 20px; } }

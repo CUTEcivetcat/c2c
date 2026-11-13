@@ -43,7 +43,9 @@ JwtUtils.validate(token, secret)        // 是否有效
 |---|---|---|
 | 密码登录 | `POST /user/login`（loginType=1） | 智能识别手机号/邮箱 |
 | 验证码登录 | `POST /user/login`（loginType=2） | 不存在自动注册 |
-| 微信登录 | `POST /user/wechat-login` | code2session → openid 自动注册 |### 1.4 验证码机制
+| 微信登录 | `POST /user/wechat-login` | code2session → openid 自动注册 |
+
+### 1.4 验证码机制
 
 **文件**：`UserServiceImpl.sendVerificationCodeAndReturn`
 
@@ -113,7 +115,9 @@ config/application-pro.yml            → 真实值（gitignore 排除）
 ### 2.5 日志
 
 - `logging.file.name: ${APP_LOG_FILE:./logs/app.log}`
-- 生产：宝塔设 `APP_LOG_FILE` 环境变量指向固定目录---
+- 生产：宝塔设 `APP_LOG_FILE` 环境变量指向固定目录
+
+---
 
 ## 三、前端公共组件
 

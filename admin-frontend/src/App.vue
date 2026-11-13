@@ -36,8 +36,17 @@
         <el-tooltip :content="'轮播图管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('banner')" to="/banner" class="nav-item"><el-icon><Picture /></el-icon><span v-show="!collapsed">轮播图管理</span></router-link>
         </el-tooltip>
+        <el-tooltip :content="'优惠券管理'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('coupon')" to="/coupon" class="nav-item"><el-icon><Ticket /></el-icon><span v-show="!collapsed">优惠券管理</span></router-link>
+        </el-tooltip>
         <el-tooltip :content="'公告管理'" placement="right" :disabled="!collapsed">
         <router-link v-if="hasPerm('announcement')" to="/announcement" class="nav-item"><el-icon><Bell /></el-icon><span v-show="!collapsed">公告管理</span></router-link>
+        </el-tooltip>
+        <el-tooltip :content="'FAQ 知识库'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('ai')" to="/faq" class="nav-item"><el-icon><QuestionFilled /></el-icon><span v-show="!collapsed">FAQ 知识库</span></router-link>
+        </el-tooltip>
+        <el-tooltip :content="'对话看板'" placement="right" :disabled="!collapsed">
+        <router-link v-if="hasPerm('ai')" to="/ai-chat" class="nav-item"><el-icon><ChatDotRound /></el-icon><span v-show="!collapsed">对话看板</span></router-link>
         </el-tooltip>
       </nav>
       <!-- 收起按钮（导航与退出之间，居中） -->

@@ -13,11 +13,10 @@ App({
     // 环境区分：开发版/体验版走本地后端，正式版走测试服务器（按需修改两个地址）
     var env = ''
     try { env = wx.getAccountInfoSync().miniProgram.envVersion || '' } catch (e) {}
-    // 开发版/体验版：默认走本地后端（127.0.0.1:8080，已连 192.168.1.11 数据库）；
-    // 如需真机连电脑联调，改成电脑局域网 IP，如 http://192.168.1.100:8080/api/v1
-    var devServer = 'http://127.0.0.1:8080/api/v1'
-    // 正式版：本地内网服务器 192.168.1.11（旧公网 81.71.118.128、测试机 192.168.163.135 均已下线）
-    var prodServer = 'http://192.168.1.11:8080/api/v1'
+    // 本地调试：后端在本机 IDEA 运行（连 192.168.1.14 的库），手机真机需与电脑同一局域网；
+    // 后端部署到服务器后，把此处改回服务器 IP（如 http://192.168.1.14:8080/api/v1）
+    var devServer = 'http://192.168.1.7:8080/api/v1'
+    var prodServer = 'http://192.168.1.7:8080/api/v1'
     this.globalData.serverUrl = env === 'release' ? prodServer : devServer
     const token = wx.getStorageSync('token')
     const userInfo = wx.getStorageSync('userInfo')

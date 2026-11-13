@@ -1,7 +1,7 @@
 package com.c2c.user.dto;
 
 import lombok.Data;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 微信登录请求：前端 wx.login 拿到的 code。

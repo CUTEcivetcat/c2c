@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container review-workbench" style="max-width:760px">
+  <div class="page-container review-workbench" style="max-width:1200px">
     <page-back-bar title="审核工作台" />
     <p class="wb-tip">你是「审核员」，这里处理用户举报与卖家整改申诉。处理结果会通过站内信通知相关方。</p>
 

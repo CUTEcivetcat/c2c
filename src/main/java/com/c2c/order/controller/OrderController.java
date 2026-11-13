@@ -28,12 +28,12 @@ public class OrderController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
 
-    @Operation(summary = "创建订单", description = "body 传 productId 与 addressId，需登录")
+    @Operation(summary = "创建订单", description = "body 传 productId、addressId，可选 userCouponId，需登录")
     @PostMapping(ApiPath.ORDER)
     public R<Map<String, Object>> create(@RequestBody Map<String, Long> body,
                                          @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
         Map<String, Object> result = orderService.create(
-                body.get("productId"), body.get("addressId"), userId);
+                body.get("productId"), body.get("addressId"), body.get("userCouponId"), userId);
         return R.ok(result);
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container user-profile fade-in-up" style="max-width:900px">
+  <div class="page-container user-profile fade-in-up">
     <page-back-bar title="用户主页" />
 
     <!-- 用户信息卡片 -->
@@ -30,7 +30,7 @@
     <h3 class="section-title">在售商品（{{ total }}）</h3>
     <div v-if="products.length" class="product-grid">
       <div v-for="p in products" :key="p.id" class="product-card" @click="$router.push(`/product/${p.id}`)">
-        <div class="thumb"><product-cover :src="p.images?.[0]?.url" :title="p.title" /></div>
+        <div class="thumb"><product-cover :src="p.images?.[0]?.thumbUrl || p.images?.[0]?.url" :title="p.title" /></div>
         <div class="card-body">
           <div class="card-title">{{ p.title }}</div>
           <div class="card-footer">

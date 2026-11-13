@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" style="max-width:760px">
+  <div class="page-container" style="max-width:1000px">
     <page-back-bar title="我的整改申诉" />
     <div v-loading="loading" class="list">
       <div v-for="a in list" :key="a.id" class="card">

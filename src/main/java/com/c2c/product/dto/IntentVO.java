@@ -46,7 +46,7 @@ public class IntentVO {
     /** 买家期望价格 */
     private BigDecimal expectedPrice;
 
-    /** 意向状态（如 0=待回复，1=已回复，2=已成交，3=已取消） */
+    /** 意向状态：1 待处理 / 2 已回复 / 3 已成交 / 4 已关闭 */
     private Integer status;
 
     /** 状态文本描述 */

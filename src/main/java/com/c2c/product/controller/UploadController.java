@@ -35,9 +35,10 @@ public class UploadController {
     public R<Map<String, String>> uploadImage(@Parameter(description = "图片文件（multipart）") @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return R.badRequest("文件不能为空");
         try {
-            String url = storageService.upload(file);
+            FileStorageService.UploadedImage uploaded = storageService.uploadWithThumb(file);
             Map<String, String> result = new HashMap<>();
-            result.put("url", url);
+            result.put("url", uploaded.getUrl());
+            result.put("thumbUrl", uploaded.getThumbUrl());
             return R.ok(result);
         } catch (Exception e) {
             log.error("上传失败", e);

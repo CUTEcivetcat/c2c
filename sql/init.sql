@@ -96,6 +96,7 @@ CREATE TABLE `product_image` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `product_id` BIGINT NOT NULL,
   `url` VARCHAR(500) NOT NULL,
+  `thumb_url` VARCHAR(500) DEFAULT NULL COMMENT '400px缩略图地址',
   `sort_order` INT DEFAULT 0,
   `is_cover` TINYINT DEFAULT 0,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -118,6 +119,8 @@ CREATE TABLE `order` (
   `status` TINYINT NOT NULL DEFAULT 0,
   `payment_method` VARCHAR(20),
   `escrow` DECIMAL(10,2) DEFAULT NULL,
+  `coupon_id` BIGINT DEFAULT NULL COMMENT '使用的用户券ID(user_coupon.id)',
+  `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '优惠券抵扣金额',
   `payment_time` DATETIME,
   `ship_company` VARCHAR(50),
   `ship_no` VARCHAR(50),
@@ -345,5 +348,37 @@ CREATE TABLE `faq` (
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='客服知识库(FAQ)';
+
+CREATE TABLE `coupon_template` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL COMMENT '券名称',
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT '券类型 1满减(预留折扣)',
+  `discount_amount` DECIMAL(10,2) NOT NULL COMMENT '满减金额',
+  `min_amount` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '使用门槛(订单金额满此额可用)，0无门槛',
+  `category_id` BIGINT NOT NULL DEFAULT 0 COMMENT '适用分类ID(category.id)，0全部分类通用',
+  `max_discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '折扣券减免封顶金额，0不封顶',
+  `total_count` INT NOT NULL DEFAULT 0 COMMENT '发行总量',
+  `claimed_count` INT NOT NULL DEFAULT 0 COMMENT '已领取数',
+  `valid_start` DATETIME DEFAULT NULL COMMENT '生效开始',
+  `valid_end` DATETIME DEFAULT NULL COMMENT '有效期截止',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '1生效 0停用',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='优惠券模板(批次)';
+
+CREATE TABLE `user_coupon` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `coupon_id` BIGINT NOT NULL COMMENT '券模板ID(coupon_template.id)',
+  `user_id` BIGINT NOT NULL COMMENT '持有人',
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0未使用 1已使用 2已过期 3已作废',
+  `order_id` BIGINT DEFAULT NULL COMMENT '使用后回填订单ID',
+  `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT '本券抵扣金额(快照)',
+  `receive_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `use_time` DATETIME DEFAULT NULL,
+  `expire_time` DATETIME DEFAULT NULL COMMENT '过期时间',
+  UNIQUE KEY `uk_coupon_user` (`coupon_id`, `user_id`),
+  KEY `idx_user_status` (`user_id`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户已领优惠券';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container">
+  <div class="page-container" style="max-width:1000px">
     <page-back-bar title="我的订单" />
     <el-tabs v-model="tab" @tab-change="load"><el-tab-pane label="买入" name="buy"/><el-tab-pane label="卖出" name="sell"/></el-tabs>
     <el-card v-for="o in orders" :key="o.id" style="margin-bottom:12px;cursor:pointer" @click="$router.push(`/order/${o.id}`)">

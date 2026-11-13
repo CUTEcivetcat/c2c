@@ -168,6 +168,15 @@ public interface ApiPath {
     /** AI 智能客服（登录用户；助手会话内发消息走此接口） */
     String AI_CHAT = "/ai/chat";
     String AI_CHAT_FAQ = "/ai/chat/faq-suggestions";
+    /** 管理端 FAQ 知识库维护（需管理员 ai 权限） */
+    String AI_FAQ_ADMIN_LIST = "/admin/faq/list";
+    String AI_FAQ_ADMIN = "/admin/faq";
+    String AI_FAQ_ADMIN_ID = "/admin/faq/{id}";
+    String AI_FAQ_ADMIN_STATUS = "/admin/faq/{id}/status";
+    /** 管理端 AI 客服对话看板（需管理员 ai 权限） */
+    String AI_CHAT_ADMIN_LIST = "/admin/ai/chat/list";
+    String AI_CHAT_ADMIN_STATS = "/admin/ai/chat/stats";
+    String AI_CHAT_ADMIN_EXPORT = "/admin/ai/chat/export";
 
     // ==================== 低碳循环 /eco（用户统计需登录；/admin/eco 需管理端 DASHBOARD 权限） ====================
     String ECO_USER_STATS = "/eco/user/stats";
@@ -176,4 +185,16 @@ public interface ApiPath {
 
     // ==================== 系统运行配置 /admin/config（仅总管理员） ====================
     String ADMIN_CONFIG = "/admin/config";
+
+    // ==================== 优惠券 /coupon（用户端需登录） ====================
+    String COUPON_AVAILABLE = "/coupon/available";
+    String COUPON_MY = "/coupon/my";
+    String COUPON_CLAIM = "/coupon/{couponId}/claim";
+    String COUPON_CALC = "/coupon/calc";
+
+    // ==================== 优惠券管理 /admin/coupon（需管理员 coupon 权限） ====================
+    String ADMIN_COUPON_LIST = "/admin/coupon/list";
+    String ADMIN_COUPON = "/admin/coupon";
+    String ADMIN_COUPON_ID = "/admin/coupon/{id}";
+    String ADMIN_COUPON_STATUS = "/admin/coupon/{id}/status";
 }

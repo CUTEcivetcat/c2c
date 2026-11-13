@@ -15,7 +15,10 @@ const routes = [
   { path: '/config', name: 'SystemConfig', component: () => import('@/views/SystemConfigView.vue'), meta: { requiresAuth: true, requiresTop: true } },
   { path: '/review', name: 'Review', component: () => import('@/views/ReviewManageView.vue'), meta: { requiresAuth: true, perm: 'review' } },
   { path: '/announcement', name: 'Announcement', component: () => import('@/views/AnnouncementManageView.vue'), meta: { requiresAuth: true, perm: 'announcement' } },
-  { path: '/banner', name: 'Banner', component: () => import('@/views/BannerManageView.vue'), meta: { requiresAuth: true, perm: 'banner' } }
+  { path: '/banner', name: 'Banner', component: () => import('@/views/BannerManageView.vue'), meta: { requiresAuth: true, perm: 'banner' } },
+  { path: '/coupon', name: 'Coupon', component: () => import('@/views/CouponManageView.vue'), meta: { requiresAuth: true, perm: 'coupon' } },
+  { path: '/faq', name: 'Faq', component: () => import('@/views/FaqManageView.vue'), meta: { requiresAuth: true, perm: 'ai' } },
+  { path: '/ai-chat', name: 'AiChatBoard', component: () => import('@/views/AiChatBoardView.vue'), meta: { requiresAuth: true, perm: 'ai' } }
 ]
 
 const router = createRouter({ history: createWebHashHistory(), routes })

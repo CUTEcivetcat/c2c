@@ -156,6 +156,8 @@ const PERM_OPTIONS = [
   { code: 'review', label: '审核管理' },
   { code: 'announcement', label: '公告管理' },
   { code: 'banner', label: '轮播图管理' },
+  { code: 'coupon', label: '优惠券管理' },
+  { code: 'ai', label: 'FAQ 知识库' },
   { code: 'permissions', label: '权限管理' }
 ]
 const PERM_LABEL = Object.fromEntries(PERM_OPTIONS.map(p => [p.code, p.label]))

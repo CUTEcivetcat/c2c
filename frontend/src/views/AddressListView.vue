@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" style="max-width:600px">
+  <div class="page-container" style="max-width:900px">
     <page-back-bar title="收货地址" />
     <el-button type="primary" @click="showForm=true;editing=null;form={}" style="margin:12px 0">新增地址</el-button>
     <el-card v-for="a in addresses" :key="a.id" style="margin-bottom:8px">

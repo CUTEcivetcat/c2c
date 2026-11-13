@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 确认下单（从商品页点「立即购买」进入，route.query.productId 存在） -->
-    <div v-if="checkoutProduct" class="page-container order-detail fade-in-up" style="max-width:700px">
+    <div v-if="checkoutProduct" class="page-container order-detail fade-in-up" style="max-width:960px">
       <page-back-bar title="确认订单" />
 
       <div class="info-card">
@@ -33,13 +33,42 @@
         </div>
       </div>
 
+      <!-- 选择优惠券 -->
+      <div class="info-card" v-if="myCoupons.length">
+        <div class="section-title">优惠券</div>
+        <div class="coupon-option" :class="{ active: selectedCouponId === null }" @click="selectNoCoupon">
+          <span class="coupon-option-label">不使用优惠券</span>
+        </div>
+        <div v-for="c in myCoupons" :key="c.userCouponId"
+             class="coupon-option" :class="{ active: selectedCouponId === c.userCouponId }"
+             @click="selectCoupon(c)">
+          <div class="coupon-option-main">
+            <span class="coupon-face-mini">{{ couponFaceText(c) }}</span>
+            <span class="coupon-option-name">{{ c.name }}</span>
+            <span class="coupon-option-threshold">{{ couponThresholdText(c) }}</span>
+            <span class="coupon-option-cat">{{ couponCategoryText(c) }}</span>
+          </div>
+          <el-icon v-if="selectedCouponId === c.userCouponId" class="check-icon"><Check /></el-icon>
+        </div>
+      </div>
+
+      <!-- 金额汇总 -->
+      <div class="info-card">
+        <div class="info-row"><span class="info-label">商品金额</span><span class="info-value">¥{{ checkoutProduct.price }}</span></div>
+        <div class="info-row"><span class="info-label">运费</span><span class="info-value">¥{{ checkoutProduct.freightAmount || 0 }}</span></div>
+        <div class="info-row" v-if="discountAmount > 0">
+          <span class="info-label">优惠券抵扣</span><span class="info-value" style="color:var(--c2c-primary)">-¥{{ discountAmount }}</span>
+        </div>
+        <div class="info-row"><span class="info-label">应付</span><span class="price-highlight">¥{{ payableAmount }}</span></div>
+      </div>
+
       <div class="action-bar">
         <button class="btn-primary" :disabled="creating" @click="submitOrder">{{ creating ? '提交中…' : '确认下单' }}</button>
       </div>
     </div>
 
     <!-- 订单详情 -->
-    <div v-else-if="order" class="page-container order-detail fade-in-up" style="max-width:700px">
+    <div v-else-if="order" class="page-container order-detail fade-in-up" style="max-width:960px">
       <page-back-bar title="订单详情" />
 
       <!-- 步骤条 -->
@@ -88,6 +117,8 @@ import { useUserStore } from '@/stores/userStore'
 import { getOrderDetail, createOrder, payOrder, shipOrder, receiveOrder, cancelOrder } from '@/api/order'
 import { getProductDetail } from '@/api/product'
 import { getAddresses } from '@/api/user'
+import { getMyCoupons, calcCoupon } from '@/api/coupon'
+import { COUPON_TYPE_DISCOUNT, couponFaceText, couponThresholdText, couponCategoryText } from '@/utils/coupon'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
@@ -111,6 +142,54 @@ const addresses = ref([])
 const selectedAddressId = ref(null)
 const creating = ref(false)
 
+// ==================== 优惠券 ====================
+const myCoupons = ref([])
+const selectedCouponId = ref(null)
+const calcDiscount = ref(0)
+const calcPayable = ref(null)
+
+// 订单金额 = 商品价 + 运费（抵扣前）
+const orderAmount = computed(() => {
+  if (!checkoutProduct.value) return 0
+  return Number(checkoutProduct.value.price) + Number(checkoutProduct.value.freightAmount || 0)
+})
+const discountAmount = computed(() => selectedCouponId.value ? Number(calcDiscount.value || 0) : 0)
+const payableAmount = computed(() =>
+  selectedCouponId.value ? Number(calcPayable.value ?? orderAmount.value) : orderAmount.value)
+
+const loadCoupons = async () => {
+  try {
+    myCoupons.value = (await getMyCoupons(0)) || []
+  } catch (e) { myCoupons.value = [] }
+}
+
+const selectNoCoupon = () => {
+  selectedCouponId.value = null
+  calcDiscount.value = 0
+  calcPayable.value = null
+}
+
+const selectCoupon = async (c) => {
+  // 再次点击已选券 → 取消使用
+  if (selectedCouponId.value === c.userCouponId) {
+    selectedCouponId.value = null
+    calcDiscount.value = 0
+    calcPayable.value = null
+    return
+  }
+  try {
+    const calc = await calcCoupon({ userCouponId: c.userCouponId, orderAmount: orderAmount.value, categoryId: checkoutProduct.value?.categoryId })
+    selectedCouponId.value = c.userCouponId
+    calcDiscount.value = Number(calc.discountAmount)
+    calcPayable.value = Number(calc.payableAmount)
+  } catch (e) {
+    // 不满足门槛等：拦截器已提示，清空选择
+    selectedCouponId.value = null
+    calcDiscount.value = 0
+    calcPayable.value = null
+  }
+}
+
 onMounted(async () => {
   if (route.query.productId) {
     await initCheckout()
@@ -127,6 +206,7 @@ const initCheckout = async () => {
     addresses.value = await getAddresses()
     const def = addresses.value.find(a => a.isDefault === 1) || addresses.value[0]
     if (def) selectedAddressId.value = def.id
+    loadCoupons()
   } catch (e) { /* 拦截器已提示 */ }
 }
 
@@ -136,7 +216,9 @@ const submitOrder = async () => {
   }
   creating.value = true
   try {
-    const res = await createOrder({ productId: Number(route.query.productId), addressId: selectedAddressId.value })
+    const body = { productId: Number(route.query.productId), addressId: selectedAddressId.value }
+    if (selectedCouponId.value) body.userCouponId = selectedCouponId.value
+    const res = await createOrder(body)
     const orderId = res.orderId
     // 切到订单详情视图，并更新 URL，之后刷新页面也能直接打开
     checkoutProduct.value = null
@@ -196,5 +278,16 @@ const doCancel = async () => {
 .address-option.active { border-color: var(--c2c-primary); background: #fff7f3 }
 .address-line { font-size: 14px; color: var(--c2c-text) }
 .address-line.sub { font-size: 13px; color: #909399; margin-top: 4px }
+/* 结算选券 */
+.coupon-option { display: flex; align-items: center; gap: 10px; border: 1px solid #eef0f3; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; }
+.coupon-option:hover { border-color: var(--c2c-primary-light); }
+.coupon-option.active { border-color: var(--c2c-primary); background: #fff7f3; }
+.coupon-option-main { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.coupon-face-mini { font-weight: 800; color: var(--c2c-primary-dark); font-size: 15px; width: 64px; flex-shrink: 0; }
+.coupon-option-name { font-size: 14px; font-weight: 600; color: var(--c2c-text); }
+.coupon-option-threshold { font-size: 12px; color: var(--c2c-text-muted); }
+.coupon-option-cat { font-size: 12px; color: var(--c2c-primary-dark); }
+.coupon-option-label { font-size: 14px; color: var(--c2c-text-secondary); }
+.check-icon { color: var(--c2c-primary); }
 @media (max-width: 480px) { .steps-card { padding: 16px; } .info-card { padding: 14px; } .btn-primary, .btn-success, .btn-outline { height: 42px; font-size: 14px; } }
 </style>

@@ -13,6 +13,7 @@ import com.c2c.order.service.OrderNoticeService;
 import com.c2c.order.service.OrderService;
 import com.c2c.product.dto.ProductVO;
 import com.c2c.wallet.service.WalletService;
+import com.c2c.coupon.service.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +53,13 @@ public class OrderServiceImpl implements OrderService {
     private final UserDelegate userDelegate;
     private final OrderEventPublisher eventPublisher;
     private final WalletService walletService;
+    private final CouponService couponService;
     private final ObjectMapper objectMapper;
     private final OrderNoticeService orderNoticeService;
 
     @Override
     @Transactional
-    public Map<String, Object> create(Long productId, Long addressId, Long buyerId) {
+    public Map<String, Object> create(Long productId, Long addressId, Long userCouponId, Long buyerId) {
         synchronized (lockFor("product:" + productId)) {
             Map<String, Object> productResp = productDelegate.getProduct(productId, buyerId);
             @SuppressWarnings("unchecked")
@@ -86,6 +88,18 @@ public class OrderServiceImpl implements OrderService {
             String orderNo = generateOrderNo();
             BigDecimal price = new BigDecimal(product.get("price").toString());
             BigDecimal freight = new BigDecimal(product.getOrDefault("freightAmount", "0").toString());
+            BigDecimal orderAmount = price.add(freight);
+
+            // 选券抵扣：校验券归属/状态/门槛/分类，得到抵扣额；应付 = 商品价+运费 - 抵扣
+            BigDecimal discount = BigDecimal.ZERO;
+            Long couponId = null;
+            if (userCouponId != null) {
+                Long categoryId = product.get("categoryId") == null ? null : Long.valueOf(product.get("categoryId").toString());
+                Map<String, Object> calc = couponService.calculate(userCouponId, buyerId, orderAmount, categoryId);
+                discount = (BigDecimal) calc.get("discountAmount");
+                couponId = userCouponId;
+            }
+            BigDecimal payable = orderAmount.subtract(discount);
 
             Order order = new Order();
             order.setOrderNo(orderNo);
@@ -96,11 +110,18 @@ public class OrderServiceImpl implements OrderService {
             order.setProductImage(firstImageUrl(product.get("images")));
             order.setPrice(price);
             order.setFreightAmount(freight);
-            order.setTotalAmount(price.add(freight));
+            order.setCouponId(couponId);
+            order.setDiscountAmount(discount);
+            order.setTotalAmount(payable);
             order.setAddressId(addressId);
             order.setAddressSnapshot(buildAddressSnapshot(address));
             order.setStatus(0);
             orderMapper.insert(order);
+
+            // 选券则在待支付期间锁定券，防同一券被多单占用；占用失败整单回滚
+            if (couponId != null) {
+                couponService.reserve(couponId, order.getId(), buyerId);
+            }
 
             productDelegate.updateStatus(productId, ProductStatus.RESERVED.getCode());
             eventPublisher.publishOrderCreated(order.getId(), orderNo);
@@ -113,6 +134,7 @@ public class OrderServiceImpl implements OrderService {
             result.put("orderId", order.getId());
             result.put("orderNo", orderNo);
             result.put("totalAmount", order.getTotalAmount());
+            result.put("discountAmount", order.getDiscountAmount());
             result.put("status", 0);
             result.put("expireTime", LocalDateTime.now().plusMinutes(30).toString());
             return result;
@@ -139,7 +161,9 @@ public class OrderServiceImpl implements OrderService {
         if (status != null) {
             w.eq(Order::getStatus, status);
         }
-        return orderMapper.selectPage(new Page<>(page, size), w);
+        Page<Order> result = orderMapper.selectPage(new Page<>(page, size), w);
+        log.info("买家订单列表: buyerId={}, status={}, page={}, size={}, total={}", buyerId, status, page, size, result.getTotal());
+        return result;
     }
 
     @Override
@@ -150,7 +174,9 @@ public class OrderServiceImpl implements OrderService {
         if (status != null) {
             w.eq(Order::getStatus, status);
         }
-        return orderMapper.selectPage(new Page<>(page, size), w);
+        Page<Order> result = orderMapper.selectPage(new Page<>(page, size), w);
+        log.info("卖家订单列表: sellerId={}, status={}, page={}, size={}, total={}", sellerId, status, page, size, result.getTotal());
+        return result;
     }
 
     @Override
@@ -163,6 +189,11 @@ public class OrderServiceImpl implements OrderService {
             }
             if (order.getStatus() != 0) {
                 throw new BusinessException("当前订单状态不允许支付");
+            }
+
+            // 有券先锁定（原子置已使用，防同一券被多单占用）；失败则整单回滚，不扣款
+            if (order.getCouponId() != null) {
+                couponService.markUsed(order.getCouponId(), orderId, buyerId);
             }
 
             // 余额扣款，资金进入平台托管（escrow）；确认收货后打款卖家，取消则全额退款
@@ -266,6 +297,10 @@ public class OrderServiceImpl implements OrderService {
         if (needRefund) {
             walletService.refund(order.getBuyerId(), order.getEscrow(), orderId,
                     "订单退款 #" + order.getOrderNo());
+        }
+        // 取消订单释放已使用券（未支付券本就未锁定，方法内按状态兜底）
+        if (order.getCouponId() != null) {
+            couponService.releaseAfterCancel(order.getCouponId(), orderId);
         }
         // 未支付/已支付未发货的订单取消后，商品恢复在售
         productDelegate.updateStatus(order.getProductId(), ProductStatus.ON_SALE.getCode());

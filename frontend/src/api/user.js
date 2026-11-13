@@ -15,6 +15,9 @@ export const resetPassword = (data) => request.post('/user/reset-password', data
 // 绑定手机号
 export const bindPhone = (data) => request.post('/user/bind-phone', data)
 
+// 绑定/换绑邮箱
+export const bindEmail = (data) => request.post('/user/bind-email', data)
+
 // 退出
 export const logout = () => request.post('/user/logout')
 

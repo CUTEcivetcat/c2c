@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config'
 import { loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -23,8 +25,14 @@ export default defineConfig(({ mode }) => {
     }
   }
 
+  const isTest = process.env.VITEST === 'true'
+
   return {
-    plugins: [vue()],
+    plugins: [
+      vue(),
+      // element-plus 组件按需自动引入（模板中的 el-* 组件及其样式）；测试环境不挂，避免 resolver 注入 CSS 被 jsdom 解析失败
+      ...(isTest ? [] : [Components({ resolvers: [ElementPlusResolver()] })])
+    ],
     test: {
       environment: 'jsdom',
       globals: true,
@@ -46,12 +54,15 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
+      // element-plus 为全量引入（含全部图标），单块客观体积较大；按需引入需接 unplugin-vue-components，列为后续瘦身项
+      chunkSizeWarningLimit: 1100,
       rollupOptions: {
         output: {
           // 大依赖独立分包，提升首屏加载与缓存命中
-          manualChunks: {
-            'element-plus': ['element-plus'],
-            vendor: ['vue', 'vue-router', 'pinia', 'axios']
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return
+            if (id.includes('@element-plus/icons-vue')) return 'icons'
+            if (/[\\/]node_modules[\\/](vue|vue-router|pinia|axios)[\\/]/.test(id)) return 'vendor'
           }
         }
       }

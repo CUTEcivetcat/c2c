@@ -13,7 +13,7 @@
       <el-table :data="products" stripe>
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column label="封面" width="60"><template #default="{row}">
-          <product-cover :src="row.images?.[0]?.url" style="width:44px;height:44px;border-radius:8px" />
+          <product-cover :src="row.images?.[0]?.thumbUrl || row.images?.[0]?.url" style="width:44px;height:44px;border-radius:8px" />
         </template></el-table-column>
         <el-table-column prop="title" label="标题" min-width="200"><template #default="{row}"><router-link :to="`/product/${row.id}`" target="_blank" style="color:#2d3436;font-weight:600">{{ row.title }}</router-link></template></el-table-column>
         <el-table-column prop="price" label="价格" width="100"><template #default="{row}">¥{{ row.price }}</template></el-table-column>

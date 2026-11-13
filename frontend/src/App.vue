@@ -18,6 +18,12 @@
       <el-icon :size="22"><Top /></el-icon>
     </div>
 
+    <!-- 全局悬浮 AI 客服入口（聊天全屏页隐藏） -->
+    <chat-widget v-if="showWidget" />
+
+    <!-- 全局登录弹窗（未登录操作就地弹出，蒙版遮罩当前页） -->
+    <login-dialog />
+
     <!-- 强制公告弹窗（登录后弹出，最低停留秒数内不可关闭） -->
     <el-dialog v-model="forceDialog" :show-close="false" width="460px" class="force-dialog"
       :close-on-click-modal="false" :close-on-press-escape="false" align-center
@@ -50,6 +56,8 @@ import { useUserStore } from '@/stores/userStore'
 import { getAnnouncementForce } from '@/api/announcement'
 import AppHeader from './components/layout/AppHeader.vue'
 import AppFooter from './components/layout/AppFooter.vue'
+import ChatWidget from './components/chat/ChatWidget.vue'
+import LoginDialog from './components/layout/LoginDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -118,9 +126,11 @@ watch(() => store.isLoggedIn(), async (loggedIn) => {
 onUnmounted(() => { if (countdownTimer) clearInterval(countdownTimer) })
 
 // 隐藏头尾的页面
-const hideLayoutPages = ['Chat']
+const hideLayoutPages = ['Chat', 'ChatList']
 const showHeader = computed(() => !hideLayoutPages.includes(route.name))
 const showFooter = computed(() => !hideLayoutPages.includes(route.name))
+// 悬浮客服窗：聊天全屏页与消息列表页不重复展示
+const showWidget = computed(() => !hideLayoutPages.includes(route.name))
 const mainClass = computed(() => ({
   'has-header': showHeader.value,
   'chat-page': route.name === 'Chat'

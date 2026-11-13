@@ -53,7 +53,7 @@ public class ProductVO {
     /** 成色文本描述 */
     private String conditionText;
 
-    /** 商品状态（如 0=待审核，1=在售，2=已下架，3=审核驳回，4=已售出） */
+    /** 商品状态：1 在售 / 2 已预订 / 3 已售 / 4 已下架 / 5 违规下架 */
     private Integer status;
 
     /** 状态文本描述 */
@@ -104,6 +104,9 @@ public class ProductVO {
 
         /** 图片URL */
         private String url;
+
+        /** 400px 缩略图地址（为空时前端回退 url） */
+        private String thumbUrl;
 
         /** 是否为封面图 */
         private Boolean isCover;

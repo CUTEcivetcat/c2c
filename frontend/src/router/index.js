@@ -74,6 +74,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/profile/edit',
+    name: 'ProfileEdit',
+    component: () => import('@/views/ProfileEditView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/user/:id',
     name: 'UserProfile',
     component: () => import('@/views/UserProfileView.vue')
@@ -129,6 +135,12 @@ const routes = [
     path: '/wallet',
     name: 'Wallet',
     component: () => import('@/views/WalletView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/coupon/my',
+    name: 'CouponMy',
+    component: () => import('@/views/CouponMyView.vue'),
     meta: { requiresAuth: true }
   },
   {

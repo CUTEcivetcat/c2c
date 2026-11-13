@@ -22,6 +22,9 @@ public class ProductImage {
     /** 图片访问 URL */
     private String url;
 
+    /** 400px 缩略图地址（老数据为空时回退原图 url） */
+    private String thumbUrl;
+
     /** 排序权重（越小越靠前） */
     private Integer sortOrder;
 

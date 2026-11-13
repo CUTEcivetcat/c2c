@@ -100,9 +100,9 @@ a { color: $primary; text-decoration: none; transition: $transition;
 
 // ====== 页面容器 ======
 .page-container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: 24px 24px 60px;
 }
 
 // ====== 商品网格 ======
@@ -308,7 +308,6 @@ a { color: $primary; text-decoration: none; transition: $transition;
 
 // ===== 超大屏 (≥1400px) =====
 @media (min-width: 1400px) {
-  .page-container { max-width: 1300px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
 }
 

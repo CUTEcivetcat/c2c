@@ -33,7 +33,7 @@ public class WechatService {
     private boolean mock;
 
     /** 安全闸：生产环境禁止开启 mock（否则可伪造任意 openid 登录） */
-    @javax.annotation.PostConstruct
+    @jakarta.annotation.PostConstruct
     void checkMockGate() {
         String profiles = environment.getProperty("spring.profiles.active", "");
         if (mock && profiles.contains("prod")) {

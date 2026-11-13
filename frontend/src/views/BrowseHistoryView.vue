@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" style="max-width:700px">
+  <div class="page-container" style="max-width:1000px">
     <page-back-bar title="最近浏览" />
     <div class="history-head" v-if="list.length">
       <span style="font-size:13px;color:var(--c2c-text-muted)">共 {{ list.length }} 件</span>
@@ -7,7 +7,7 @@
     </div>
     <div v-loading="loading" class="history-list">
       <div v-for="p in list" :key="p.id" class="history-card" @click="$router.push(`/product/${p.id}`)">
-        <product-cover :src="p.images?.[0]?.url" :title="p.title" class="hc-cover" />
+        <product-cover :src="p.images?.[0]?.thumbUrl || p.images?.[0]?.url" :title="p.title" class="hc-cover" />
         <div class="hc-main">
           <div class="hc-title">{{ p.title }}</div>
           <div class="hc-sub">

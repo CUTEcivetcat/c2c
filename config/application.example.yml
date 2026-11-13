@@ -24,11 +24,12 @@ spring:
     url: jdbc:mysql://YOUR_DB_HOST:YOUR_DB_PORT/YOUR_DB_NAME?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: YOUR_DB_USER
     password: YOUR_DB_PASSWORD
-  redis:
-    # Redis：主机、端口、密码换成你的
-    host: YOUR_REDIS_HOST
-    port: YOUR_REDIS_PORT
-    password: YOUR_REDIS_PASSWORD
+  data:
+    redis:
+      # Redis：主机、端口、密码换成你的
+      host: YOUR_REDIS_HOST
+      port: YOUR_REDIS_PORT
+      password: YOUR_REDIS_PASSWORD
   mail:
     # SMTP 邮箱配置（用于发送验证码邮件），QQ 邮箱示例：
     # host=smtp.qq.com, port=587, username=你的QQ邮箱, password=授权码（非登录密码）

@@ -5,6 +5,7 @@ import com.c2c.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,20 @@ public class UserDelegate {
             data.put("reputationScore", user.getReputationScore());
         }
         return ok(data);
+    }
+
+    /** 批量获取卖家公开信息，返回 userId -> 信息Map，供列表一次性装配避免 N+1。 */
+    public Map<Long, Map<String, Object>> getPublicInfoMap(Collection<Long> userIds) {
+        Map<Long, UserVO> users = userService.listPublicInfoByIds(userIds);
+        Map<Long, Map<String, Object>> out = new HashMap<>();
+        users.forEach((id, user) -> {
+            Map<String, Object> data = new HashMap<>();
+            data.put("nickname", user.getNickname());
+            data.put("avatarUrl", user.getAvatarUrl());
+            data.put("reputationScore", user.getReputationScore());
+            out.put(id, data);
+        });
+        return out;
     }
 
     /** 构造统一成功响应。 */

@@ -31,6 +31,28 @@
           </span>
         </div>
 
+        <!-- 优惠券活动栏（游客可见可领券；领取需登录，弹窗完成） -->
+        <div class="coupon-banner" v-if="bannerCoupons.length">
+          <div class="banner-head">
+            <el-icon><Ticket /></el-icon>
+            <span class="coupon-title">优惠活动</span>
+          </div>
+          <div class="banner-tags">
+            <div v-for="c in bannerCoupons" :key="c.key" class="banner-tag" :class="{ owned: c.owned }">
+              <div class="tag-main">
+                <strong>{{ couponFaceText(c) }}</strong>
+                <span class="tag-threshold">{{ couponThresholdText(c) }}</span>
+                <span class="tag-cat">{{ couponCategoryText(c) }}</span>
+              </div>
+              <button v-if="!c.owned" class="tag-claim" :disabled="claiming === c.couponId" @click.prevent="claimOne(c)">
+                {{ claiming === c.couponId ? '领取中' : '领取' }}
+              </button>
+              <em v-else class="tag-state">已持有</em>
+            </div>
+          </div>
+          <router-link v-if="store.isLoggedIn()" to="/coupon/my" class="banner-more">我的券 ›</router-link>
+        </div>
+
         <!-- 属性 -->
         <div class="detail-attrs">
           <div class="attr-item">
@@ -168,7 +190,7 @@
       <h2 class="section-title">猜你喜欢</h2>
       <div class="similar-grid">
         <div v-for="p in similar" :key="p.id" class="similar-card" @click="$router.push(`/product/${p.id}`)">
-          <product-cover :src="p.images?.[0]?.url" :title="p.title" class="similar-img" />
+          <product-cover :src="p.images?.[0]?.thumbUrl || p.images?.[0]?.url" :title="p.title" class="similar-img" />
           <div class="similar-info">
             <div class="similar-title">{{ p.title }}</div>
             <div class="similar-price">¥{{ p.price }}</div>
@@ -238,19 +260,29 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+import { useCouponStore } from '@/stores/couponStore'
 import { getProductDetail, getComments, addComment, deleteComment, createIntent, searchProducts } from '@/api/product'
 import { recordBrowse } from '@/utils/browseHistory'
 import { addFavorite, removeFavorite, checkFavorite } from '@/api/favorite'
 import { getOrCreateConversation } from '@/api/im'
 import { createReport, createAppeal } from '@/api/review'
+import { claimCoupon } from '@/api/coupon'
+import { couponFaceText, couponThresholdText, couponCategoryText } from '@/utils/coupon'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
 const store = useUserStore()
+const couponStore = useCouponStore()
 const product = ref(null)
 const activeImage = ref('')
 const isFav = ref(false)
+
+// 券活动栏：已持有未用券 + 可领券（登录后拉取，无券不展示）
+const ownedCoupons = ref([])
+const claimableCoupons = ref([])
+const claiming = ref(null)
+const bannerCoupons = computed(() => [...ownedCoupons.value, ...claimableCoupons.value].slice(0, 4))
 
 // 评论
 const comments = ref([])
@@ -308,9 +340,46 @@ onMounted(async () => {
   if (store.isLoggedIn()) {
     try { const r = await checkFavorite(route.params.id); isFav.value = r.isFavorited } catch (e) { /* */ }
   }
+  loadCouponBanner()
   loadComments()
   loadSimilar()
 })
+
+// 券活动栏：我的未用券优先，其次可领未领券；按当前商品分类祖先链过滤；游客也可看可领券；失败内部消化，不阻塞详情
+const loadCouponBanner = async () => {
+  try {
+    const categoryId = product.value?.categoryId
+    await couponStore.ensureCategories()
+    const mineP = store.isLoggedIn() ? couponStore.fetchMine().catch(() => []) : Promise.resolve([])
+    const [mine, avail] = await Promise.all([
+      mineP,
+      couponStore.fetchAvailable(categoryId).catch(() => [])
+    ])
+    ownedCoupons.value = (mine || []).filter(c => couponStore.isApplicable(c.categoryId, categoryId))
+      .map(c => ({ ...c, key: 'own-' + c.userCouponId, owned: true }))
+    claimableCoupons.value = (avail || [])
+      .filter(c => !c.claimed && c.remaining > 0)
+      .map(c => ({ ...c, key: 'avail-' + c.couponId, owned: false }))
+  } catch (e) { /* 拦截器已提示 */ }
+}
+
+// 活动栏直接领取：未登录先弹登录窗，登录成功后刷新券栏；成功后移入已持有列表
+const claimOne = async (c) => {
+  if (!store.isLoggedIn()) {
+    store.openLoginDialog(() => loadCouponBanner())
+    return
+  }
+  claiming.value = c.couponId
+  try {
+    await claimCoupon(c.couponId)
+    ElMessage.success('领取成功，可在「我的优惠券」查看')
+    couponStore.invalidate()
+    claimableCoupons.value = claimableCoupons.value.filter(x => x.couponId !== c.couponId)
+    ownedCoupons.value.unshift({ ...c, key: 'own-' + c.couponId, owned: true })
+  } catch (e) { /* 拦截器已提示 */ } finally {
+    claiming.value = null
+  }
+}
 
 // 猜你喜欢：同分类在售商品，排除当前
 const similar = ref([])
@@ -466,6 +535,8 @@ const contactSeller = async () => {
   .detail-original { font-size: 12px; }
   .detail-attrs { grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; }
   .detail-actions { gap: 8px; }
+  .coupon-banner { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .banner-more { width: 100%; text-align: right; }
   .action-buy, .action-chat { height: 44px; font-size: 14px; border-radius: 12px; }
   .action-fav { width: 44px; height: 44px; }
   .thumb { width: 50px; height: 50px; }
@@ -507,6 +578,36 @@ const contactSeller = async () => {
   font-size: 12px; font-weight: 700; color: #fff;
   background: var(--c2c-danger); padding: 3px 10px; border-radius: 10px;
 }
+
+/* 优惠券活动栏 */
+.coupon-banner {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #fff5f0, #fff);
+  border: 1px solid #ffe3d6; border-radius: 14px;
+  padding: 12px 16px; margin-bottom: 20px;
+}
+.banner-head { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.banner-head .el-icon { color: var(--c2c-primary); }
+.coupon-title { font-size: 14px; font-weight: 700; color: var(--c2c-text); }
+.banner-tags { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.banner-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid var(--c2c-primary-light);
+  border-radius: 10px; padding: 6px 10px; font-size: 12px;
+}
+.tag-main { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.banner-tag strong { color: var(--c2c-danger); font-size: 15px; }
+.tag-threshold { color: var(--c2c-text-secondary); }
+.tag-cat { color: var(--c2c-text-muted); }
+.tag-state { font-style: normal; color: var(--c2c-primary); font-weight: 600; }
+.tag-claim {
+  flex-shrink: 0; border: none; cursor: pointer;
+  background: var(--c2c-primary); color: #fff;
+  font-size: 12px; font-weight: 600; border-radius: 8px; padding: 3px 10px;
+}
+.tag-claim:disabled { opacity: 0.6; cursor: default; }
+.banner-tag.owned { border-color: var(--c2c-line-soft); }
+.banner-more { flex-shrink: 0; font-size: 13px; color: var(--c2c-primary); text-decoration: none; font-weight: 600; }
 
 /* 属性 */
 .detail-attrs {
@@ -610,7 +711,7 @@ const contactSeller = async () => {
 .comment-empty { text-align: center; color: var(--c2c-text-muted); padding: 32px; font-size: 14px; }
 
 /* 猜你喜欢 */
-.similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
 @media (max-width: 768px) { .similar-grid { grid-template-columns: repeat(2, 1fr); } }
 .similar-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--c2c-line-soft); cursor: pointer; transition: all 0.25s; }
 .similar-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }

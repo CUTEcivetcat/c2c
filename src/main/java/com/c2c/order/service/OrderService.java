@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public interface OrderService {
 
-    /** 创建订单（校验商品与收货地址、锁定商品并发布订单事件） */
-    Map<String, Object> create(Long productId, Long addressId, Long buyerId);
+    /** 创建订单（校验商品与收货地址、锁定商品并发布订单事件；可携带用户券抵扣） */
+    Map<String, Object> create(Long productId, Long addressId, Long userCouponId, Long buyerId);
 
     /** 查询订单详情（买家或卖家均可查看） */
     Order getDetail(Long orderId, Long userId);

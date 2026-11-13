@@ -52,7 +52,7 @@ onMounted(load)
 </script>
 
 <style scoped>
-.page-container { max-width: 800px; margin: 0 auto; padding: 16px; }
+.page-container { max-width: 1000px; margin: 0 auto; padding: 16px; }
 .announcement-list { display: flex; flex-direction: column; gap: 12px; }
 .ann-card { border-radius: 14px; }
 .ann-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

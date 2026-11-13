@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container">
+  <div class="page-container" style="max-width:1000px">
     <page-back-bar title="我的意向" />
     <el-tabs v-model="tab" style="margin-top:8px" @tab-change="load">
       <el-tab-pane :label="`我想要的（${myTotal}）`" name="buyer">

@@ -29,6 +29,10 @@ public final class AdminPerm {
     public static final String PERMISSIONS = "permissions";
     /** 安全设置（设置二级密码为管理员基础能力；次级管理员管理仅总管理员） */
     public static final String SECURITY = "security";
+    /** AI 助手知识库（FAQ 维护） */
+    public static final String AI = "ai";
+    /** 优惠券发放管理 */
+    public static final String COUPON = "coupon";
 
     /** 全部权限（admin_level=2 时恒有） */
     public static final String ALL = "*";
@@ -36,7 +40,7 @@ public final class AdminPerm {
     /** 全部可分配权限码（总管理员给次级/子级管理员勾选） */
     public static final String[] ASSIGNABLE = {
             DASHBOARD, USERS, PRODUCTS, ORDERS, REVIEW,
-            ANNOUNCEMENT, BANNER, PERMISSIONS, SECURITY
+            ANNOUNCEMENT, BANNER, PERMISSIONS, SECURITY, AI, COUPON
     };
 
     private AdminPerm() {

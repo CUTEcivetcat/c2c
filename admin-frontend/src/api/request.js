@@ -95,5 +95,22 @@ export const adminApi = {
   getBanners: () => request.get('/admin/banner/list'),
   createBanner: (data) => request.post('/admin/banner', data),
   updateBanner: (id, data) => request.put(`/admin/banner/${id}`, data),
-  deleteBanner: (id) => request.delete(`/admin/banner/${id}`)
+  deleteBanner: (id) => request.delete(`/admin/banner/${id}`),
+  // FAQ 知识库管理（AI 助手规则问答）
+  getFaqs: (params) => request.get('/admin/faq/list', { params }),
+  createFaq: (data) => request.post('/admin/faq', data),
+  updateFaq: (id, data) => request.put(`/admin/faq/${id}`, data),
+  toggleFaqStatus: (id, status) => request.put(`/admin/faq/${id}/status`, { status }),
+  deleteFaq: (id) => request.delete(`/admin/faq/${id}`),
+  // AI 客服对话看板
+  getAiChatLogs: (params) => request.get('/admin/ai/chat/list', { params }),
+  getAiChatStats: () => request.get('/admin/ai/chat/stats'),
+  exportAiChatLogs: (params) => request.get('/admin/ai/chat/export', { params }),
+  // 优惠券管理
+  getCoupons: (params) => request.get('/admin/coupon/list', { params }),
+  getCategoryTree: () => request.get('/product/category'),
+  createCoupon: (data) => request.post('/admin/coupon', data),
+  updateCoupon: (id, data) => request.put(`/admin/coupon/${id}`, data),
+  toggleCouponStatus: (id, status) => request.put(`/admin/coupon/${id}/status`, { status }),
+  deleteCoupon: (id) => request.delete(`/admin/coupon/${id}`)
 }

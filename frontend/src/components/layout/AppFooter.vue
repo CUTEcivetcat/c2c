@@ -27,7 +27,7 @@
   margin-top: auto;
 }
 .footer-inner {
-  max-width: 1200px; margin: 0 auto;
+  max-width: 1600px; margin: 0 auto;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 .footer-brand { display: flex; align-items: center; gap: 10px; }

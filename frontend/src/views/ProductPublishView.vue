@@ -195,7 +195,6 @@ const submit = async () => {
 </script>
 
 <style scoped>
-.publish-page { max-width: 960px; }
 .publish-layout { display: flex; gap: 20px; align-items: flex-start; }
 .publish-left { flex: 1; min-width: 0; }
 .publish-card { background: #fff; border-radius: 20px; padding: 32px; border: 1px solid var(--c2c-line-soft); }

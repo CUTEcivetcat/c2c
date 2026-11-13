@@ -86,24 +86,45 @@ class TestEnv {
         throw new IllegalStateException("未找到 config/application-pro.yml（请在项目根目录运行测试）");
     }
 
-    /** 极简 YAML 节解析：只取 spring 下二级节（datasource/redis/mail）的 key: value */
+    /** 极简 YAML 节解析：取 spring 下二级节（datasource/mail）与 data.redis 嵌套节的 key: value */
     private static Map<String, Map<String, String>> parseYamlSections(Path cfg) {
         try {
             Map<String, Map<String, String>> sections = new LinkedHashMap<>();
             String current = null;
+            boolean inData = false;
             for (String raw : Files.readAllLines(cfg, StandardCharsets.UTF_8)) {
                 String line = raw.replace("\t", "    ");
-                // 二级节：两个空格的 key:
-                Matcher sec = Pattern.compile("^  (\\w+):\\s*$").matcher(line);
-                if (sec.matches()) {
-                    current = sec.group(1);
+                if (line.trim().startsWith("#")) {
+                    continue;
+                }
+                // 二级节：两个空格的 key:（datasource / mail / data）
+                Matcher sec2 = Pattern.compile("^  (\\w+):\\s*$").matcher(line);
+                if (sec2.matches()) {
+                    String name = sec2.group(1);
+                    inData = "data".equals(name);
+                    current = inData ? null : name;
+                    if (current != null) {
+                        sections.putIfAbsent(current, new LinkedHashMap<>());
+                    }
+                    continue;
+                }
+                // 三级节：data 下的 redis:（Spring Boot 3 起 Redis 配置在 spring.data.redis）
+                Matcher sec3 = Pattern.compile("^    (\\w+):\\s*$").matcher(line);
+                if (sec3.matches() && inData) {
+                    current = sec3.group(1);
                     sections.putIfAbsent(current, new LinkedHashMap<>());
                     continue;
                 }
-                // 三级键：四个空格的 key: value
-                Matcher kv = Pattern.compile("^    (\\w+):\\s*(.+)$").matcher(line);
-                if (kv.matches() && current != null && !line.trim().startsWith("#")) {
-                    sections.get(current).put(kv.group(1), kv.group(2).trim());
+                // 三级键：四个空格的 key: value（datasource / mail 下）
+                Matcher kv3 = Pattern.compile("^    (\\w+):\\s*(.+)$").matcher(line);
+                if (kv3.matches() && current != null && !inData) {
+                    sections.get(current).put(kv3.group(1), kv3.group(2).trim());
+                    continue;
+                }
+                // 四级键：六个空格的 key: value（data.redis 下）
+                Matcher kv4 = Pattern.compile("^      (\\w+):\\s*(.+)$").matcher(line);
+                if (kv4.matches() && current != null) {
+                    sections.get(current).put(kv4.group(1), kv4.group(2).trim());
                 }
             }
             return sections;
@@ -118,8 +139,8 @@ class TestEnv {
             return "";
         }
         Matcher m = PLACEHOLDER.matcher(value);
-        // 注意：Matcher.appendReplacement/Tail 的 StringBuilder 重载是 Java 9+ API，
-        // 项目兼容 JDK8，此处必须用 StringBuffer
+        // Matcher.appendReplacement/Tail 的 StringBuilder 重载是 Java 9+ API，
+        // 沿用 StringBuffer 写法以保持兼容；JDK17 下 StringBuffer 仍可用
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String env = System.getenv(m.group(1));

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" style="max-width:600px">
+  <div class="page-container" style="max-width:880px">
     <page-back-bar title="我的钱包" />
     <!-- 余额卡片 -->
     <div class="balance-card">

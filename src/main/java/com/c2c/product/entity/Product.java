@@ -39,7 +39,7 @@ public class Product {
     @TableField("`condition`")
     private Integer condition;
 
-    /** 状态：1 在售 / 2 已预订 / 3 已售 / 4 下架 / 5 违规下架 */
+    /** 状态：1 在售 / 2 已预订 / 3 已售 / 4 已下架 / 5 违规下架 */
     @TableField("`status`")
     private Integer status;
 

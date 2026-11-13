@@ -10,6 +10,7 @@ import com.c2c.order.mq.OrderEventPublisher;
 import com.c2c.order.service.OrderNoticeService;
 import com.c2c.order.service.impl.OrderServiceImpl;
 import com.c2c.wallet.service.WalletService;
+import com.c2c.coupon.service.CouponService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,6 +44,8 @@ class OrderServiceImplTest {
     private OrderNoticeService orderNoticeService;
     @Mock
     private WalletService walletService;
+    @Mock
+    private CouponService couponService;
     @Mock
     private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 

@@ -68,3 +68,8 @@ blog/.env.local
 openapi.json
 .DS_Store
 Thumbs.db
+
+# ===== JMeter 压测运行产物（jmx 脚本与 README 入库，结果产物本地保留）=====
+jmeter/result/*.jtl
+jmeter/result/*.csv
+jmeter/result/report/

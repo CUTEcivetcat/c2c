@@ -1,7 +1,10 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
+import { ElLoading } from 'element-plus'
+// 命令式组件样式按需手动引入（模板 el-* 组件由 unplugin 自动按需）
+import 'element-plus/es/components/message/style/css'
+import 'element-plus/es/components/message-box/style/css'
+import 'element-plus/es/components/loading/style/css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
@@ -35,5 +38,6 @@ app.component('LoadingSpinner', LoadingSpinner)
 
 app.use(createPinia())
 app.use(router)
-app.use(ElementPlus)
+// 注册 v-loading 指令（ElMessage/ElMessageBox 为直接调用，无需全局注册）
+app.use(ElLoading)
 app.mount('#app')

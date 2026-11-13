@@ -30,6 +30,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -285,6 +286,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void bindPhone(Long userId, String phone, String smsCode) {
+        if (StrUtil.isBlank(phone) || !phone.matches("^1[3-9]\\d{9}$")) {
+            throw new BusinessException("手机号格式不正确");
+        }
         String codeKey = "sms:code:" + phone;
         String cachedCode = redisTemplate.opsForValue().get(codeKey);
         if (StrUtil.isBlank(cachedCode)) {
@@ -294,7 +298,9 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(1002, "验证码错误");
         }
 
-        Long count = userMapper.selectCount(new LambdaQueryWrapper<User>().eq(User::getPhone, phone));
+        // 占用查询排除自身，换绑成当前手机号不误报
+        Long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
+                .eq(User::getPhone, phone).ne(User::getId, userId));
         if (count > 0) {
             throw new BusinessException("该手机号已被绑定");
         }
@@ -327,6 +333,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
+        log.info("查看个人资料: userId={}, nickname={}", userId, user.getNickname());
         return toUserVO(user);
     }
 
@@ -382,6 +389,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
+        log.info("查看他人资料: userId={}, nickname={}", userId, user.getNickname());
         return UserVO.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
@@ -390,6 +398,19 @@ public class UserServiceImpl implements UserService {
                 .reputationScore(user.getReputationScore())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public Map<Long, UserVO> listPublicInfoByIds(java.util.Collection<Long> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Map.of();
+        }
+        List<User> users = userMapper.selectBatchIds(userIds);
+        Map<Long, UserVO> map = new HashMap<>();
+        for (User u : users) {
+            map.put(u.getId(), toUserVO(u));
+        }
+        return map;
     }
 
     private User findUserByAccount(String account) {

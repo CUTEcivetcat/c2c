@@ -17,6 +17,7 @@ import com.c2c.product.delegate.UserDelegate;
 import com.c2c.product.mapper.CategoryMapper;
 import com.c2c.product.mapper.ProductImageMapper;
 import com.c2c.product.mapper.ProductMapper;
+import com.c2c.product.service.FileStorageService;
 import com.c2c.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageMapper imageMapper;
     private final CategoryMapper categoryMapper;
     private final UserDelegate userDelegate;
+    private final FileStorageService fileStorageService;
     private final StringRedisTemplate redisTemplate;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
@@ -67,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
                 ProductImage image = new ProductImage();
                 image.setProductId(product.getId());
                 image.setUrl(dto.getImages().get(i));
+                image.setThumbUrl(fileStorageService.ensureThumbForUrl(dto.getImages().get(i)));
                 image.setSortOrder(i);
                 image.setIsCover(i == 0 ? 1 : 0);
                 imageMapper.insert(image);
@@ -87,16 +90,35 @@ public class ProductServiceImpl implements ProductService {
         BeanUtil.copyProperties(dto, product, "images");
         productMapper.updateById(product);
 
-        // 更新图片（先删后增）
-        imageMapper.delete(new LambdaQueryWrapper<ProductImage>().eq(ProductImage::getProductId, productId));
-        if (dto.getImages() != null && !dto.getImages().isEmpty()) {
-            for (int i = 0; i < dto.getImages().size(); i++) {
+        // 更新图片（先增后删：先落新图记录，再清理被替换的旧记录，避免中间态丢图；物理文件不在此主动清理）
+        List<ProductImage> oldImages = imageMapper.selectList(
+                new LambdaQueryWrapper<ProductImage>().eq(ProductImage::getProductId, productId));
+        List<String> newUrls = dto.getImages() == null ? Collections.emptyList() : dto.getImages();
+        Map<String, ProductImage> oldByUrl = oldImages.stream()
+                .collect(Collectors.toMap(ProductImage::getUrl, img -> img, (a, b) -> a));
+
+        for (int i = 0; i < newUrls.size(); i++) {
+            String url = newUrls.get(i);
+            ProductImage exist = oldByUrl.get(url);
+            if (exist == null) {
                 ProductImage image = new ProductImage();
                 image.setProductId(productId);
-                image.setUrl(dto.getImages().get(i));
+                image.setUrl(url);
+                image.setThumbUrl(fileStorageService.ensureThumbForUrl(url));
                 image.setSortOrder(i);
                 image.setIsCover(i == 0 ? 1 : 0);
                 imageMapper.insert(image);
+            } else {
+                // 保留的旧图按新顺序/封面位更新
+                exist.setSortOrder(i);
+                exist.setIsCover(i == 0 ? 1 : 0);
+                imageMapper.updateById(exist);
+            }
+        }
+        // 删除不再保留的旧图记录
+        for (ProductImage old : oldImages) {
+            if (!newUrls.contains(old.getUrl())) {
+                imageMapper.deleteById(old.getId());
             }
         }
         // 清除缓存
@@ -166,7 +188,9 @@ public class ProductServiceImpl implements ProductService {
         if (!cached.isEmpty()) {
             Product product = BeanUtil.toBeanIgnoreError(cached, Product.class);
             redisTemplate.opsForZSet().incrementScore("product:hot", String.valueOf(productId), 1);
-            return buildVO(product, currentUserId);
+            ProductVO vo = buildVO(product, currentUserId);
+            log.info("商品详情: id={}, title={}, price={}, sellerId={}", product.getId(), product.getTitle(), product.getPrice(), product.getSellerId());
+            return vo;
         }
 
         Product product = productMapper.selectById(productId);
@@ -187,7 +211,9 @@ public class ProductServiceImpl implements ProductService {
         });
         redisTemplate.expire(cacheKey, 1, TimeUnit.HOURS);
 
-        return buildVO(product, currentUserId);
+        ProductVO vo = buildVO(product, currentUserId);
+        log.info("商品详情: id={}, title={}, price={}, sellerId={}", product.getId(), product.getTitle(), product.getPrice(), product.getSellerId());
+        return vo;
     }
 
     @Override
@@ -250,9 +276,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> result = productMapper.selectPage(new Page<>(page, size), wrapper);
 
         Page<ProductVO> voPage = new Page<>(page, size, result.getTotal());
-        voPage.setRecords(result.getRecords().stream()
-                .map(p -> buildVO(p, null))
-                .collect(Collectors.toList()));
+        voPage.setRecords(buildVOList(result.getRecords(), null));
 
         // 写入首页缓存
         if (cacheKey != null) {
@@ -265,6 +289,8 @@ public class ProductServiceImpl implements ProductService {
                 // 缓存失败不影响查询结果
             }
         }
+        log.info("商品列表: keyword={}, categoryId={}, condition={}, page={}, size={}, total={}, rows={}",
+                keyword, categoryId, condition, page, size, voPage.getTotal(), voPage.getRecords().size());
         return voPage;
     }
 
@@ -276,9 +302,7 @@ public class ProductServiceImpl implements ProductService {
                         .orderByDesc(Product::getCreatedAt));
 
         Page<ProductVO> voPage = new Page<>(page, size, result.getTotal());
-        voPage.setRecords(result.getRecords().stream()
-                .map(p -> buildVO(p, null))
-                .collect(Collectors.toList()));
+        voPage.setRecords(buildVOList(result.getRecords(), null));
         return voPage;
     }
 
@@ -291,9 +315,7 @@ public class ProductServiceImpl implements ProductService {
                         .orderByDesc(Product::getCreatedAt));
 
         Page<ProductVO> voPage = new Page<>(page, size, result.getTotal());
-        voPage.setRecords(result.getRecords().stream()
-                .map(p -> buildVO(p, null))
-                .collect(Collectors.toList()));
+        voPage.setRecords(buildVOList(result.getRecords(), null));
         return voPage;
     }
 
@@ -318,11 +340,11 @@ public class ProductServiceImpl implements ProductService {
         }
         java.util.Map<Long, Product> map = productMapper.selectBatchIds(idList).stream()
                 .collect(java.util.stream.Collectors.toMap(Product::getId, p -> p));
-        return idList.stream()
+        List<Product> ordered = idList.stream()
                 .filter(map::containsKey)
                 .map(map::get)
-                .map(p -> buildVO(p, null))
                 .collect(Collectors.toList());
+        return buildVOList(ordered, null);
     }
 
     // ========== 私有方法 ==========
@@ -338,33 +360,59 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private ProductVO buildVO(Product product, Long currentUserId) {
-        // 获取图片
-        List<ProductImage> images = imageMapper.selectList(
-                new LambdaQueryWrapper<ProductImage>()
-                        .eq(ProductImage::getProductId, product.getId())
-                        .orderByAsc(ProductImage::getSortOrder));
+    /** 批量装配 VO：图片 / 卖家 / 分类各一次查询，消除列表 N+1。 */
+    private List<ProductVO> buildVOList(List<Product> products, Long currentUserId) {
+        if (products == null || products.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> productIds = products.stream().map(Product::getId).collect(Collectors.toList());
+        List<Long> sellerIds = products.stream().map(Product::getSellerId)
+                .filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        List<Long> catIds = products.stream().map(Product::getCategoryId)
+                .filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
-        // 获取卖家信息
+        Map<Long, List<ProductImage>> imageMap = imageMapper.selectList(
+                        new LambdaQueryWrapper<ProductImage>().in(ProductImage::getProductId, productIds))
+                .stream().collect(Collectors.groupingBy(ProductImage::getProductId));
+        imageMap.values().forEach(list -> list.sort(
+                Comparator.comparing(ProductImage::getSortOrder,
+                        Comparator.nullsLast(Comparator.naturalOrder()))));
+
+        Map<Long, Map<String, Object>> sellerMap = sellerIds.isEmpty()
+                ? Collections.emptyMap() : userDelegate.getPublicInfoMap(sellerIds);
+
+        Map<Long, String> categoryMap = catIds.isEmpty()
+                ? Collections.emptyMap()
+                : categoryMapper.selectBatchIds(catIds).stream()
+                        .collect(Collectors.toMap(Category::getId, Category::getName, (a, b) -> a));
+
+        return products.stream()
+                .map(p -> buildVO(p, currentUserId, imageMap, sellerMap, categoryMap))
+                .collect(Collectors.toList());
+    }
+
+    private ProductVO buildVO(Product product, Long currentUserId) {
+        return buildVOList(Collections.singletonList(product), currentUserId).get(0);
+    }
+
+    private ProductVO buildVO(Product product, Long currentUserId,
+                              Map<Long, List<ProductImage>> imageMap,
+                              Map<Long, Map<String, Object>> sellerMap,
+                              Map<Long, String> categoryMap) {
+        List<ProductImage> images = imageMap.getOrDefault(product.getId(), Collections.emptyList());
+
+        Map<String, Object> info = sellerMap.get(product.getSellerId());
         String sellerName = "";
         String sellerAvatar = "";
         BigDecimal sellerReputation = BigDecimal.valueOf(5.0);
-        try {
-            Map<String, Object> userInfo = userDelegate.getUserPublicInfo(product.getSellerId());
-            if (userInfo != null && userInfo.get("data") != null) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> data = (Map<String, Object>) userInfo.get("data");
-                sellerName = String.valueOf(data.getOrDefault("nickname", ""));
-                sellerAvatar = String.valueOf(data.getOrDefault("avatarUrl", ""));
-                Object rep = data.get("reputationScore");
-                if (rep != null) sellerReputation = new BigDecimal(rep.toString());
-            }
-        } catch (Exception e) {
-            log.warn("获取卖家信息失败: sellerId={}", product.getSellerId());
+        if (info != null) {
+            if (info.get("nickname") != null) sellerName = String.valueOf(info.get("nickname"));
+            if (info.get("avatarUrl") != null) sellerAvatar = String.valueOf(info.get("avatarUrl"));
+            Object rep = info.get("reputationScore");
+            if (rep != null) sellerReputation = new BigDecimal(rep.toString());
         }
 
-        Category category = categoryMapper.selectById(product.getCategoryId());
-        String categoryName = category != null ? category.getName() : "";
+        String categoryName = categoryMap.getOrDefault(product.getCategoryId(), "");
 
         // 检查是否已收藏
         boolean isFavorited = false;
@@ -401,6 +449,7 @@ public class ProductServiceImpl implements ProductService {
                 .images(images.stream().map(img -> ProductVO.ImageVO.builder()
                         .id(img.getId())
                         .url(img.getUrl())
+                        .thumbUrl(img.getThumbUrl())
                         .isCover(img.getIsCover() == 1)
                         .build()).collect(Collectors.toList()))
                 .createdAt(product.getCreatedAt())

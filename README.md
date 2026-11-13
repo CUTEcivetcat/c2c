@@ -30,7 +30,7 @@
 
 | 层 | 技术 |
 |---|---|
-| 后端 | Java 8 · Spring Boot 2.7 · MyBatis-Plus 3.5 · MySQL 8 · Redis · JWT · Hutool · Lombok · SpringDoc(Swagger) |
+| 后端 | Java 17 · Spring Boot 3.3 · MyBatis-Plus 3.5(boot3 starter) · MySQL 8 · Redis · JWT · Hutool · Lombok · SpringDoc 2.x(Swagger) |
 | 用户端前端 | Vue 3 · Vite 5 · Vue Router · Pinia · Element Plus · ESLint |
 | 管理端前端 | Vue 3 · Element Plus · ECharts · ESLint |
 | 微信小程序 | 原生微信小程序（完整闭环：登录/发布/订单/钱包） |
@@ -71,7 +71,7 @@ c2c/
 ## 🏃 快速开始（本地开发）
 
 ### 环境要求
-- JDK **8 或 17**（⚠️ 勿用 JDK 21+：Lombok 1.18.30 不支持，编译会报"找不到符号"）
+- JDK **17**（Spring Boot 3.3 要求 17+；⚠️ 勿用 JDK 21+：Lombok 1.18.30 不支持，编译会报"找不到符号"）
 - Maven 3.6+
 - MySQL 8（或 MariaDB 10.3+）、Redis（本地或远程均可）
 - Node.js 16+、npm

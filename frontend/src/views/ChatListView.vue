@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container" style="max-width:600px">
+  <div class="page-container" style="max-width:1000px">
     <page-back-bar title="消息" />
     <!-- 平台助手固定入口 -->
     <div class="assistant-entry" @click="goAssistant">

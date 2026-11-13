@@ -5,7 +5,7 @@
 
 function baseUrl() {
   const app = getApp()
-  return (app && app.globalData && app.globalData.serverUrl) || 'http://192.168.1.11:8080/api/v1'
+  return (app && app.globalData && app.globalData.serverUrl) || 'http://192.168.1.7:8080/api/v1'
 }
 
 // 服务器「源」，如 http://192.168.1.11:8080（去掉 /api/v1 后缀）

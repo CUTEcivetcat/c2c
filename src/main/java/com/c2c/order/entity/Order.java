@@ -60,6 +60,12 @@ public class Order {
     /** 平台托管金额（支付时暂扣，收货后打给卖家） */
     private BigDecimal escrow;
 
+    /** 使用的用户券 ID（user_coupon.id），未用券为 null */
+    private Long couponId;
+
+    /** 优惠券抵扣金额 */
+    private BigDecimal discountAmount;
+
     /** 支付时间 */
     private LocalDateTime paymentTime;
 

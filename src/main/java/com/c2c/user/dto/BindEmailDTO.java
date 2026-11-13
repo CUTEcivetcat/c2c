@@ -1,8 +1,8 @@
 package com.c2c.user.dto;
 
 import lombok.Data;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 绑定邮箱请求（微信登录后绑定邮箱，用于找回密码 / 多端登录）。
