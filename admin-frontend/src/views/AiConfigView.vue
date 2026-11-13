@@ -27,6 +27,7 @@
             <el-form-item>
               <el-button type="primary" :loading="saving" @click="saveForm">保存配置</el-button>
               <el-button plain @click="load">刷新</el-button>
+              <el-button type="danger" plain :loading="stopping" @click="disableAi">停用 AI（清空接入）</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -53,7 +54,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { adminApi } from '@/api/request'
 
 const KEY = {
@@ -65,6 +66,7 @@ const KEY = {
 
 const loading = ref(false)
 const saving = ref(false)
+const stopping = ref(false)
 const hasKey = ref(false)
 const jsonText = ref('')
 
@@ -111,6 +113,25 @@ const saveForm = async () => {
     /* 拦截器已统一提示 */
   } finally {
     saving.value = false
+  }
+}
+
+// 停用 AI：清空 Base URL 与 API Key，回到本地规则引擎模式
+const disableAi = async () => {
+  try {
+    await ElMessageBox.confirm('停用后将清空 Base URL 与 API Key，客服对话与商品估价自动回到本地规则引擎模式。确定停用？',
+      '停用 AI 接入', { type: 'warning', confirmButtonText: '确定停用', cancelButtonText: '取消' })
+  } catch { return }
+  stopping.value = true
+  try {
+    await adminApi.updateConfig({ key: KEY.BASE_URL, value: '' })
+    await adminApi.updateConfig({ key: KEY.API_KEY, value: '' })
+    ElMessage.success('已停用 AI 接入，回到规则引擎模式')
+    await load()
+  } catch {
+    /* 拦截器已统一提示 */
+  } finally {
+    stopping.value = false
   }
 }
 

@@ -6,6 +6,7 @@ import com.c2c.review.entity.AdminLog;
 import com.c2c.review.mapper.AdminLogMapper;
 import com.c2c.system.entity.SysConfig;
 import com.c2c.system.service.SysConfigService;
+import com.c2c.system.constant.SysConfigKey;
 import com.c2c.user.entity.User;
 import com.c2c.user.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 系统运行配置（管理端「系统设置」面板）。
@@ -34,6 +36,10 @@ public class AdminConfigController {
     private final UserMapper userMapper;
     private final AdminLogMapper adminLogMapper;
 
+    /** 允许写空值的 AI 接入键：清空即退回规则引擎模式 */
+    private static final Set<String> AI_CONNECTION_KEYS =
+            Set.of(SysConfigKey.AI_BASE_URL, SysConfigKey.AI_API_KEY);
+
     @Operation(summary = "配置列表（总管理员）", description = "返回全部系统运行配置及说明")
     @GetMapping(ApiPath.ADMIN_CONFIG)
     public R<List<SysConfig>> list(@Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
@@ -48,10 +54,16 @@ public class AdminConfigController {
         requireTopAdmin(userId);
         String key = body.get("key");
         String value = body.get("value");
-        if (key == null || key.trim().isEmpty() || value == null || value.trim().isEmpty()) {
-            throw new com.c2c.common.exception.BusinessException("配置键与值不能为空");
+        if (key == null || key.trim().isEmpty()) {
+            throw new com.c2c.common.exception.BusinessException("配置键不能为空");
         }
-        sysConfigService.update(key.trim(), value.trim(), userId);
+        String trimmedKey = key.trim();
+        boolean allowEmpty = AI_CONNECTION_KEYS.contains(trimmedKey);
+        if ((value == null || value.trim().isEmpty()) && !allowEmpty) {
+            throw new com.c2c.common.exception.BusinessException("配置值不能为空");
+        }
+        String trimmedValue = value == null ? "" : value.trim();
+        sysConfigService.update(trimmedKey, trimmedValue, userId);
 
         AdminLog adminLog = new AdminLog();
         adminLog.setOperatorId(userId);
@@ -59,7 +71,7 @@ public class AdminConfigController {
         adminLog.setAction("CONFIG_UPDATE");
         adminLog.setTargetType("sys_config");
         adminLog.setTargetId(null);
-        adminLog.setDetail("更新系统配置 " + key.trim() + " = " + value.trim());
+        adminLog.setDetail("更新系统配置 " + trimmedKey + " = " + (trimmedValue.isEmpty() ? "（已清空）" : trimmedValue));
         adminLogMapper.insert(adminLog);
         return R.ok();
     }
