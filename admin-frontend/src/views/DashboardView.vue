@@ -13,7 +13,7 @@
 
     <!-- 待处理卡片（点击跳转对应审核页） -->
     <el-row :gutter="20" class="pending-row">
-      <el-col :span="8">
+      <el-col :span="6">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=report')">
           <div class="pending-inner">
             <span class="pending-ico">⚑</span>
@@ -21,7 +21,7 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=appeal')">
           <div class="pending-inner">
             <span class="pending-ico">🔁</span>
@@ -29,11 +29,19 @@
           </div>
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col :span="6">
         <el-card shadow="hover" class="pending-card" @click="$router.push('/review?tab=nickname')">
           <div class="pending-inner">
             <span class="pending-ico">👤</span>
             <div class="pending-text"><strong>{{ stats.pendingNicknames }}</strong><span>待审昵称</span></div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="pending-card" @click="$router.push('/suggestion')">
+          <div class="pending-inner">
+            <span class="pending-ico">💬</span>
+            <div class="pending-text"><strong>{{ stats.pendingSuggestions }}</strong><span>待处理建议</span></div>
           </div>
         </el-card>
       </el-col>
@@ -119,7 +127,7 @@ import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
 import { adminApi } from '@/api/request'
 import * as echarts from 'echarts'
 
-const stats = ref({ totalUsers: 0, totalProducts: 0, onSaleProducts: 0, todayOrders: 0 })
+const stats = ref({ totalUsers: 0, totalProducts: 0, onSaleProducts: 0, todayOrders: 0, pendingSuggestions: 0 })
 const userChartRef = ref(null)
 const orderChartRef = ref(null)
 const ecoChartRef = ref(null)
@@ -214,7 +222,8 @@ onMounted(async () => {
       totalAnnouncements: summary.totalAnnouncements || 0,
       pendingReports: summary.pendingReports || 0,
       pendingAppeals: summary.pendingAppeals || 0,
-      pendingNicknames: summary.pendingNicknames || 0
+      pendingNicknames: summary.pendingNicknames || 0,
+      pendingSuggestions: summary.pendingSuggestions || 0
     }
     nextTick(() => {
       if (userTrends) initUserChart(userTrends)
@@ -288,6 +297,7 @@ const initOrderChart = (trends) => {
 .pending-card:nth-child(1) .pending-ico { color: #ff6b35; }
 .pending-card:nth-child(2) .pending-ico { color: #e67e22; }
 .pending-card:nth-child(3) .pending-ico { color: #d35400; }
+.pending-card:nth-child(4) .pending-ico { color: #409eff; }
 .pending-text { display: flex; flex-direction: column; line-height: 1.3; }
 .pending-text strong { font-size: 26px; font-weight: 800; color: #2d3436; }
 .pending-text span { font-size: 13px; color: #909399; }

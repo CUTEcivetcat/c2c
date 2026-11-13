@@ -28,4 +28,7 @@ public interface DashboardMapper {
 
     @Select("SELECT COUNT(*) FROM nickname_audit WHERE status = 0")
     int pendingNicknames();
+
+    @Select("SELECT COUNT(*) FROM suggestion WHERE status = 1")
+    int pendingSuggestions();
 }

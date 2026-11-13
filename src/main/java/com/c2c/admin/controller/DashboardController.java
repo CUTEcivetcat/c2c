@@ -60,6 +60,7 @@ public class DashboardController {
         result.put("pendingReports", dashboardMapper.pendingReports());
         result.put("pendingAppeals", dashboardMapper.pendingAppeals());
         result.put("pendingNicknames", dashboardMapper.pendingNicknames());
+        result.put("pendingSuggestions", dashboardMapper.pendingSuggestions());
         return R.ok(result);
     }
 
