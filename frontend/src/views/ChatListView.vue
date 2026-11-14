@@ -5,8 +5,8 @@
     <div class="assistant-entry" @click="goAssistant">
       <div class="assistant-avatar">🤖</div>
       <div class="assistant-main">
-        <div class="assistant-title"><strong>青禾助手</strong><span class="ai-tag">AI</span></div>
-        <div class="assistant-sub">查订单 · 问规则 · 7×24 在线</div>
+        <div class="assistant-title"><strong>青禾助手</strong><span v-if="modelConfigured" class="ai-tag">AI</span></div>
+        <div class="assistant-sub">{{ modelConfigured ? '查订单 · 问规则 · 7×24 在线' : '查订单 · 问规则' }}</div>
       </div>
       <span class="assistant-arrow">›</span>
     </div>
@@ -43,10 +43,13 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getConversations, getOrCreateConversation } from '@/api/im'
+import { getAssistantStatus } from '@/api/ai'
 
 const store = useUserStore()
 const router = useRouter()
 const conversations = ref([])
+// 是否已接入大模型（默认 true，接口异常保持原 AI 口径）
+const modelConfigured = ref(true)
 let timer = null
 
 /** 平台助手账号（与后端一致） */
@@ -87,7 +90,13 @@ const formatTime = (t) => {
 }
 
 const load = async () => { try { conversations.value = await getConversations() } catch (e) { /* */ } }
-onMounted(() => { load(); timer = setInterval(load, 5000) })
+const loadStatus = async () => {
+  try {
+    const s = await getAssistantStatus()
+    modelConfigured.value = s ? !!s.modelConfigured : true
+  } catch (e) { /* 保持默认 AI 口径 */ }
+}
+onMounted(() => { load(); loadStatus(); timer = setInterval(load, 5000) })
 onUnmounted(() => clearInterval(timer))
 </script>
 

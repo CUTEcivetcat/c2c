@@ -11,3 +11,5 @@ export const intelligentPublish = (imageUrl, categoryId) =>
 export const aiChat = (conversationId, content) => request.post('/ai/chat', { conversationId, content })
 // 快捷问题 Top8（聊天页 chips）
 export const getFaqSuggestions = () => request.get('/ai/chat/faq-suggestions')
+// 助手状态：enabled 总开关 / modelConfigured 是否已接入大模型
+export const getAssistantStatus = () => request.get('/ai/chat/status')

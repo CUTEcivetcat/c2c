@@ -186,6 +186,7 @@ public interface ApiPath {
     /** AI 智能客服（登录用户；助手会话内发消息走此接口） */
     String AI_CHAT = "/ai/chat";
     String AI_CHAT_FAQ = "/ai/chat/faq-suggestions";
+    String AI_CHAT_STATUS = "/ai/chat/status";
     /** 管理端 FAQ 知识库维护（需管理员 ai 权限） */
     String AI_FAQ_ADMIN_LIST = "/admin/faq/list";
     String AI_FAQ_ADMIN = "/admin/faq";

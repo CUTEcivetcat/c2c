@@ -1,5 +1,6 @@
 package com.c2c.ai.controller;
 
+import com.c2c.ai.dto.AiAssistantStatusVO;
 import com.c2c.ai.dto.AiChatRequest;
 import com.c2c.ai.dto.AiChatVO;
 import com.c2c.ai.service.AiChatService;
@@ -43,5 +44,11 @@ public class AiChatController {
     @GetMapping(ApiPath.AI_CHAT_FAQ)
     public R<List<String>> faqSuggestions() {
         return R.ok(aiChatService.faqSuggestions());
+    }
+
+    @Operation(summary = "助手状态", description = "返回助手开关与是否已接入大模型，前端据此区分 AI / 规则问答口径")
+    @GetMapping(ApiPath.AI_CHAT_STATUS)
+    public R<AiAssistantStatusVO> assistantStatus() {
+        return R.ok(aiChatService.assistantStatus());
     }
 }

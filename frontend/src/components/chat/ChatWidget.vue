@@ -13,13 +13,13 @@
         <el-avatar :size="34" class="cw-avatar">🤖</el-avatar>
         <div class="cw-partner-info">
           <strong>青禾助手</strong>
-          <span class="cw-ai-tag">AI</span>
-          <div class="cw-status">{{ humanMode ? '人工服务入口' : '在线 · 7×24 智能解答' }}</div>
+          <span v-if="modelConfigured" class="cw-ai-tag">AI</span>
+          <div class="cw-status">{{ humanMode ? '人工服务入口' : (modelConfigured ? '在线 · 7×24 智能解答' : '在线 · 规则问答') }}</div>
         </div>
       </div>
       <div class="cw-actions">
         <button v-if="!humanMode" class="cw-link-btn" @click="enterHuman">转人工</button>
-        <button v-else class="cw-link-btn" @click="humanMode = false">返回 AI</button>
+        <button v-else class="cw-link-btn" @click="humanMode = false">{{ modelConfigured ? '返回 AI' : '返回问答' }}</button>
         <button class="cw-close" @click="closePanel" aria-label="关闭">
           <el-icon><Close /></el-icon>
         </button>
@@ -81,7 +81,7 @@ import { ref, computed, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { getOrCreateConversation, getMessages, markRead } from '@/api/im'
-import { aiChat, getFaqSuggestions } from '@/api/ai'
+import { aiChat, getFaqSuggestions, getAssistantStatus } from '@/api/ai'
 
 /** 平台助手账号（与后端 AiChatService.ASSISTANT_ID 一致） */
 const ASSISTANT_ID = 90000001
@@ -99,6 +99,8 @@ const humanMode = ref(false)
 const convId = ref(null)
 const messages = ref([])
 const faqChips = ref([])
+// 是否已接入大模型（默认 true，接口异常时保持原 AI 口径）
+const modelConfigured = ref(true)
 const text = ref('')
 const msgBox = ref(null)
 let pollTimer = null
@@ -113,7 +115,7 @@ const openPanel = async () => {
   }
   open.value = true
   humanMode.value = false
-  await ensureConversation()
+  await Promise.all([loadStatus(), ensureConversation()])
 }
 
 const closePanel = () => {
@@ -134,21 +136,29 @@ const ensureConversation = async () => {
   } catch (e) { /* 拦截器已提示 */ }
 }
 
-const loadMessages = async () => {
+const loadMessages = async (silent = false) => {
   if (!convId.value) return
-  loading.value = true
+  // 仅首屏加载翻“加载中…”；轮询/发送后后台刷新不抢首屏加载态
+  if (!silent) loading.value = true
   try {
     const res = await getMessages(convId.value, { size: 200 })
     messages.value = res.records || []
     scrollBottom()
     markRead(convId.value).catch(() => {})
   } catch (e) { /* */ } finally {
-    loading.value = false
+    if (!silent) loading.value = false
   }
 }
 
 const loadChips = async () => {
   try { faqChips.value = await getFaqSuggestions() || [] } catch (e) { faqChips.value = [] }
+}
+
+const loadStatus = async () => {
+  try {
+    const s = await getAssistantStatus()
+    modelConfigured.value = s ? !!s.modelConfigured : true
+  } catch (e) { /* 接口异常保持默认 AI 口径 */ }
 }
 
 const send = async () => {
@@ -165,7 +175,7 @@ const send = async () => {
   try {
     await aiChat(convId.value, content)
     text.value = ''
-    await loadMessages()
+    await loadMessages(true)
   } catch (e) { /* 拦截器已提示 */ } finally {
     sending.value = false
   }
@@ -185,7 +195,7 @@ const goExternal = (path) => {
 
 const startPolling = () => {
   clearTimer()
-  pollTimer = setInterval(() => { if (!sending.value) loadMessages() }, 4000)
+  pollTimer = setInterval(() => { if (!sending.value) loadMessages(true) }, 4000)
 }
 const clearTimer = () => { if (pollTimer) { clearInterval(pollTimer); pollTimer = null } }
 

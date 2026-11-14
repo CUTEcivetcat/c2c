@@ -2,6 +2,7 @@ package com.c2c.ai.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.c2c.ai.client.SpringAiModelClient;
+import com.c2c.ai.dto.AiAssistantStatusVO;
 import com.c2c.ai.dto.AiChatRequest;
 import com.c2c.ai.dto.AiChatVO;
 import com.c2c.ai.entity.Faq;
@@ -103,6 +104,14 @@ public class AiChatService {
         return faqSearchService.suggestions(8);
     }
 
+    /** 助手状态：是否开启、是否已接入大模型（供前端区分 AI / 规则问答口径） */
+    public AiAssistantStatusVO assistantStatus() {
+        return AiAssistantStatusVO.builder()
+                .enabled(sysConfigService.getBool(SysConfigKey.AI_ASSISTANT_ENABLED, true))
+                .modelConfigured(springAiClient.configured())
+                .build();
+    }
+
     // ==================== 校验 ====================
 
     private void checkEnabled() {
@@ -178,7 +187,10 @@ public class AiChatService {
         if (direct != null) {
             return direct;
         }
-        // 3) 引导语
-        return "我还不太理解你的问题～可以试试问我：\n· 我的订单到哪了\n· 余额还有多少\n· 下单后多久付款\n· 如何退款\n也可以点下方常见问题直接查看。";
+        // 3) 引导语：未接入大模型时明确标注本地规则问答，避免与大模型回复口径混淆
+        String prefix = springAiClient.configured()
+                ? "我还不太理解你的问题～"
+                : "当前为本地规则问答，我还不太理解你的问题～";
+        return prefix + "可以试试问我：\n· 我的订单到哪了\n· 余额还有多少\n· 下单后多久付款\n· 如何退款\n也可以点下方常见问题直接查看。";
     }
 }
