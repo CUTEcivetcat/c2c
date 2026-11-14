@@ -13,6 +13,9 @@ config/*
 # 注：config/ 下的 application*.yml、pro.xml、test.xml、服务器密码.txt
 #     都含真实 IP/密码，全部被上面 config/* 排除；只放行 example 演示文件。
 
+# ===== 本地大模型 Key 备份（明文，仅存本地，绝不上传）=====
+deepseek/
+
 # ===== 数据库导出（含真实业务数据，绝不上传）=====
 sql/c2c.sql
 sql/c2cnew.sql
