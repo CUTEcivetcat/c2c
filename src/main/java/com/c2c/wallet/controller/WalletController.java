@@ -2,14 +2,17 @@ package com.c2c.wallet.controller;
 
 import com.c2c.common.constant.ApiPath;
 import com.c2c.common.result.R;
+import com.c2c.common.utils.NetUtils;
 import com.c2c.wallet.service.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,6 +24,10 @@ import java.util.Map;
 public class WalletController {
 
     private final WalletService walletService;
+
+    /** 配置的对外前端 origin（完整协议+主机+端口），留空回退自动探测内网 IP */
+    @Value("${app.public-base-url:}")
+    private String publicBaseUrl;
 
     @Operation(summary = "钱包概况", description = "返回余额 + 最近 20 条流水")
     @GetMapping(ApiPath.WALLET_PROFILE)
@@ -46,11 +53,16 @@ public class WalletController {
         return R.ok();
     }
 
-    @Operation(summary = "生成充值二维码票据", description = "返回一次性短期 ticket，供手机 H5 扫码充值")
+    @Operation(summary = "生成充值二维码票据", description = "返回一次性短期 ticket、对外 base 与探测内网 IP，供手机 H5 扫码充值")
     @GetMapping(ApiPath.WALLET_RECHARGE_TICKET)
     public R<Map<String, String>> ticket(@Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {
         String t = walletService.createRechargeTicket(userId);
-        return R.ok(Map.of("ticket", t));
+        Map<String, String> data = new HashMap<>();
+        data.put("ticket", t);
+        data.put("publicBase", publicBaseUrl == null ? "" : publicBaseUrl.trim());
+        String lanIp = NetUtils.detectLanIp();
+        data.put("lanIp", lanIp == null ? "" : lanIp);
+        return R.ok(data);
     }
 
     @Operation(summary = "H5 凭票据充值", description = "公开接口，body: {ticket, amount}；票据一次性、5 分钟有效")

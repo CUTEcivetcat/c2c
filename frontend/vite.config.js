@@ -40,11 +40,13 @@ export default defineConfig(({ mode }) => {
       include: ['src/**/*.spec.js']
     },
     server: {
+      host: true,
       port: 5173,
       open: true,
       proxy
     },
     preview: {
+      host: true,
       port: 4173,
       proxy
     },

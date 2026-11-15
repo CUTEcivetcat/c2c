@@ -46,6 +46,9 @@ app:
   # 上传文件保存的根目录（推荐相对路径 ./uploads，基于启动目录/项目根目录；
   # 服务器部署可用绝对路径，如 /softservice/c2c/uploads）
   upload-root: YOUR_UPLOAD_ROOT
+  # 对外可访问的前端 H5 完整 origin（协议+IP/域名+端口），用于充值二维码链接；
+  # 留空则自动探测本机内网 IP。示例：http://192.168.1.10:5173 或 http://your-domain.com
+  public-base-url:
 
 logging:
   file:

@@ -80,6 +80,9 @@ jwt:
 app:
   upload-root: ${APP_UPLOAD_ROOT:./uploads}
   upload-url-prefix: /files
+  # 对外可访问的前端 H5 完整 origin（协议+IP/域名+端口），用于充值二维码链接；
+  # 留空则自动探测本机内网 IP，由前端按当前协议/端口拼接
+  public-base-url: ${APP_PUBLIC_BASE_URL:}
   # 安全：是否在验证码接口响应中回显 code。仅本地开发置 true，生产必须 false（默认 false）
   sms-echo-code: ${APP_SMS_ECHO_CODE:true}
   # AI 智能发布（参赛改造）：配置 API Key 走真实多模态大模型，留空自动降级本地规则引擎

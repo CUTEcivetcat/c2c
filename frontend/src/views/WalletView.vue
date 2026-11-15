@@ -214,9 +214,22 @@ const genTicket = async () => {
   try {
     const res = await createRechargeTicket()
     qrTicket.value = res.ticket
-    qrLink.value = `${location.origin}/wallet/recharge?ticket=${res.ticket}`
+    qrLink.value = buildRechargeLink(res.ticket, res)
     qrDataUrl.value = await QRCode.toDataURL(qrLink.value, { width: 200, margin: 1 })
   } catch (e) { /* */ }
+}
+
+// 组装 H5 充值链接：优先配置的对外 origin；未配置且当前为回环地址时，用后端探测的内网 IP 替换主机名
+const buildRechargeLink = (ticket, info = {}) => {
+  const path = `/wallet/recharge?ticket=${ticket}`
+  if (info.publicBase) return `${info.publicBase.replace(/\/+$/, '')}${path}`
+  const host = location.hostname
+  const loopback = host === 'localhost' || host === '127.0.0.1' || host === '::1'
+  if (info.lanIp && loopback) {
+    const port = location.port ? `:${location.port}` : ''
+    return `${location.protocol}//${info.lanIp}${port}${path}`
+  }
+  return `${location.origin}${path}`
 }
 
 const doRechargeCard = async () => {
