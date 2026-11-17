@@ -5,7 +5,7 @@
 
 ## 1. 压测原则
 
-- **凭证预生成，不实时登录**：压测不依赖单账号反复调 `/user/login`（避免被频控 / 验证码拦截，也不把登录接口计入业务吞吐）。先跑测试侧生成器，从库内读取可用普通买家，按当前 `jwt.secret` 复刻登录签发口径签出 access token，导出 CSV 供 JMeter 直接读取。
+- **凭证预生成，不实时登录**：压测不依赖单账号反复调 `/user/login`（避免被频控 / 验证码拦截，也不把登录接口计入业务吞吐）。库内普通买家不足并发数时先用造号程序批量扩充（§4.3 第一步），再跑测试侧生成器从库内读取可用普通买家，按当前 `jwt.secret` 复刻登录签发口径签出 access token，导出 CSV 供 JMeter 直接读取。
 - **只压查询链路**：列表、详情、订单查询等只读取样器；写接口不在本计划范围。
 - **结论用途**：用于改造前后的相对对比与瓶颈初判；压测端与后端同机部署时，吞吐受本机资源限制，不等同生产容量。
 
@@ -15,6 +15,7 @@
 JMeter/
 ├── c2c-baseline.jmx    # 基线压测计划：100 并发 / Ramp-up 10s / 持续 300s
 ├── c2c-smoke.jmx       # 联调计划：1 线程 1 轮，先跑通链路再切基线
+├── seed-perf-users.sql # 备用造号 SQL（不启 Java 环境时使用，见 §4.3）
 ├── README.md           # 本说明
 └── result/             # 结果落盘目录（运行产物，不入库）
     └── perf-tokens.csv # 生成器产出的压测 token（见 §4）
@@ -57,7 +58,8 @@ mvn -o spring-boot:run "-Dspring-boot.run.arguments=--server.port=8080"
 
 | 项 | 值 |
 |---|---|
-| 造号脚本 | `JMeter/seed-perf-users.sql`（幂等，可重复执行）：批量插入普通压测买家，密码复用演示账号同一 BCrypt 哈希（明文 `ww123456`），默认 50 个、号段 `15000000001~15000000050` |
+| 造号程序 | `src/test/java/com/c2c/common/infra/PerfUserSeedTest.java`（不启 Spring，纯 JDBC；含 `main` 交互入口与 `@Test` 入口）：读 `application-pro.yml` 库配置，按昵称前缀与数量批量插入普通压测买家，密码明文 `ww123456`（BCrypt 现场计算），号段 `15000000001` 起连续分配 |
+| 备用造号脚本 | `JMeter/seed-perf-users.sql`（幂等 SQL，不启 Java 环境时使用）：口径与上面测试类一致，默认 50 个、号段 `15000000001~15000000050` |
 | 生成脚本 | `src/test/java/com/c2c/common/infra/PerfTokenGeneratorTest.java`（含 `main` 入口，IDEA 可直接运行；也可走 Maven 测试） |
 | 产物路径 | `JMeter/result/perf-tokens.csv`（相对项目根） |
 | CSV 列 | `userId,token,account`；首行为表头，CSV Data Set 跳过首行 |
@@ -73,12 +75,23 @@ mvn -o spring-boot:run "-Dspring-boot.run.arguments=--server.port=8080"
 
 **第一步：批量造号（库内普通买家不足并发数时执行，幂等可重复）**
 
-```bash
-mysql -uroot -p c2c < JMeter/seed-perf-users.sql
+优先用测试类（不启 Spring，直连库）：
+
+- IDEA 里直接运行 `PerfUserSeedTest` 的 `main` 方法，启动后按提示填写**昵称前缀**与**数量**（空回车走默认：前缀 `压测用户`、数量 50）；
+- 或 Maven 非交互执行，前缀/数量走环境变量（缺省同上默认值）：
+
+```powershell
+$env:JAVA_HOME="C:\Users\wm\.jdks\ms-17.0.17"
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+cd D:\Ide_HOME\IDe_HOME\java\c2c
+$env:PERF_SEED_PREFIX="压测用户"   # 可选，默认 压测用户
+$env:PERF_SEED_COUNT="50"         # 可选，默认 50，上限 9999
+mvn -o test -Dtest=PerfUserSeedTest
 ```
 
-- 脚本先清理 `15000000%` 号段的旧压测号，再插入 50 个 `role=0, status=1` 的普通买家；需要更多/更少账号时，改脚本末尾递归 CTE 的上限 `n < 50`。
+- 程序先清理 `15000000%` 号段的旧压测号，再插入指定数量的 `role=0, status=1` 普通买家；密码明文 `ww123456`，BCrypt 现场算哈希；手机号按 `15000000001` 起连续分配。
 - 造号只影响本号段，不动管理员、审核员与 AI 助手账号；压测结束可直接按同一号段清理。
+- 不启 Java 环境时的备用方式：`mysql -uroot -p c2c < JMeter/seed-perf-users.sql`（改脚本末尾递归 CTE 上限调整数量）。
 
 **第二步：生成压测 token**
 
@@ -94,7 +107,7 @@ mvn -o test -Dtest=PerfTokenGeneratorTest
 ### 4.4 失效与重生成
 
 - 账号**改密 / 封禁 / 角色权限变更**会使 `token_version` 递增，旧 token 立即失效；出现 401 时先重跑本节生成器。
-- 库内可用买家数量少于并发线程数时，CSV Data Set 配置 `recycle=true`，账号循环复用同一批 token；想一人一号时先按 §4.3 第一步跑造号脚本扩充买家，再重跑生成器。
+- 库内可用买家数量少于并发线程数时，CSV Data Set 配置 `recycle=true`，账号循环复用同一批 token；想一人一号时先按 §4.3 第一步跑造号程序扩充买家，再重跑生成器。
 - 凭空编造的用户 ID 不可用：用户不存在会被过滤器拒绝（401），必须是库内真实存在的账号。
 
 ## 5. JMeter 安装、启动与导入计划
