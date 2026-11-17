@@ -3,6 +3,7 @@ package com.c2c.product.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.c2c.common.utils.PageUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,7 +18,12 @@ public class MyBatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+        PaginationInnerInterceptor pagination = new PaginationInnerInterceptor(DbType.MYSQL);
+        // 单页条数上限：所有 selectPage 统一截断，防止超大 size 拉全表
+        pagination.setMaxLimit((long) PageUtil.MAX_SIZE);
+        // 页码超出范围时回落首页，而非返回空页
+        pagination.setOverflow(true);
+        interceptor.addInnerInterceptor(pagination);
         return interceptor;
     }
 }

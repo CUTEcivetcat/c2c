@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.enums.ProductStatus;
 import com.c2c.common.exception.BusinessException;
+import com.c2c.common.lock.RedisLock;
+import com.c2c.common.utils.PageUtil;
 import com.c2c.order.entity.Order;
 import com.c2c.order.delegate.ProductDelegate;
 import com.c2c.order.delegate.UserDelegate;
@@ -21,12 +23,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 订单服务实现类
@@ -38,15 +42,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    /** 条纹锁：固定 64 把，替代无限增长的 ConcurrentHashMap（防内存膨胀） */
-    private static final Object[] LOCKS = new Object[64];
     private static final java.security.SecureRandom ORDER_NO_RANDOM = new java.security.SecureRandom();
-
-    static {
-        for (int i = 0; i < LOCKS.length; i++) {
-            LOCKS[i] = new Object();
-        }
-    }
 
     private final OrderMapper orderMapper;
     private final ProductDelegate productDelegate;
@@ -56,12 +52,18 @@ public class OrderServiceImpl implements OrderService {
     private final CouponService couponService;
     private final ObjectMapper objectMapper;
     private final OrderNoticeService orderNoticeService;
+    private final RedisLock redisLock;
 
     @Override
     @Transactional
     public Map<String, Object> create(Long productId, Long addressId, Long userCouponId, Long buyerId) {
-        synchronized (lockFor("product:" + productId)) {
-            Map<String, Object> productResp = productDelegate.getProduct(productId, buyerId);
+        String lockKey = "order:lock:product:" + productId;
+        String lockValue = UUID.randomUUID().toString();
+        if (!redisLock.tryLock(lockKey, lockValue, Duration.ofSeconds(15))) {
+            throw new BusinessException("操作太频繁，请稍后再试");
+        }
+        try {
+        Map<String, Object> productResp = productDelegate.getProduct(productId, buyerId);
             @SuppressWarnings("unchecked")
             Map<String, Object> product = (Map<String, Object>) productResp.get("data");
             if (product == null) {
@@ -138,6 +140,8 @@ public class OrderServiceImpl implements OrderService {
             result.put("status", 0);
             result.put("expireTime", LocalDateTime.now().plusMinutes(30).toString());
             return result;
+        } finally {
+            redisLock.unlock(lockKey, lockValue);
         }
     }
 
@@ -155,6 +159,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<Order> getBuyerList(Long buyerId, Integer status, int page, int size) {
+        page = PageUtil.normalizePage(page);
+        size = PageUtil.normalizeSize(size);
         LambdaQueryWrapper<Order> w = new LambdaQueryWrapper<Order>()
                 .eq(Order::getBuyerId, buyerId)
                 .orderByDesc(Order::getCreatedAt);
@@ -168,6 +174,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<Order> getSellerList(Long sellerId, Integer status, int page, int size) {
+        page = PageUtil.normalizePage(page);
+        size = PageUtil.normalizeSize(size);
         LambdaQueryWrapper<Order> w = new LambdaQueryWrapper<Order>()
                 .eq(Order::getSellerId, sellerId)
                 .orderByDesc(Order::getCreatedAt);
@@ -182,8 +190,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void pay(Long orderId, Long buyerId) {
-        synchronized (lockFor("order:" + orderId)) {
-            Order order = orderMapper.selectById(orderId);
+        String lockKey = "order:lock:pay:" + orderId;
+        String lockValue = UUID.randomUUID().toString();
+        if (!redisLock.tryLock(lockKey, lockValue, Duration.ofSeconds(10))) {
+            throw new BusinessException("操作太频繁，请稍后再试");
+        }
+        try {
+        Order order = orderMapper.selectById(orderId);
             if (order == null || !order.getBuyerId().equals(buyerId)) {
                 throw new BusinessException("订单不存在");
             }
@@ -211,6 +224,8 @@ public class OrderServiceImpl implements OrderService {
 
             eventPublisher.publishOrderPaid(orderId);
             log.info("order paid into escrow: orderId={}, amount={}", orderId, amount);
+        } finally {
+            redisLock.unlock(lockKey, lockValue);
         }
     }
 
@@ -307,10 +322,6 @@ public class OrderServiceImpl implements OrderService {
         // 【G4 接入点⑥】取消订单通知：
         orderNoticeService.notifyOrderEvent(order, "订单已取消：" + (reason == null ? "无" : reason));
         log.info("order cancelled: orderId={}, statusBefore={}", orderId, statusBefore);
-    }
-
-    private Object lockFor(String key) {
-        return LOCKS[Math.floorMod(key.hashCode(), LOCKS.length)];
     }
 
     /** 订单号：时间戳(14位) + 8位安全随机后缀；生成后查重（order_no 有唯一索引兜底），冲突重试 3 次 */

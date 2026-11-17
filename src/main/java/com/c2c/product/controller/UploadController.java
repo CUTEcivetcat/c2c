@@ -1,6 +1,7 @@
 package com.c2c.product.controller;
 
 import com.c2c.common.constant.ApiPath;
+import com.c2c.common.ratelimit.RateLimit;
 import com.c2c.common.result.R;
 import com.c2c.product.service.FileStorageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ public class UploadController {
      * 上传单张图片 → 本地存储
      */
     @Operation(summary = "上传单张图片")
+    @RateLimit(limit = 20, windowSec = 60, message = "上传过于频繁，请稍后再试")
     @PostMapping(ApiPath.UPLOAD_IMAGE)
     public R<Map<String, String>> uploadImage(@Parameter(description = "图片文件（multipart）") @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return R.badRequest("文件不能为空");

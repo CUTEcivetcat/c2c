@@ -2,6 +2,7 @@ package com.c2c.coupon.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.constant.ApiPath;
+import com.c2c.common.ratelimit.RateLimit;
 import com.c2c.common.result.R;
 import com.c2c.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ public class CouponController {
     }
 
     @Operation(summary = "领取优惠券", description = "并发扣库存，防超发与重复领取")
+    @RateLimit(limit = 10, windowSec = 60, message = "领券过于频繁，请稍后再试")
     @PostMapping(ApiPath.COUPON_CLAIM)
     public R<Map<String, Object>> claim(@Parameter(description = "券模板 ID") @PathVariable Long couponId,
                                         @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {

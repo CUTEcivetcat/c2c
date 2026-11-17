@@ -5,6 +5,7 @@ import com.c2c.ai.dto.AiChatRequest;
 import com.c2c.ai.dto.AiChatVO;
 import com.c2c.ai.service.AiChatService;
 import com.c2c.common.constant.ApiPath;
+import com.c2c.common.ratelimit.RateLimit;
 import com.c2c.common.result.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,6 +35,7 @@ public class AiChatController {
     private final AiChatService aiChatService;
 
     @Operation(summary = "助手对话", description = "body: {conversationId, content}；返回助手回复（已落库），source=model/rule")
+    @RateLimit(limit = 15, windowSec = 60, message = "咨询过于频繁，请稍后再试")
     @PostMapping(ApiPath.AI_CHAT)
     public R<AiChatVO> chat(@Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId,
                             @Valid @RequestBody AiChatRequest req) {

@@ -4,12 +4,14 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * 邮件发送服务
@@ -23,10 +25,13 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
+    @Qualifier("mailExecutor")
+    private final Executor mailExecutor;
+
     @Value("${spring.mail.username}")
     private String from;
 
-    /** 异步发送验证码邮件到指定邮箱 */
+    /** 异步发送验证码邮件到指定邮箱（独立邮件线程池，不占用公共 ForkJoinPool） */
     public void sendVerificationCode(String to, String code) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -57,6 +62,6 @@ public class EmailService {
             } catch (MessagingException e) {
                 log.error("failed to send verification email: to={}", to, e);
             }
-        });
+        }, mailExecutor);
     }
 }

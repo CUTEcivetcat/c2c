@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.enums.ProductCondition;
 import com.c2c.common.enums.ProductStatus;
 import com.c2c.common.exception.BusinessException;
+import com.c2c.common.utils.PageUtil;
 import com.c2c.product.dto.ProductCreateDTO;
 import com.c2c.product.dto.ProductVO;
 import com.c2c.product.entity.Category;
@@ -21,12 +22,15 @@ import com.c2c.product.service.FileStorageService;
 import com.c2c.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -184,42 +188,59 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVO getDetail(Long productId, Long currentUserId) {
         String cacheKey = "product:info:" + productId;
-        Map<Object, Object> cached = redisTemplate.opsForHash().entries(cacheKey);
-        if (!cached.isEmpty()) {
-            Product product = BeanUtil.toBeanIgnoreError(cached, Product.class);
-            redisTemplate.opsForZSet().incrementScore("product:hot", String.valueOf(productId), 1);
-            ProductVO vo = buildVO(product, currentUserId);
-            log.info("商品详情: id={}, title={}, price={}, sellerId={}", product.getId(), product.getTitle(), product.getPrice(), product.getSellerId());
-            return vo;
+        Product product = readDetailCache(cacheKey);
+
+        if (product == null) {
+            product = productMapper.selectById(productId);
+            if (product == null
+                    || product.getStatus() == ProductStatus.OFF_SHELF.getCode()
+                    || product.getStatus() == ProductStatus.BANNED.getCode()) {
+                throw new BusinessException(404, "商品不存在或已下架");
+            }
+            writeDetailCache(cacheKey, product);
         }
 
-        Product product = productMapper.selectById(productId);
-        if (product == null
-                || product.getStatus() == ProductStatus.OFF_SHELF.getCode()
-                || product.getStatus() == ProductStatus.BANNED.getCode()) {
-            throw new BusinessException(404, "商品不存在或已下架");
-        }
-
-        // 浏览量+1
-        product.setViewCount(product.getViewCount() + 1);
-        productMapper.updateById(product);
+        // 浏览量 SQL 层原子自增（view_count = view_count + 1），并发不丢更新；内存计数 +1 用于本次展示
+        productMapper.update(null, new LambdaUpdateWrapper<Product>()
+                .eq(Product::getId, productId)
+                .setSql("view_count = view_count + 1"));
+        product.setViewCount(product.getViewCount() == null ? 1 : product.getViewCount() + 1);
         redisTemplate.opsForZSet().incrementScore("product:hot", String.valueOf(productId), 1);
-
-        Map<String, Object> cacheMap = BeanUtil.beanToMap(product, false, true);
-        cacheMap.forEach((k, v) -> {
-            if (v != null) redisTemplate.opsForHash().put(cacheKey, k, v.toString());
-        });
-        redisTemplate.expire(cacheKey, 1, TimeUnit.HOURS);
 
         ProductVO vo = buildVO(product, currentUserId);
         log.info("商品详情: id={}, title={}, price={}, sellerId={}", product.getId(), product.getTitle(), product.getPrice(), product.getSellerId());
         return vo;
     }
 
+    /** 读取详情缓存（JSON 整对象，避免 Hash 序列化导致 LocalDateTime/BigDecimal 类型失真） */
+    private Product readDetailCache(String cacheKey) {
+        String cached = redisTemplate.opsForValue().get(cacheKey);
+        if (cached == null) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(cached, Product.class);
+        } catch (Exception e) {
+            // 缓存损坏/旧格式 → 回源数据库重建
+            return null;
+        }
+    }
+
+    /** 写入详情缓存（JSON），1 小时过期；缓存失败不影响查询 */
+    private void writeDetailCache(String cacheKey, Product product) {
+        try {
+            redisTemplate.opsForValue().set(cacheKey, objectMapper.writeValueAsString(product), 1, TimeUnit.HOURS);
+        } catch (Exception ignored) {
+            // 缓存序列化失败不阻断主流程
+        }
+    }
+
     @Override
     public Page<ProductVO> search(String keyword, Long categoryId, Integer condition,
                                    Double minPrice, Double maxPrice, String sort,
                                    int page, int size) {
+        page = PageUtil.normalizePage(page);
+        size = PageUtil.normalizeSize(size);
         // 首页默认列表（无筛选、第一页、按最新）缓存 60 秒，降低 DB 压力
         boolean homeList = StrUtil.isBlank(keyword) && categoryId == null && condition == null
                 && minPrice == null && maxPrice == null && page == 1
@@ -296,6 +317,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductVO> getMyPublished(Long sellerId, int page, int size) {
+        page = PageUtil.normalizePage(page);
+        size = PageUtil.normalizeSize(size);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size),
                 new LambdaQueryWrapper<Product>()
                         .eq(Product::getSellerId, sellerId)
@@ -308,6 +331,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductVO> getUserOnSaleList(Long userId, int page, int size) {
+        page = PageUtil.normalizePage(page);
+        size = PageUtil.normalizeSize(size);
         Page<Product> result = productMapper.selectPage(new Page<>(page, size),
                 new LambdaQueryWrapper<Product>()
                         .eq(Product::getSellerId, userId)
@@ -351,13 +376,28 @@ public class ProductServiceImpl implements ProductService {
 
     private void clearHomeCache() {
         try {
-            Set<String> keys = redisTemplate.keys("product:home:*");
-            if (keys != null && !keys.isEmpty()) {
+            Set<String> keys = scanKeys("product:home:*");
+            if (!keys.isEmpty()) {
                 redisTemplate.delete(keys);
             }
         } catch (Exception ignored) {
             // 缓存清理失败不影响业务
         }
+    }
+
+    /** SCAN 游标分批扫描匹配 key，避免 KEYS 命令在大库上阻塞 Redis */
+    private Set<String> scanKeys(String pattern) {
+        Set<String> keys = new HashSet<>();
+        redisTemplate.execute((RedisCallback<Void>) connection -> {
+            try (Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(200).build())) {
+                while (cursor.hasNext()) {
+                    keys.add(new String(cursor.next(), StandardCharsets.UTF_8));
+                }
+            }
+            return null;
+        });
+        return keys;
     }
 
     /** 批量装配 VO：图片 / 卖家 / 分类各一次查询，消除列表 N+1。 */

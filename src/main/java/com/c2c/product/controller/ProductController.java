@@ -3,6 +3,7 @@ package com.c2c.product.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.c2c.common.constant.ApiPath;
+import com.c2c.common.ratelimit.RateLimit;
 import com.c2c.common.result.R;
 import com.c2c.product.dto.ProductCreateDTO;
 import com.c2c.product.dto.ProductVO;
@@ -35,6 +36,7 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @Operation(summary = "发布商品", description = "需登录")
+    @RateLimit(limit = 20, windowSec = 60, message = "发布过于频繁，请稍后再试")
     @PostMapping(ApiPath.PRODUCT)
     public R<Long> publish(@Valid @RequestBody ProductCreateDTO dto,
                            @Parameter(hidden = true) @RequestHeader("X-User-Id") Long userId) {

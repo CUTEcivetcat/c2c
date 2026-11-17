@@ -89,6 +89,7 @@ CREATE TABLE `product` (
   INDEX `idx_category_status` (`category_id`, `status`),
   INDEX `idx_price` (`price`),
   INDEX `idx_view_count` (`view_count`),
+  INDEX `idx_status_created` (`status`, `created_at`),
   FULLTEXT INDEX `ft_search` (`title`, `description`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

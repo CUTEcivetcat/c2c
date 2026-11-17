@@ -2,6 +2,7 @@ package com.c2c.order;
 
 import com.c2c.common.exception.BusinessException;
 import com.c2c.common.infra.TestLog;
+import com.c2c.common.lock.RedisLock;
 import com.c2c.order.entity.Order;
 import com.c2c.order.delegate.ProductDelegate;
 import com.c2c.order.delegate.UserDelegate;
@@ -11,6 +12,7 @@ import com.c2c.order.service.OrderNoticeService;
 import com.c2c.order.service.impl.OrderServiceImpl;
 import com.c2c.wallet.service.WalletService;
 import com.c2c.coupon.service.CouponService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -48,9 +51,17 @@ class OrderServiceImplTest {
     private CouponService couponService;
     @Mock
     private com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    @Mock
+    private RedisLock redisLock;
 
     @InjectMocks
     private OrderServiceImpl orderService;
+
+    @BeforeEach
+    void setUpLock() {
+        // 单测默认加锁成功，聚焦状态机流转；锁竞争分支不在此覆盖。lenient：不走锁的用例不视为多余 stub
+        lenient().when(redisLock.tryLock(anyString(), anyString(), any(Duration.class))).thenReturn(true);
+    }
 
     /** 已完成订单：买家=2，卖家=1 */
     private Order orderWithStatus(int status) {

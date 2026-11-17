@@ -1,6 +1,7 @@
 package com.c2c.user.controller;
 
 import com.c2c.common.constant.ApiPath;
+import com.c2c.common.ratelimit.RateLimit;
 import com.c2c.common.result.R;
 import com.c2c.user.dto.*;
 import com.c2c.user.entity.User;
@@ -50,6 +51,7 @@ public class UserController {
      * <p>安全说明：默认不回显验证码，仅当 app.sms-echo-code=true（本地开发）时返回 code 字段，生产必须保持 false。</p>
      */
     @Operation(summary = "发送验证码", description = "account 自动识别手机号或邮箱。验证码仅通过短信/邮件下发，生产环境不回显")
+    @RateLimit(limit = 5, windowSec = 60, message = "验证码发送过于频繁，请 1 分钟后再试")
     @PostMapping(ApiPath.USER_SMS_SEND)
     public R<Map<String, String>> sendSms(@Parameter(description = "手机号或邮箱") @RequestParam("account") String account) {
         String code = userService.sendVerificationCodeAndReturn(account);
@@ -69,6 +71,7 @@ public class UserController {
      * account 自动识别手机号或邮箱
      */
     @Operation(summary = "登录", description = "loginType=1 密码登录 / loginType=2 验证码登录；account 自动识别手机号或邮箱")
+    @RateLimit(limit = 10, windowSec = 60, message = "登录尝试过于频繁，请稍后再试")
     @PostMapping(ApiPath.USER_LOGIN)
     public R<LoginVO> login(@Valid @RequestBody LoginDTO dto) {
         LoginVO vo;
@@ -84,6 +87,7 @@ public class UserController {
 
     @Operation(summary = "注册")
     @PostMapping(ApiPath.USER_REGISTER)
+    @RateLimit(limit = 5, windowSec = 60, message = "注册请求过于频繁，请稍后再试")
     public R<Void> register(@Valid @RequestBody RegisterDTO dto) {
         userService.register(dto);
         return R.ok();
