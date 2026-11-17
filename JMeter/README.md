@@ -202,9 +202,18 @@ jmeter -n -t c2c-baseline.jmx -l result/c2c-baseline.jtl -e -o result/report
 - JMeter 与后端都用 JDK 17 启动；若 JMeter 报版本错误，先检查 `JAVA_HOME`。
 - 断言类型（ResponseAssertion `test_type` 位掩码，5.6.3）：`1`=正则匹配、`2`=包含、`4`=取反、`8`=相等、`16`=子串。本计划断言响应码等于 `200`，用 `8`；在 GUI 里改断言时注意别勾上「Not」（取反位 `4`），否则 200 会被误判为失败。
 
-## 12. 历史联调记录（上一轮可连环境）
+## 12. 联调与实测记录
 
-> 以下为上一轮 MySQL / Redis 可达时的实跑记录，供口径参照；当前环境不可达时，以脚本与配置对齐为准，指标需在环境恢复后按 §8 跑满基线回填。
+### 12.1 本轮复测（2026-11-17，pro 测试库）
+
+- MySQL 3306 / Redis 6379 连通；生成器连库读普通买家（`role=0 AND status=1`）签出 7 个 access token，写入 `result/perf-tokens.csv`，自检（subject、`tv` 一致）通过。
+- 临时后端实例（端口 8081，profile `pro`）逐条复核：
+  - `GET /product/list?page=1&size=20`（无 token）→ HTTP 200，业务 `code=200`，返回商品记录；
+  - `GET /order/list?page=1&size=20`（带 CSV `Bearer ${token}`）7 条 token 全部 HTTP 200、`code=200`（账号无订单时 `records=[]` 属正常）；
+  - 对照：订单接口不带 token → HTTP 401 `请先登录`，确认鉴权拦截生效，token 并非被放行。
+- 结论：离线复签口径与过滤器校验一致，CSV token 可直接喂鉴权头。基线长压指标（P90 / P95 / 吞吐）仍需按 §8 跑满 300s 后回填。
+
+### 12.2 上一轮建树与 URL 核对记录（供参照）
 
 - 两个 `.jmx` 均在 JMeter 5.6.3 非 GUI 下成功建树解析，无 XML / 元件转换异常。
 - 实际发出的 URL 已确认带 `/api/v1` 前缀：
@@ -212,4 +221,4 @@ jmeter -n -t c2c-baseline.jmx -l result/c2c-baseline.jtl -e -o result/report
   - `http://localhost:8080/api/v1/product/list?page=1&size=20`
   - `http://localhost:8080/api/v1/product/1`
   - `http://localhost:8080/api/v1/order/list?page=1&size=20`
-- 实跑联调计划：登录禁用，列表 / 详情 / 订单 3 条样本均 `success=true`、HTTP 200；脚本签发的 CSV token 直连订单接口返回 200（非 401），鉴权头生效。业务指标（P90 / P95 / 吞吐）需跑满 300s 基线后回填。
+- 联调计划：登录禁用，列表 / 详情 / 订单 3 条样本均 `success=true`、HTTP 200；CSV token 直连订单接口返回 200（非 401），鉴权头生效。
