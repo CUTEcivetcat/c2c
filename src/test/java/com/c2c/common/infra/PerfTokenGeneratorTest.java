@@ -38,14 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <pre>
  *   mvn test -Dtest=PerfTokenGeneratorTest
  * </pre>
- * 或直接运行本类 {@code main} 方法。产物：{@code jmeter/result/perf-tokens.csv}。
+ * 或直接运行本类 {@code main} 方法。产物：{@code JMeter/result/perf-tokens.csv}。
  *
  * @author wzh
  */
 class PerfTokenGeneratorTest {
 
     /** 导出给 JMeter 的 CSV（相对项目根） */
-    private static final Path CSV_PATH = Paths.get("jmeter", "result", "perf-tokens.csv");
+    private static final Path CSV_PATH = Paths.get("JMeter", "result", "perf-tokens.csv");
 
     /** access token 有效期：7 天，压测 5 分钟内不会过期 */
     private static final long TTL_SECONDS = 604800L;
