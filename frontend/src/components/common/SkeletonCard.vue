@@ -21,7 +21,7 @@ defineProps({
 <style scoped>
 .skeleton-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .skeleton-list { grid-template-columns: 1fr; }
-.sk-card { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid var(--c2c-line-soft); }
+.sk-card { background: var(--glass-bg-strong); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
 .sk-img { height: 200px; background: var(--c2c-bg-soft); }
 .sk-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
 .sk-line { height: 14px; border-radius: 8px; background: var(--c2c-bg-soft); }
@@ -34,6 +34,9 @@ defineProps({
 @keyframes shimmer {
   0% { background-position: 100% 50%; }
   100% { background-position: 0 50%; }
+}
+html.dark .sk-animate {
+  background: linear-gradient(90deg, #2a2e36 25%, #22252c 37%, #2a2e36 63%);
 }
 @media (max-width: 768px) { .skeleton-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .skeleton-grid { grid-template-columns: 1fr; } }

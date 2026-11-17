@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>青禾集市</title>
+  <script>
+    // 首帧前按本地偏好置暗色 class，避免亮暗闪烁
+    try { if (localStorage.getItem('c2c_theme') === 'dark') document.documentElement.classList.add('dark') } catch (e) {}
+  </script>
 </head>
 <body>
   <div id="app"></div>

@@ -24,6 +24,9 @@
 
       <!-- 桌面端操作 -->
       <div class="nav-actions hidden-mobile">
+        <button class="nav-icon-btn theme-toggle" @click="toggleTheme" :title="isDark ? '切换亮色' : '切换暗色'">
+          <el-icon :size="22"><component :is="isDark ? 'Sunny' : 'Moon'" /></el-icon>
+        </button>
         <template v-if="store.isLoggedIn()">
           <router-link to="/publish" class="btn-publish"><el-icon><Plus /></el-icon><span>发布</span></router-link>
           <router-link v-if="store.userInfo?.role === 2" to="/review" class="review-entry" @click="mobileMenuOpen=false">🛡️ 审核</router-link>
@@ -76,6 +79,7 @@
         </div>
         <router-link to="/" class="mobile-nav-item" @click="mobileMenuOpen=false">🏠 首页</router-link>
         <router-link to="/search" class="mobile-nav-item" @click="mobileMenuOpen=false">🔍 搜索</router-link>
+        <div class="mobile-nav-item" @click="toggleTheme">{{ isDark ? '☀️ 切换亮色' : '🌙 切换暗色' }}</div>
         <template v-if="store.isLoggedIn()">
           <router-link to="/publish" class="mobile-nav-item" @click="mobileMenuOpen=false">➕ 发布商品</router-link>
           <router-link to="/chat" class="mobile-nav-item" @click="mobileMenuOpen=false">💬 消息<el-badge v-if="unread" :value="unread" style="margin-left:6px" /></router-link>
@@ -100,11 +104,13 @@ import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { useCouponStore } from '@/stores/couponStore'
 import { getUnreadCount } from '@/api/im'
+import { useTheme } from '@/composables/useTheme'
 
 const router = useRouter()
 const route = useRoute()
 const store = useUserStore()
 const couponStore = useCouponStore()
+const { isDark, toggleTheme } = useTheme()
 const keyword = ref('')
 const unread = ref(0)
 const mobileMenuOpen = ref(false)
@@ -127,7 +133,7 @@ watch(() => route.fullPath, () => { fetchUnread() })
 </script>
 
 <style scoped>
-.app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; background: rgba(255,255,255,0.94); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.06); box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+.app-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: 0 1px 12px rgba(31, 38, 51, 0.05); }
 .header-inner { max-width: 1600px; margin: 0 auto; height: 100%; padding: 0 24px; display: flex; align-items: center; gap: 12px; }
 
 /* Logo */
@@ -140,12 +146,12 @@ watch(() => route.fullPath, () => { fetchUnread() })
 .search-bar { flex: 1; max-width: 560px; }
 .search-input-wrap {
   display: flex; align-items: center; gap: 8px;
-  background: var(--c2c-bg-soft); border-radius: 24px; padding: 0 16px; height: 38px;
+  background: var(--glass-bg); border-radius: 24px; padding: 0 16px; height: 38px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid transparent; box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  border: 1px solid var(--c2c-line-soft); box-shadow: 0 1px 4px rgba(31, 38, 51, 0.04);
 }
 .search-input-wrap:focus-within {
-  background: #fff; border-color: var(--c2c-primary);
+  background: var(--glass-bg-strong); border-color: var(--c2c-primary);
   box-shadow: 0 0 0 4px rgba(255,107,53,0.12), 0 4px 16px rgba(255,107,53,0.08);
   transform: scale(1.02);
 }
@@ -167,7 +173,7 @@ watch(() => route.fullPath, () => { fetchUnread() })
 }
 .review-entry:hover { background: #8e44ad; color: #fff; }
 .nav-icon-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--c2c-text-secondary); transition: all 0.25s; text-decoration: none; }
-.nav-icon-btn:hover { background: var(--c2c-bg-soft); color: var(--c2c-primary); }
+.nav-icon-btn:hover { background: var(--glass-bg-strong); color: var(--c2c-primary); }
 .user-avatar-btn { cursor: pointer; padding: 1px; border-radius: 50%; transition: all 0.25s; }
 .user-avatar-btn:hover { box-shadow: 0 0 0 3px rgba(255,107,53,0.2); }
 
@@ -177,11 +183,11 @@ watch(() => route.fullPath, () => { fetchUnread() })
 .mobile-publish-btn { color: var(--c2c-primary); font-size: 20px; }
 
 /* 手机菜单 */
-.mobile-menu { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(10px); z-index: 999; padding: 12px 16px; overflow-y: auto; }
+.mobile-menu { display: none; position: fixed; top: 56px; left: 0; right: 0; bottom: 0; background: var(--glass-bg-strong); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); z-index: 999; padding: 12px 16px; overflow-y: auto; }
 .mobile-search { margin-bottom: 12px; }
-.mobile-search input { width: 100%; padding: 10px 16px; border: 2px solid #e4e7ed; border-radius: 12px; font-size: 15px; outline: none; }
+.mobile-search input { width: 100%; padding: 10px 16px; border: 2px solid var(--c2c-line-soft); border-radius: 12px; font-size: 15px; outline: none; background: var(--c2c-surface-soft); color: var(--c2c-text); }
 .mobile-search input:focus { border-color: var(--c2c-primary); }
-.mobile-nav-item { display: block; padding: 14px 8px; font-size: 16px; color: var(--c2c-text); text-decoration: none; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: all 0.2s; }
+.mobile-nav-item { display: block; padding: 14px 8px; font-size: 16px; color: var(--c2c-text); text-decoration: none; border-bottom: 1px solid var(--c2c-line-soft); cursor: pointer; transition: all 0.2s; }
 .mobile-nav-item:hover { color: var(--c2c-primary); background: #fff5f0; padding-left: 14px; }
 .slide-enter-active, .slide-leave-active { transition: all 0.25s ease; }
 .slide-enter-from, .slide-leave-to { opacity: 0; transform: translateY(-10px); }
@@ -204,14 +210,14 @@ watch(() => route.fullPath, () => { fetchUnread() })
 
 <!-- 用户下拉浮层挂在 body 上，需要全局样式（不受 scoped 限制） -->
 <style>
-.user-dropdown { border-radius: 14px !important; padding: 6px; box-shadow: 0 12px 32px rgba(36, 59, 83, 0.12) !important; }
+.user-dropdown { border-radius: 16px !important; padding: 6px; background: var(--glass-bg-strong) !important; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--c2c-line-soft); box-shadow: var(--glass-shadow) !important; }
 .user-dropdown .dropdown-user-card {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px 10px; margin-bottom: 4px;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--c2c-line-soft);
 }
 .user-dropdown .dropdown-user-info { display: flex; flex-direction: column; line-height: 1.4; }
-.user-dropdown .dropdown-user-info span { font-size: 12px; color: #9aa5b1; }
+.user-dropdown .dropdown-user-info span { font-size: 12px; color: var(--c2c-text-muted); }
 .user-dropdown .el-dropdown-menu__item {
   display: flex; align-items: center; gap: 8px;
   border-radius: 10px; margin: 2px 0; padding: 8px 14px;

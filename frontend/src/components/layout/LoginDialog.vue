@@ -171,8 +171,8 @@ watch(() => store.isLoggedIn(), (loggedIn) => { if (loggedIn) store.closeLoginDi
 
 <style scoped>
 .login-container {
-  display: flex; max-width: 720px; width: 100%;
-  background: rgba(255,255,255,0.98); border-radius: 20px; overflow: hidden;
+  display: flex; width: 100%; height: 100%;
+  overflow: hidden;
 }
 .login-art {
   flex: 0 0 300px;
@@ -192,7 +192,7 @@ watch(() => store.isLoggedIn(), (loggedIn) => { if (loggedIn) store.closeLoginDi
 .art-feat { display: flex; align-items: center; gap: 10px; font-size: 14px; opacity: 0.9; }
 .art-feat span { font-size: 20px; }
 
-.login-form-wrap { flex: 1; padding: 32px 32px 24px; display: flex; flex-direction: column; }
+.login-form-wrap { flex: 1; padding: 32px 32px 24px; display: flex; flex-direction: column; background: var(--c2c-surface); }
 .login-form-wrap h3 { font-size: 20px; font-weight: 700; color: var(--c2c-text); }
 .form-subtitle { font-size: 13px; color: var(--c2c-text-muted); margin: 6px 0 16px; }
 .auto-reg-tip { color: var(--c2c-accent); font-weight: 600; }
@@ -203,14 +203,14 @@ watch(() => store.isLoggedIn(), (loggedIn) => { if (loggedIn) store.closeLoginDi
   font-size: 14px; font-weight: 600; color: var(--c2c-text-secondary); cursor: pointer;
   border-radius: 10px; transition: all 0.2s;
 }
-.mode-switch button.active { background: #fff; color: var(--c2c-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.mode-switch button.active { background: var(--c2c-surface); color: var(--c2c-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
 .input-group {
-  display: flex; align-items: center; background: var(--c2c-bg); border-radius: 14px;
+  display: flex; align-items: center; background: var(--c2c-surface); border-radius: 14px;
   padding: 0 16px; height: 46px; margin-bottom: 14px;
-  border: 2px solid transparent; transition: all 0.25s;
+  border: 1px solid var(--c2c-line-soft); transition: all 0.25s;
 }
-.input-group:focus-within { background: #fff; border-color: var(--c2c-primary); box-shadow: 0 0 0 4px rgba(255,107,53,0.08); }
+.input-group:focus-within { background: var(--c2c-surface); border-color: var(--c2c-primary); box-shadow: 0 0 0 4px rgba(255,107,53,0.08); }
 .input-prefix { font-size: 18px; color: var(--c2c-text-muted); margin-right: 10px; flex-shrink: 0; }
 .modern-input { flex: 1; border: none; outline: none; background: transparent; font-size: 15px; color: var(--c2c-text); }
 .modern-input::placeholder { color: var(--c2c-text-muted); }
@@ -244,7 +244,7 @@ watch(() => store.isLoggedIn(), (loggedIn) => { if (loggedIn) store.closeLoginDi
 .form-footer a { color: var(--c2c-primary); font-weight: 500; }
 
 .admin-entry {
-  margin-top: 16px; padding-top: 12px; border-top: 1px dashed #eee;
+  margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--c2c-line-soft);
   display: flex; align-items: center; justify-content: center; gap: 4px;
   font-size: 13px; color: var(--c2c-text-muted); cursor: pointer; transition: all 0.2s;
 }
@@ -254,5 +254,51 @@ watch(() => store.isLoggedIn(), (loggedIn) => { if (loggedIn) store.closeLoginDi
   .login-container { flex-direction: column; max-width: 420px; }
   .login-art { display: none; }
   .login-form-wrap { padding: 24px 20px; }
+}
+</style>
+
+<!-- 弹窗 teleport 到 body，根元素需全局样式 -->
+<style>
+.login-dialog {
+  background: var(--c2c-surface) !important;
+  border: 1px solid var(--c2c-line-soft) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+  box-shadow: var(--glass-shadow) !important;
+  padding: 0 !important;
+}
+.login-dialog .el-dialog__body { padding: 0 !important; }
+/* 空标题栏不占高度，关闭按钮绝对定位悬浮右上 */
+.login-dialog .el-dialog__header {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* 关闭按钮：加深图标 + 圆形浅底，提升可见度 */
+.login-dialog .el-dialog__headerbtn {
+  top: 14px !important;
+  right: 14px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(29, 33, 41, 0.06) !important;
+  transition: all 0.2s ease !important;
+}
+.login-dialog .el-dialog__headerbtn:hover {
+  background: rgba(255, 107, 53, 0.14) !important;
+}
+.login-dialog .el-dialog__close,
+.login-dialog .el-dialog__headerbtn .el-icon {
+  color: var(--c2c-text) !important;
+  font-size: 16px !important;
+}
+.login-dialog .el-dialog__headerbtn:hover .el-dialog__close,
+.login-dialog .el-dialog__headerbtn:hover .el-icon {
+  color: var(--c2c-primary) !important;
 }
 </style>

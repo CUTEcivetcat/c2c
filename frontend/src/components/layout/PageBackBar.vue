@@ -33,7 +33,7 @@ const goBack = () => {
   width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   border: none; border-radius: 50%;
-  background: #fff; color: var(--c2c-text);
+  background: var(--glass-bg-strong); color: var(--c2c-text);
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   cursor: pointer; transition: all 0.25s; flex-shrink: 0;
 }

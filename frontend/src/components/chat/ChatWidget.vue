@@ -222,7 +222,7 @@ onUnmounted(clearTimer)
 .chat-widget-panel {
   position: fixed; right: 24px; bottom: 92px; z-index: 1000;
   width: 360px; height: 500px; max-height: calc(100vh - 140px);
-  background: #fff; border-radius: 18px; overflow: hidden;
+  background: var(--c2c-surface); border-radius: 18px; overflow: hidden;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
   display: flex; flex-direction: column;
 }
@@ -261,7 +261,7 @@ onUnmounted(clearTimer)
 .cw-other { align-self: flex-start; }
 .cw-bubble {
   padding: 8px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5;
-  background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); word-break: break-word; white-space: pre-wrap;
+  background: var(--c2c-surface); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); word-break: break-word; white-space: pre-wrap;
 }
 .cw-other .cw-bubble { border-top-left-radius: 5px; }
 .cw-mine-bubble {
@@ -271,25 +271,25 @@ onUnmounted(clearTimer)
 
 .cw-sys-msg { display: flex; justify-content: center; }
 .cw-sys-bubble {
-  max-width: 90%; background: #eef1f5; color: var(--c2c-text-secondary);
+  max-width: 90%; background: var(--c2c-bg-soft); color: var(--c2c-text-secondary);
   border-radius: 12px; padding: 7px 12px; font-size: 12px; line-height: 1.6; word-break: break-word;
 }
 
 /* chips */
-.cw-chips { display: flex; gap: 8px; overflow-x: auto; padding: 8px 12px 4px; scrollbar-width: none; }
-.cw-chips::-webkit-scrollbar { display: none; }
+.cw-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px 4px; }
 .cw-chip {
-  flex-shrink: 0; padding: 6px 12px; font-size: 12px; background: #fff;
+  flex-shrink: 0; padding: 6px 12px; font-size: 12px; background: var(--c2c-surface);
   border: 1px solid var(--c2c-line-soft); border-radius: 999px; color: var(--c2c-text-secondary);
   cursor: pointer; user-select: none; transition: all 0.2s;
 }
 .cw-chip:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); background: #fff5f0; }
 
 /* 输入栏 */
-.cw-input-bar { display: flex; gap: 8px; padding: 10px 12px; background: #fff; border-top: 1px solid var(--c2c-line-soft); }
+.cw-input-bar { display: flex; gap: 8px; padding: 10px 12px; background: var(--c2c-surface); border-top: 1px solid var(--c2c-line-soft); }
 .cw-input {
   flex: 1; border: 2px solid var(--c2c-line-soft); border-radius: 22px; padding: 9px 16px;
   font-size: 14px; outline: none; transition: border-color 0.2s;
+  background: var(--c2c-bg-soft); color: var(--c2c-text);
 }
 .cw-input:focus { border-color: var(--c2c-primary); }
 .cw-send {
@@ -305,7 +305,7 @@ onUnmounted(clearTimer)
 .cw-human-tip { font-size: 14px; line-height: 1.8; color: var(--c2c-text-secondary); text-align: center; }
 .cw-human-links { display: flex; flex-direction: column; gap: 10px; }
 .cw-human-link {
-  padding: 13px 16px; border: 1px solid var(--c2c-line-soft); background: #fff; border-radius: 14px;
+  padding: 13px 16px; border: 1px solid var(--c2c-line-soft); background: var(--c2c-surface); border-radius: 14px;
   font-size: 14px; text-align: left; cursor: pointer; transition: all 0.2s;
 }
 .cw-human-link:hover { border-color: var(--c2c-primary); color: var(--c2c-primary); }

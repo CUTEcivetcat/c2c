@@ -39,7 +39,7 @@ const placeholderUrl = computed(() => {
 <style scoped>
 .product-cover {
   width: 100%; height: 100%; overflow: hidden;
-  background: #f2f3f5;
+  background: var(--c2c-bg-soft);
 }
 .pc-img { width: 100%; height: 100%; display: block; object-fit: cover; }
 </style>

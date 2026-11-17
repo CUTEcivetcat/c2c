@@ -14,6 +14,8 @@ import ErrorPage from './components/common/ErrorPage.vue'
 import SkeletonCard from './components/common/SkeletonCard.vue'
 import LoadingSpinner from './components/common/LoadingSpinner.vue'
 import './assets/styles/global.scss'
+// Element Plus 暗色主题变量（html.dark 下激活）
+import 'element-plus/theme-chalk/dark/css-vars.css'
 
 const app = createApp(App)
 

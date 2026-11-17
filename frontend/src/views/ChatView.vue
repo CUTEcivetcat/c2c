@@ -296,10 +296,8 @@ const messageItems = computed(() => {
 /* 输入栏 */
 /* 快捷问题 chips（助手会话） */
 .faq-chips {
-  display: flex; gap: 8px; overflow-x: auto; padding: 8px 4px 4px;
-  scrollbar-width: none;
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 4px 4px;
 }
-.faq-chips::-webkit-scrollbar { display: none; }
 .faq-chip {
   flex-shrink: 0; padding: 6px 14px; font-size: 12px;
   background: #fff; border: 1px solid var(--c2c-line-soft, #e6e9ee);

@@ -21,8 +21,8 @@
 
 <style scoped>
 .app-footer {
-  border-top: 1px solid #e8ecf1;
-  background: #fff;
+  border-top: 1px solid var(--c2c-line-soft);
+  background: transparent;
   padding: 28px 20px;
   margin-top: auto;
 }

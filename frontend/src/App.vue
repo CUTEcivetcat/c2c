@@ -168,7 +168,7 @@ onUnmounted(() => {
   min-height: 100dvh; /* 移动端动态viewport高度 */
   display: flex;
   flex-direction: column;
-  background: var(--c2c-bg);
+  background: transparent;
 }
 .main-content {
   flex: 1;
@@ -195,7 +195,11 @@ onUnmounted(() => {
 .back-top {
   position: fixed; bottom: 32px; right: 32px; z-index: 999;
   width: 44px; height: 44px; border-radius: 50%;
-  background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: all 0.3s;
   color: var(--c2c-text-secondary);
@@ -210,8 +214,8 @@ onUnmounted(() => {
 .fd-icon { font-size: 20px; }
 .force-dialog-body {
   white-space: pre-wrap; word-break: break-word;
-  font-size: 14px; line-height: 1.9; color: #4a5568;
-  background: #fafafa; border-radius: 12px; padding: 16px;
+  font-size: 14px; line-height: 1.9; color: var(--c2c-text-secondary);
+  background: var(--c2c-bg-soft); border-radius: 12px; padding: 16px;
   max-height: 320px; overflow-y: auto;
 }
 .force-dialog-foot { display: flex; align-items: center; justify-content: space-between; }
@@ -223,12 +227,15 @@ onUnmounted(() => {
 
 /* 卡片统一样式 */
 #app-container .el-card {
-  border-radius: 16px !important;
+  border-radius: 18px !important;
   border: 1px solid var(--c2c-line-soft) !important;
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   transition: all 0.25s ease !important;
 }
 #app-container .el-card:hover {
-  box-shadow: 0 8px 28px rgba(0,0,0,0.07) !important;
+  box-shadow: var(--glass-shadow) !important;
 }
 
 /* 按钮统一样式 */
@@ -300,7 +307,8 @@ onUnmounted(() => {
 
 /* 弹窗统一样式 */
 #app-container .el-dialog {
-  border-radius: 18px !important;
+  border-radius: 20px !important;
+  overflow: hidden;
 }
 #app-container .el-dialog__header {
   padding: 24px 24px 0 !important;
